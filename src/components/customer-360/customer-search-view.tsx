@@ -37,27 +37,27 @@ export const CustomerSearchView = ({ searchValue, setSearchValue, handleSearch }
         {/* CENTERED HERO SEARCH (When NOT searching) */}
         {!isSearching && (
            <div className="flex-1 flex flex-col items-center justify-center p-6 -mt-20 animate-in fade-in zoom-in-95 duration-500">
-              <div className="w-full max-w-2xl space-y-8">
-                 
+              <div className="w-full max-w-4xl space-y-8">
+
                  {/* Brand / Header */}
                  <div className="text-center space-y-3">
                     <div className="inline-flex items-center justify-center p-4 bg-white rounded-full shadow-sm border border-gray-100 mb-2">
                        <Search className="size-8 text-[#2A53A0]" />
                     </div>
                     <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Customer 360 Lookup</h2>
-                    <p className="text-gray-500 text-lg">
-                       Search by Name, ID, Phone, Account Number, Base Branch, or Risk Score
+                    <p className="text-gray-500 text-lg whitespace-nowrap">
+                       Search by Customer ID, Customer Name, Mobile Number, Risk Category, or Base Branch
                     </p>
                  </div>
 
                  {/* Google-Style Search Bar */}
-                 <div className="relative max-w-xl mx-auto w-full">
+                 <div className="relative max-w-2xl mx-auto w-full">
                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                          <Search className="size-5" />
                      </div>
                      <Input 
                          className="h-14 pl-12 pr-6 rounded-full border border-gray-200 shadow-md text-lg focus-visible:ring-2 focus-visible:ring-[#2A53A0]/20 focus-visible:border-[#2A53A0] transition-all bg-white placeholder:text-gray-400" 
-                         placeholder="Search by Name, ID, Phone, Account Number, Base Branch, Risk Score" 
+                         placeholder="Search by Customer ID, Customer Name, Mobile Number, Risk Category, Base Branch" 
                          value={searchValue}
                          onChange={(e) => setSearchValue(e.target.value)}
                          autoFocus
@@ -65,7 +65,7 @@ export const CustomerSearchView = ({ searchValue, setSearchValue, handleSearch }
                  </div>
 
                  {/* Quick Access / Recent */}
-                 <div className="pt-8 max-w-xl mx-auto w-full">
+                 <div className="pt-8 max-w-2xl mx-auto w-full">
                      <div className="flex items-center justify-between mb-4 px-2">
                          <h3 className="text-xs font-bold text-gray-500 tracking-wider">Recent Searches</h3>
                          <Button variant="link" size="sm" className="h-auto p-0 text-xs text-blue-600">Clear History</Button>
@@ -102,7 +102,7 @@ export const CustomerSearchView = ({ searchValue, setSearchValue, handleSearch }
                               className="h-10 pl-9 pr-9 bg-gray-100/50 border-transparent hover:bg-gray-100 focus:bg-white focus:border-gray-200 focus:shadow-sm transition-all text-sm rounded-full" 
                               value={searchValue}
                               onChange={(e) => setSearchValue(e.target.value)}
-                              placeholder="Search by Name, ID, Phone, Account Number, Base Branch, Risk Score" 
+                              placeholder="Search by Customer ID, Customer Name, Mobile Number, Risk Category, Base Branch" 
                               autoFocus
                           />
                           <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-900 rounded-full" onClick={() => setSearchValue("")}>
@@ -145,14 +145,10 @@ export const CustomerSearchView = ({ searchValue, setSearchValue, handleSearch }
                                            </div>
 
                                            {/* Key Details */}
-                                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1">
+                                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1">
                                               <div>
-                                                 <p className="text-[10px] text-gray-400 tracking-wider font-semibold mb-0.5">Mobile</p>
+                                                 <p className="text-[10px] text-gray-400 tracking-wider font-semibold mb-0.5">Mobile Number</p>
                                                  <p className="text-xs font-medium text-gray-700 truncate">{item.mobile}</p>
-                                              </div>
-                                              <div>
-                                                 <p className="text-[10px] text-[#2A53A0] tracking-wider font-semibold mb-0.5">Cust ID Count</p>
-                                                 <p className="text-xs font-bold text-[#2A53A0]">{item.customerIds?.length || 1}</p>
                                               </div>
                                               <div>
                                                  <p className="text-[10px] text-gray-400 tracking-wider font-semibold mb-0.5">Accounts</p>
@@ -180,7 +176,7 @@ export const CustomerSearchView = ({ searchValue, setSearchValue, handleSearch }
                            <div className="p-12 text-center flex flex-col items-center justify-center text-gray-400 bg-white rounded-lg border border-dashed border-gray-200">
                               <Search className="size-8 mb-3 opacity-20" />
                               <h3 className="text-sm font-semibold text-gray-900">No customers found</h3>
-                              <p className="text-xs text-gray-500 mt-1 max-w-[200px]">We couldn't find any results for "{searchValue}". Try searching by Name, ID, Phone, Account, Branch, or Risk Score.</p>
+                              <p className="text-xs text-gray-500 mt-1 max-w-[200px]">We couldn't find any results for "{searchValue}". Try searching by Customer ID, Customer Name, Mobile Number, Risk Category, or Base Branch.</p>
                            </div>
                        )}
                    </div>

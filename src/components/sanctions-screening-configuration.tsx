@@ -1,10 +1,10 @@
 import { useState } from "react";
 import {
   Checkbox,
-  Select,
-  SelectItem,
+  Dropdown,
   Tag,
   NumberInput,
+  InlineNotification,
 } from "carbon-components-react";
 import {
   Reset,
@@ -20,7 +20,7 @@ interface SanctionsScreeningConfigurationProps {
 }
 
 type RiskLevel = "Extreme" | "High" | "Medium-High" | "Medium" | "Low";
-type OverrideOption = "No" | "Yes – Prohibit" | "Override to High" | "Override to Medium-High" | "Override to Medium";
+type OverrideOption = "No" | "Yes" | "Override to High" | "Override to prohibit";
 
 interface Parameter {
   id: string;
@@ -94,10 +94,10 @@ const initialSubSections: SubSection[] = [
     number: "4.1.1",
     title: "SANCTIONS LIST SCREENING",
     parameters: [
-      { id: "p1", label: "UN Security Council / Taliban Sanctions (1267/1989)", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p2", label: "OFAC SDN / EU & UK HMT Sanctions", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p3", label: "UAE Local Sanctions List", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p4", label: "Internal Bank Blacklist", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
+      { id: "p1", label: "UN Security Council / Taliban Sanctions (1267/1989)", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p2", label: "OFAC SDN / EU & UK HMT Sanctions", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p3", label: "UAE Local Sanctions List", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p4", label: "Internal Bank Blacklist", enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
       { id: "p5", label: "Export Control Lists (Dual-Use Goods)", enabled: true, riskLevel: "High", score: 75, override: "No" },
       { id: "p6", label: "INTERPOL Red Notices / FBI Most Wanted", enabled: true, riskLevel: "High", score: 75, override: "Override to High" },
     ],
@@ -108,10 +108,10 @@ const initialSubSections: SubSection[] = [
     title: "PROLIFERATION FINANCING (CPF) – NEW",
     isNew: true,
     parameters: [
-      { id: "p7", label: "Proliferation Financing Indicator — Dual-Use Technology Broker", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p8", label: "Customer in Strategic Goods Supply Chain Without Export Licence", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p9", label: "Front Company Suspected of Sanctions/Export Control Evasion", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
-      { id: "p10", label: "Transactions Linked to WMD-Related Jurisdictions/Entities", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes – Prohibit" },
+      { id: "p7", label: "Proliferation Financing Indicator — Dual-Use Technology Broker", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p8", label: "Customer in Strategic Goods Supply Chain Without Export Licence", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p9", label: "Front Company Suspected of Sanctions/Export Control Evasion", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
+      { id: "p10", label: "Transactions Linked to WMD-Related Jurisdictions/Entities", isNew: true, enabled: true, riskLevel: "Extreme", score: 100, override: "Yes" },
       { id: "p11", label: "Ship-to-Ship Transfer / Flag-of-Convenience Vessel", isNew: true, enabled: true, riskLevel: "High", score: 75, override: "Override to High" },
       { id: "p12", label: "Secondary Sanctions Exposure (US OFAC)", isNew: true, enabled: true, riskLevel: "High", score: 75, override: "No" },
     ],
@@ -189,26 +189,17 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
     <div className="flex flex-col h-full bg-white overflow-hidden">
       {/* Page Header */}
       <div className="flex-shrink-0 bg-white">
-        {/* Total Weight Bar */}
-        <div className="flex items-center justify-between bg-[#f9f9f9] border border-[#e0e0e0] rounded px-4 py-2.5">
-          <span className="text-sm text-[#525252]">
-            Total Category Weight <span className="text-[#161616] font-medium">(must equal 100%)</span>
-          </span>
-          <div className="flex items-center gap-2">
-            <span
-              className="text-base font-semibold"
-              style={{ color: totalWeight === 100 ? "#24a148" : "#ff832b" }}
-            >
-              {totalWeight}%
-            </span>
-            {totalWeight !== 100 && (
-              <span className="flex items-center gap-1 text-sm" style={{ color: "#ff832b" }}>
-                <Warning size={14} />
-                {weightDiff > 0 ? `Under by ${weightDiff}%` : `Over by ${Math.abs(weightDiff)}%`}
-              </span>
-            )}
-          </div>
-        </div>
+        <InlineNotification
+          kind="info"
+          title="Total Category Weight (must equal 100%):"
+          subtitle={
+            totalWeight === 100
+              ? "All category weights are correctly balanced."
+              : `Current: ${totalWeight}% — ${weightDiff > 0 ? `Under by ${weightDiff}%` : `Over by ${Math.abs(weightDiff)}%`}`
+          }
+          hideCloseButton
+          lowContrast
+        />
       </div>
 
       {/* Bordered Section: Main Body + Footer */}
@@ -225,21 +216,21 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
                 onClick={() => setSelectedCategoryId(cat.id)}
                 className="w-full text-left px-4 py-3 border-b border-[#e0e0e0] flex items-center justify-between transition-colors hover:bg-[#f4f4f4]"
                 style={{
-                  background: isSelected ? "#fff1f1" : undefined,
-                  borderLeft: isSelected ? "3px solid #da1e28" : "3px solid transparent",
+                  background: isSelected ? "#eef2fa" : undefined,
+                  borderLeft: isSelected ? "3px solid #2a53a0" : "3px solid transparent",
                 }}
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <span
                     className="text-xs font-semibold flex-shrink-0"
-                    style={{ color: isSelected ? "#da1e28" : "#8d8d8d" }}
+                    style={{ color: isSelected ? "#2a53a0" : "#8d8d8d" }}
                   >
                     {cat.number}
                   </span>
                   <span
                     className="text-sm truncate"
                     style={{
-                      color: isSelected ? "#da1e28" : "#161616",
+                      color: isSelected ? "#2a53a0" : "#161616",
                       fontWeight: isSelected ? 600 : 400,
                       fontFamily: "var(--font-primary)",
                     }}
@@ -249,7 +240,7 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
                 </div>
                 <span
                   className="text-xs font-semibold ml-2 flex-shrink-0"
-                  style={{ color: isSelected ? "#da1e28" : "#525252" }}
+                  style={{ color: isSelected ? "#2a53a0" : "#525252" }}
                 >
                   {cat.weight}%
                 </span>
@@ -260,7 +251,7 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
 
         {/* Right Content Panel — only this scrolls */}
         <div className="flex-1 overflow-y-auto bg-white">
-          <div className="p-5">
+          <div className="p-4">
             {/* Category Header */}
             <div className="bg-white border border-[#e0e0e0] rounded mb-4 px-5 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -343,24 +334,19 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
                         )}
                       </div>
 
-                      {/* Risk Level Select */}
-                      <div style={{ width: 148, border: "1px solid #e0e0e0", borderRadius: 2 }} className="flex-shrink-0">
-                        <Select
+                      {/* Risk Level Dropdown */}
+                      <div style={{ width: 148 }} className="flex-shrink-0 ssc-dropdown-wrap">
+                        <Dropdown
                           id={`risk-${param.id}`}
-                          labelText=""
-                          hideLabel
-                          size="sm"
-                          value={param.riskLevel}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                            updateParameter(param.id, "riskLevel", e.target.value as RiskLevel)
+                          titleText=""
+                          label=""
+                          items={["Extreme", "High", "Medium-High", "Medium", "Low"]}
+                          selectedItem={param.riskLevel}
+                          onChange={({ selectedItem }: any) =>
+                            updateParameter(param.id, "riskLevel", selectedItem as RiskLevel)
                           }
-                        >
-                          <SelectItem value="Extreme" text="Extreme" />
-                          <SelectItem value="High" text="High" />
-                          <SelectItem value="Medium-High" text="Medium-High" />
-                          <SelectItem value="Medium" text="Medium" />
-                          <SelectItem value="Low" text="Low" />
-                        </Select>
+                          size="sm"
+                        />
                       </div>
 
                       {/* Score Badge */}
@@ -374,24 +360,19 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
                         {param.score}
                       </div>
 
-                      {/* Override Select */}
-                      <div style={{ width: 168, border: "1px solid #e0e0e0", borderRadius: 2 }} className="flex-shrink-0">
-                        <Select
+                      {/* Override Dropdown */}
+                      <div style={{ width: 168 }} className="flex-shrink-0 ssc-dropdown-wrap">
+                        <Dropdown
                           id={`override-${param.id}`}
-                          labelText=""
-                          hideLabel
-                          size="sm"
-                          value={param.override}
-                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                            updateParameter(param.id, "override", e.target.value as OverrideOption)
+                          titleText=""
+                          label=""
+                          items={["No", "Yes", "Override to High", "Override to prohibit"]}
+                          selectedItem={param.override}
+                          onChange={({ selectedItem }: any) =>
+                            updateParameter(param.id, "override", selectedItem as OverrideOption)
                           }
-                        >
-                          <SelectItem value="No" text="No" />
-                          <SelectItem value="Yes – Prohibit" text="Yes – Prohibit" />
-                          <SelectItem value="Override to High" text="Override to High" />
-                          <SelectItem value="Override to Medium-High" text="Override to Medium-High" />
-                          <SelectItem value="Override to Medium" text="Override to Medium" />
-                        </Select>
+                          size="sm"
+                        />
                       </div>
                     </div>
                   ))}
@@ -419,8 +400,9 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
             style={{
               height: 46,
               padding: "0 16px",
-              border: "1px solid #030213",
-              color: "#030213",
+              border: "1px solid #2a53a0",
+              borderRadius: 8,
+              color: "#2a53a0",
               background: "transparent",
               cursor: "pointer",
               fontSize: 14,
@@ -439,9 +421,10 @@ export function SanctionsScreeningConfiguration(_props: SanctionsScreeningConfig
             style={{
               height: 46,
               padding: "0 16px",
-              border: "1px solid #030213",
+              border: "1px solid #2a53a0",
+              borderRadius: 8,
               color: "#ffffff",
-              background: "#030213",
+              background: "#2a53a0",
               cursor: "pointer",
               fontSize: 14,
               fontFamily: "inherit",

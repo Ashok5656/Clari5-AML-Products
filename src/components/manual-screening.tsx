@@ -370,10 +370,18 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     nationality: "",
     countryBirth: "",
     residence: "",
+    address: "",
+    jointAccountHolder: "",
     purpose: "",
-    // Org specific
+    // Non-Individuals specific
     industry: "",
     registrationType: "",
+    taxId: "",
+    registeredAddress: "",
+    operatingCountries: "",
+    corporateShareholders: "",
+    directors: "",
+    trustees: "",
     // Vessel specific
     vesselType: "",
     callSign: "",
@@ -1304,7 +1312,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="organization" id="type-organization" className="text-[#2A53A0] border-gray-300" />
-                      <Label htmlFor="type-organization" className="font-medium cursor-pointer">Organization</Label>
+                      <Label htmlFor="type-organization" className="font-medium cursor-pointer">Non-Individuals</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="vessel" id="type-vessel" className="text-[#2A53A0] border-gray-300" />
@@ -1321,111 +1329,72 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                   {entityType === "individual" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="primary-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Name (English) <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="primary-name" 
-                        value={formData.primaryName}
-                        onChange={(e) => setFormData({...formData, primaryName: e.target.value})}
-                        placeholder="e.g., John Michael Smith" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
-                    
-                    <div className="space-y-1.5">
-                      <Label htmlFor="non-english-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Primary Name (Non-English)</Label>
-                      <Input 
-                        id="non-english-name" 
-                        value={formData.originalName}
-                        onChange={(e) => setFormData({...formData, originalName: e.target.value})}
-                        placeholder="e.g., 约翰·史密斯" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="alias" className="text-sm font-medium text-gray-700 dark:text-gray-300">Alias / AKA</Label>
-                      <Input 
-                        id="alias" 
-                        value={formData.alias}
-                        onChange={(e) => setFormData({...formData, alias: e.target.value})}
-                        placeholder="e.g., Johnny Smith" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="gender" className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</Label>
-                      <Select value={formData.gender} onValueChange={(v) => setFormData({...formData, gender: v})}>
-                        <SelectTrigger className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]">
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
-                          <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                          <SelectItem value="unknown">Unknown</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="id-type" className="text-sm font-medium text-gray-700 dark:text-gray-300">ID Type</Label>
-                      <Select value={formData.idType} onValueChange={(v) => setFormData({...formData, idType: v})}>
-                        <SelectTrigger className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]">
-                          <SelectValue placeholder="Select ID Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="passport">Passport</SelectItem>
-                          <SelectItem value="national-id">National ID</SelectItem>
-                          <SelectItem value="drivers-license">Driver's License</SelectItem>
-                          <SelectItem value="tax-id">Tax ID</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-1.5">
                       <Label htmlFor="id-number" className="text-sm font-medium text-gray-700 dark:text-gray-300">ID Number</Label>
-                      <Input 
-                        id="id-number" 
+                      <Input
+                        id="id-number"
                         value={formData.idNumber}
                         onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
-                        placeholder="e.g., A12345678" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
+                        placeholder="e.g., A12345678"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="primary-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Name in English <span className="text-red-500">*</span></Label>
+                      <Input
+                        id="primary-name"
+                        value={formData.primaryName}
+                        onChange={(e) => setFormData({...formData, primaryName: e.target.value})}
+                        placeholder="e.g., John Michael Smith"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="non-english-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Name in Non-English</Label>
+                      <Input
+                        id="non-english-name"
+                        value={formData.originalName}
+                        onChange={(e) => setFormData({...formData, originalName: e.target.value})}
+                        placeholder="e.g., محمد علي"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="alias" className="text-sm font-medium text-gray-700 dark:text-gray-300">Alias</Label>
+                      <Input
+                        id="alias"
+                        value={formData.alias}
+                        onChange={(e) => setFormData({...formData, alias: e.target.value})}
+                        placeholder="e.g., Johnny Smith"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5 md:col-span-2">
+                      <Label htmlFor="address" className="text-sm font-medium text-gray-700 dark:text-gray-300">Address</Label>
+                      <Input
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                        placeholder="e.g., 123 Main Street, Dubai, UAE"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
                       />
                     </div>
 
                     <div className="space-y-1.5">
                       <Label htmlFor="dob" className="text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</Label>
                       <div className="relative">
-                        <Input 
-                          id="dob" 
+                        <Input
+                          id="dob"
                           value={formData.dob}
                           onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                          placeholder="dd-mm-yyyy" 
-                          className="!h-[46px] rounded-[8px] pr-10 bg-white border-[#C6C6C6]" 
+                          placeholder="dd-mm-yyyy"
+                          className="!h-[46px] rounded-[8px] pr-10 bg-white border-[#C6C6C6]"
                         />
                         <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
                       </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="nationality" className="text-sm font-medium text-gray-700 dark:text-gray-300">Nationality</Label>
-                      <Select value={formData.nationality} onValueChange={(v) => setFormData({...formData, nationality: v})}>
-                        <SelectTrigger className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]">
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="us">United States</SelectItem>
-                          <SelectItem value="uk">United Kingdom</SelectItem>
-                          <SelectItem value="in">India</SelectItem>
-                          <SelectItem value="ae">United Arab Emirates</SelectItem>
-                          <SelectItem value="pk">Pakistan</SelectItem>
-                          <SelectItem value="qa">Qatar</SelectItem>
-                          <SelectItem value="cn">China</SelectItem>
-                          <SelectItem value="ru">Russia</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1465,61 +1434,9 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-                  )}
-
-                  {/* ORGANIZATION FORM FIELDS */}
-                  {entityType === "organization" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="org-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Organization Name (English) <span className="text-red-500">*</span></Label>
-                      <Input 
-                        id="org-name" 
-                        value={formData.primaryName}
-                        onChange={(e) => setFormData({...formData, primaryName: e.target.value})}
-                        placeholder="e.g., Acme Global Trading LLC" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
-                    
-                    <div className="space-y-1.5">
-                      <Label htmlFor="org-original-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Organization Name (Non-English)</Label>
-                      <Input 
-                        id="org-original-name" 
-                        value={formData.originalName}
-                        onChange={(e) => setFormData({...formData, originalName: e.target.value})}
-                        placeholder="e.g., شركة أكمي للتجارة العالمية" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="org-reg-number" className="text-sm font-medium text-gray-700 dark:text-gray-300">Registration Number</Label>
-                      <Input 
-                        id="org-reg-number" 
-                        value={formData.idNumber}
-                        onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
-                        placeholder="e.g., REG-2024-99812" 
-                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]" 
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="org-inc-date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Date of Incorporation</Label>
-                      <div className="relative">
-                        <Input 
-                          id="org-inc-date" 
-                          value={formData.dob}
-                          onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                          placeholder="dd-mm-yyyy" 
-                          className="!h-[46px] rounded-[8px] pr-10 bg-white border-[#C6C6C6]" 
-                        />
-                        <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="org-country" className="text-sm font-medium text-gray-700 dark:text-gray-300">Country of Registration</Label>
+                      <Label htmlFor="nationality" className="text-sm font-medium text-gray-700 dark:text-gray-300">Nationality</Label>
                       <Select value={formData.nationality} onValueChange={(v) => setFormData({...formData, nationality: v})}>
                         <SelectTrigger className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]">
                           <SelectValue placeholder="Select country" />
@@ -1527,27 +1444,173 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         <SelectContent>
                           <SelectItem value="us">United States</SelectItem>
                           <SelectItem value="uk">United Kingdom</SelectItem>
+                          <SelectItem value="in">India</SelectItem>
                           <SelectItem value="ae">United Arab Emirates</SelectItem>
+                          <SelectItem value="pk">Pakistan</SelectItem>
                           <SelectItem value="qa">Qatar</SelectItem>
                           <SelectItem value="cn">China</SelectItem>
+                          <SelectItem value="ru">Russia</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                     <div className="space-y-1.5">
-                      <Label htmlFor="industry" className="text-sm font-medium text-gray-700 dark:text-gray-300">Industry / Sector</Label>
-                      <Select value={formData.industry} onValueChange={(v) => setFormData({...formData, industry: v})}>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="joint-account-holder" className="text-sm font-medium text-gray-700 dark:text-gray-300">Joint Account Holder Name</Label>
+                      <Input
+                        id="joint-account-holder"
+                        value={formData.jointAccountHolder}
+                        onChange={(e) => setFormData({...formData, jointAccountHolder: e.target.value})}
+                        placeholder="e.g., Jane Smith"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+                  </div>
+                  )}
+
+                  {/* NON-INDIVIDUALS FORM FIELDS */}
+                  {entityType === "organization" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-reg-number" className="text-sm font-medium text-gray-700 dark:text-gray-300">Registration Number <span className="text-red-500">*</span></Label>
+                      <Input
+                        id="org-reg-number"
+                        value={formData.idNumber}
+                        onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
+                        placeholder="e.g., REG-2024-99812"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Registered Name (English)</Label>
+                      <Input
+                        id="org-name"
+                        value={formData.primaryName}
+                        onChange={(e) => setFormData({...formData, primaryName: e.target.value})}
+                        placeholder="e.g., Acme Global Trading LLC"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-original-name" className="text-sm font-medium text-gray-700 dark:text-gray-300">Entity Name (Non-English)</Label>
+                      <Input
+                        id="org-original-name"
+                        value={formData.originalName}
+                        onChange={(e) => setFormData({...formData, originalName: e.target.value})}
+                        placeholder="e.g., شركة أكمي للتجارة العالمية"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-tax-id" className="text-sm font-medium text-gray-700 dark:text-gray-300">Tax ID</Label>
+                      <Input
+                        id="org-tax-id"
+                        value={formData.taxId}
+                        onChange={(e) => setFormData({...formData, taxId: e.target.value})}
+                        placeholder="e.g., TRN-100234567890003"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-country" className="text-sm font-medium text-gray-700 dark:text-gray-300">Country of Incorporation</Label>
+                      <Select value={formData.nationality} onValueChange={(v) => setFormData({...formData, nationality: v})}>
                         <SelectTrigger className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]">
-                          <SelectValue placeholder="Select industry" />
+                          <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="finance">Banking & Finance</SelectItem>
-                          <SelectItem value="trade">Import / Export</SelectItem>
-                          <SelectItem value="tech">Technology</SelectItem>
-                          <SelectItem value="energy">Oil & Gas</SelectItem>
-                          <SelectItem value="shipping">Logistics & Shipping</SelectItem>
+                          <SelectItem value="us">United States</SelectItem>
+                          <SelectItem value="uk">United Kingdom</SelectItem>
+                          <SelectItem value="in">India</SelectItem>
+                          <SelectItem value="ae">United Arab Emirates</SelectItem>
+                          <SelectItem value="pk">Pakistan</SelectItem>
+                          <SelectItem value="qa">Qatar</SelectItem>
+                          <SelectItem value="cn">China</SelectItem>
+                          <SelectItem value="ru">Russia</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-inc-date" className="text-sm font-medium text-gray-700 dark:text-gray-300">Date of Incorporation</Label>
+                      <div className="relative">
+                        <Input
+                          id="org-inc-date"
+                          value={formData.dob}
+                          onChange={(e) => setFormData({...formData, dob: e.target.value})}
+                          placeholder="dd-mm-yyyy"
+                          className="!h-[46px] rounded-[8px] pr-10 bg-white border-[#C6C6C6]"
+                        />
+                        <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-500" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5 md:col-span-2">
+                      <Label htmlFor="org-reg-address" className="text-sm font-medium text-gray-700 dark:text-gray-300">Registered Address</Label>
+                      <Input
+                        id="org-reg-address"
+                        value={formData.registeredAddress}
+                        onChange={(e) => setFormData({...formData, registeredAddress: e.target.value})}
+                        placeholder="e.g., Office 501, Tower B, Business Bay, Dubai, UAE"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-operating-countries" className="text-sm font-medium text-gray-700 dark:text-gray-300">Operating Countries</Label>
+                      <Input
+                        id="org-operating-countries"
+                        value={formData.operatingCountries}
+                        onChange={(e) => setFormData({...formData, operatingCountries: e.target.value})}
+                        placeholder="e.g., UAE, UK, India"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-alias" className="text-sm font-medium text-gray-700 dark:text-gray-300">Alias</Label>
+                      <Input
+                        id="org-alias"
+                        value={formData.alias}
+                        onChange={(e) => setFormData({...formData, alias: e.target.value})}
+                        placeholder="e.g., Acme Corp"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-shareholders" className="text-sm font-medium text-gray-700 dark:text-gray-300">Corporate Shareholders (&gt;10%)</Label>
+                      <Input
+                        id="org-shareholders"
+                        value={formData.corporateShareholders}
+                        onChange={(e) => setFormData({...formData, corporateShareholders: e.target.value})}
+                        placeholder="e.g., Alpha Holdings Ltd (45%)"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-directors" className="text-sm font-medium text-gray-700 dark:text-gray-300">Directors / POAs</Label>
+                      <Input
+                        id="org-directors"
+                        value={formData.directors}
+                        onChange={(e) => setFormData({...formData, directors: e.target.value})}
+                        placeholder="e.g., John Smith, Jane Doe"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="org-trustees" className="text-sm font-medium text-gray-700 dark:text-gray-300">Trustees</Label>
+                      <Input
+                        id="org-trustees"
+                        value={formData.trustees}
+                        onChange={(e) => setFormData({...formData, trustees: e.target.value})}
+                        placeholder="e.g., Global Trust Services Ltd"
+                        className="!h-[46px] rounded-[8px] bg-white border-[#C6C6C6]"
+                      />
                     </div>
                   </div>
                   )}

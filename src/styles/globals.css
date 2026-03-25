@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -209,6 +207,288 @@
       line-height: 1.5;
     }
   }
+}
+
+/* Reset Tailwind global border/outline for ALL Carbon bx-- elements */
+[class*='bx--'] {
+  border: 0;
+  outline: 0;
+}
+
+/* Carbon InlineNotification minimal styles */
+.bx--inline-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 16px;
+  border-left: 3px solid transparent;
+  width: 100%;
+  box-sizing: border-box;
+}
+.bx--inline-notification--warning,
+.bx--inline-notification--warning-alt {
+  background-color: #fff8e1;
+  border-left-color: #f1c21b;
+}
+.bx--inline-notification--success {
+  background-color: #defbe6;
+  border-left-color: #24a148;
+}
+.bx--inline-notification--error {
+  background-color: #fff1f1;
+  border-left-color: #da1e28;
+}
+.bx--inline-notification--info {
+  background-color: #eef2fa;
+  border-left-color: #2a53a0;
+}
+.bx--inline-notification__details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.bx--inline-notification__icon {
+  flex-shrink: 0;
+  fill: currentColor;
+}
+.bx--inline-notification--warning .bx--inline-notification__icon { color: #f1c21b; }
+.bx--inline-notification--success .bx--inline-notification__icon { color: #24a148; }
+.bx--inline-notification--error .bx--inline-notification__icon { color: #da1e28; }
+.bx--inline-notification--info .bx--inline-notification__icon { color: #2a53a0; }
+.bx--inline-notification__text-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 14px;
+  color: #161616;
+}
+.bx--inline-notification__title {
+  font-weight: 600;
+  margin: 0;
+}
+.bx--inline-notification__subtitle {
+  font-weight: 400;
+  margin: 0;
+}
+.bx--inline-notification__close-button {
+  display: none;
+}
+
+/* Carbon Dropdown (ListBox) styles */
+
+/* Custom wrapper — owns the visible border */
+.ssc-dropdown-wrap {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  position: relative;
+  background: #ffffff;
+  height: 32px;
+  overflow: visible;
+}
+.ssc-dropdown-wrap:has(.bx--list-box--expanded) {
+  border-color: #2a53a0;
+}
+
+.bx--dropdown__wrapper,
+.bx--list-box__wrapper {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.bx--label,
+.bx--form-requirement,
+.bx--form__helper-text {
+  display: none !important;
+}
+.bx--dropdown,
+.bx--list-box {
+  position: relative !important;
+  width: 100% !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.bx--dropdown--open,
+.bx--list-box--expanded {
+  border: none !important;
+}
+.bx--list-box__field {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  height: 32px !important;
+  padding: 0 0.5rem 0 0.75rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+  gap: 4px !important;
+}
+.bx--list-box__field:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.bx--list-box__label {
+  font-size: 13px !important;
+  color: #161616 !important;
+  text-align: left !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-family: inherit !important;
+  border: none !important;
+  outline: none !important;
+}
+.bx--list-box__menu-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  outline: none !important;
+}
+.bx--list-box__menu-icon svg {
+  fill: #525252 !important;
+  border: none !important;
+}
+.bx--list-box:not(.bx--list-box--expanded) .bx--list-box__menu {
+  display: none !important;
+}
+.bx--list-box__menu {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: calc(100% + 2px) !important;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  z-index: 9999 !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  outline: none !important;
+  padding: 4px 0 !important;
+}
+.bx--list-box__menu-item {
+  padding: 0 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+.bx--list-box__menu-item__option {
+  display: flex !important;
+  align-items: center !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  color: #161616 !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  white-space: nowrap !important;
+}
+.bx--list-box__menu-item:hover .bx--list-box__menu-item__option,
+.bx--list-box__menu-item--highlighted .bx--list-box__menu-item__option {
+  background: #eef2fa !important;
+  color: #161616 !important;
+}
+.bx--list-box__menu-item--active .bx--list-box__menu-item__option {
+  font-weight: 600 !important;
+  color: #2a53a0 !important;
+  background: #eef2fa !important;
+}
+.bx--list-box__menu * {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Carbon Select styles — fixes double arrow + border */
+.bx--select {
+  position: relative;
+  width: 100%;
+}
+.bx--select-input__wrapper {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+.bx--select-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 2rem 0 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #161616;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+}
+.bx--select-input:focus {
+  outline: 2px solid #2a53a0;
+  outline-offset: -2px;
+}
+.bx--select__arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  fill: #161616;
+}
+.bx--form-item {
+  margin: 0;
+}
+.bx--select-optgroup,
+.bx--select-option {
+  color: #161616;
+}
+
+/* Carbon NumberInput styles — adds border to weight field */
+.bx--number {
+  position: relative;
+  width: 100%;
+}
+.bx--number input[type='number'] {
+  width: 100%;
+  height: 32px;
+  padding: 0 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 14px;
+  color: #161616;
+  outline: none;
+  box-sizing: border-box;
+  -moz-appearance: textfield;
+}
+.bx--number input[type='number']::-webkit-outer-spin-button,
+.bx--number input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.bx--number input[type='number']:focus {
+  outline: 2px solid #2a53a0;
+  outline-offset: -2px;
 }
 
 html {
