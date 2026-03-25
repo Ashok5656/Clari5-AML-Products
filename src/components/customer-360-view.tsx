@@ -245,11 +245,11 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
       ) },
       { id: 'type', content: <span className="flex items-center gap-1.5 text-gray-600"><UserIcon className="size-3.5 text-gray-400" />&nbsp;{selectedCustomer.type}</span> },
       { id: 'nationality', content: <span className="flex items-center gap-1.5 text-gray-600"><Globe className="size-3.5 text-gray-400" />&nbsp;{selectedCustomer.nationality}</span> },
-      { id: 'pep', content: <span className="flex items-center gap-1.5 text-gray-600">PEP Match :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.pepMatch === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.pepMatch}</span></span> },
-      { id: 'media', content: <span className="flex items-center gap-1.5 text-gray-600">Adverse Media :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.adverseMedia === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.adverseMedia}</span></span> },
+      { id: 'pep', content: <span className="flex items-center gap-1.5 text-gray-600">PEP Match :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.pepMatch === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.pepMatch}</span></span> },
+      { id: 'media', content: <span className="flex items-center gap-1.5 text-gray-600">Adverse Media :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.adverseMedia === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.adverseMedia}</span></span> },
       { id: 'risk', content: <span className="flex items-center gap-1.5 text-gray-600">Risk Score :&nbsp;<span className="font-medium text-red-600">{selectedCustomer.riskLevel}</span></span> },
-      { id: 'cdd', content: <span className="flex items-center gap-1.5 text-gray-600">CDD/EDD :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.cddEddTriggers === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.cddEddTriggers}</span></span> },
-      { id: 'dormant', content: <span className="flex items-center gap-1.5 text-gray-600">Dormant :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.dormantAccounts === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.dormantAccounts}</span></span> },
+      { id: 'cdd', content: <span className="flex items-center gap-1.5 text-gray-600">CDD/EDD :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.cddEddTriggers === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.cddEddTriggers}</span></span> },
+      { id: 'dormant', content: <span className="flex items-center gap-1.5 text-gray-600">Dormant :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.dormantAccounts === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.dormantAccounts}</span></span> },
       { id: 'txns', content: (
            <div className="flex items-center gap-1.5 text-gray-600">
                <span className="shrink-0">High Risk Txns :&nbsp;</span>
@@ -268,9 +268,9 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
                </TooltipProvider>
            </div>
       )},
-      { id: 'str', content: <span className="flex items-center gap-1.5 text-gray-600">STR/SAR :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.strSarFiled === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.strSarFiled}</span></span> },
-      { id: 'ctr', content: <span className="flex items-center gap-1.5 text-gray-600">CTR :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.ctrFiled === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.ctrFiled}</span></span> },
-      { id: 'lea', content: <span className="flex items-center gap-1.5 text-gray-600">LEA Requests :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.leaRequests === 'YES' ? "text-green-600" : "text-red-600")}>{selectedCustomer.leaRequests}</span></span> },
+      { id: 'str', content: <span className="flex items-center gap-1.5 text-gray-600">STR/SAR :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.strSarFiled === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.strSarFiled}</span></span> },
+      { id: 'ctr', content: <span className="flex items-center gap-1.5 text-gray-600">CTR :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.ctrFiled === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.ctrFiled}</span></span> },
+      { id: 'lea', content: <span className="flex items-center gap-1.5 text-gray-600">LEA Requests :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.leaRequests === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.leaRequests}</span></span> },
       { id: 'alerts', content: <span className="flex items-center gap-1.5 text-gray-600">Active Alerts :&nbsp;<span className="font-medium text-red-600">{selectedCustomer.activeAlerts}</span></span> },
   ];
 
