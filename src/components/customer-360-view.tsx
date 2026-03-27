@@ -8,7 +8,6 @@ import {
   Bell,
   Clock,
   ArrowRight,
-  Globe,
   Network,
   Scale,
   Scan,
@@ -244,7 +243,6 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
         </div>
       ) },
       { id: 'type', content: <span className="flex items-center gap-1.5 text-gray-600"><UserIcon className="size-3.5 text-gray-400" />&nbsp;{selectedCustomer.type}</span> },
-      { id: 'nationality', content: <span className="flex items-center gap-1.5 text-gray-600"><Globe className="size-3.5 text-gray-400" />&nbsp;{selectedCustomer.nationality}</span> },
       { id: 'pep', content: <span className="flex items-center gap-1.5 text-gray-600">PEP Match :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.pepMatch === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.pepMatch}</span></span> },
       { id: 'media', content: <span className="flex items-center gap-1.5 text-gray-600">Adverse Media :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.adverseMedia === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.adverseMedia}</span></span> },
       { id: 'risk', content: <span className="flex items-center gap-1.5 text-gray-600">Risk Score :&nbsp;<span className="font-medium text-red-600">{selectedCustomer.riskLevel}</span></span> },
@@ -252,7 +250,7 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
       { id: 'dormant', content: <span className="flex items-center gap-1.5 text-gray-600">Dormant :&nbsp;<span className={cn("font-medium uppercase", selectedCustomer.dormantAccounts === 'YES' ? "text-red-600" : "text-green-600")}>{selectedCustomer.dormantAccounts}</span></span> },
       { id: 'txns', content: (
            <div className="flex items-center gap-1.5 text-gray-600">
-               <span className="shrink-0">High Risk Txns :&nbsp;</span>
+               <span className="shrink-0">Transactions with High-risk Country :&nbsp;</span>
                <TooltipProvider>
                    <Tooltip>
                        <TooltipTrigger asChild>
