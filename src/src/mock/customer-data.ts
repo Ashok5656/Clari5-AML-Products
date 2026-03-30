@@ -1,72 +1,68 @@
 export const mockCustomers = [
   {
-    name: "Rajesh Kumar",
+    name: "Arjun Mehta",
     ucic: "UCO089874637",
-    id: "Cust-8829103",
-    customerIds: ["Cust-8829103", "Cust-7000362", "Cust-3668338"],
+    id: "CUST-8159176",
+    customerIds: ["CUST-8159176"],
     type: "Individual",
     riskScore: "High",
-    riskLevel: 90,
-    pepMatch: "YES",
-    adverseMedia: "YES",
-    cddEddTriggers: "YES",
+    riskLevel: 75,
+    pepMatch: "NO",
+    adverseMedia: "NO",
+    cddEddTriggers: "NO",
     dormantAccounts: "NO",
-    highRiskTransactions: { count: 3, countries: ["Iran", "North Korea", "Syria"] },
+    highRiskTransactions: { count: 1, countries: ["Kuwait"] },
     strSarFiled: "YES",
     ctrFiled: "NO",
     leaRequests: "NO",
-    activeAlerts: 4,
+    activeAlerts: 2,
     status: "Active",
     kycStatus: "Verified",
     nationality: "Indian",
-    dob: "15-08-1982",
-    occupation: "Business Owner",
-    employer: "Kumar Global Traders",
-    phone: "9876543210",
-    email: "rajesh.k@gmail.com",
-    address: { line1: "Flat 402, Krishna Heights", city: "Mumbai", zip: "400049" },
-    previousNames: "Raj V. Kumar",
-    placeOfBirth: "Mumbai, Maharashtra",
+    dob: "14-08-1985",
+    occupation: "Software Engineer",
+    employer: "Infosys Limited",
+    phone: "+91-98204-67831",
+    email: "arjun.mehta@gmail.com",
+    address: { line1: "Flat 4B, Saffron Heights, Linking Road", city: "Mumbai", zip: "400050" },
+    previousNames: "Arjun Mehta",
+    placeOfBirth: "Mumbai, Maharashtra, India",
     gender: "Male",
-    multipleCitizenships: ["United States"],
+    multipleCitizenships: ["India"],
     residentStatus: "Resident",
-    primaryAddress: "Flat 402, Krishna Heights, Bandra West, Mumbai - 400050",
-    secondaryAddresses: ["Villa 22, Palm Jumeirah, Dubai, UAE"],
-    businessSegment: "Retail Banking",
-    customerSegment: ["HNI", "High Risk"],
-    onboardingDate: "12-03-2018",
+    primaryAddress: "Flat 4B, Saffron Heights, Linking Road, Bandra West, Mumbai – 400050",
+    secondaryAddresses: [],
+    businessSegment: "Salaried",
+    customerSegment: ["HNI", "HUF"],
+    onboardingDate: "15-10-2017",
     onboardingChannel: "Branch",
-    channelUsage: { branch: "15%", digital: "80%", agent: "5%" },
-    idInfo: { 
-      emiratesId: { type: "Emirates ID", number: "784-1990-1234567-1" },
-      passport: { type: "Passport", number: "Z1234567", expiry: "2030-05-20", issuedBy: "Govt of India" }
+    channelUsage: { branch: "40%", digital: "55%", agent: "5%" },
+    idInfo: {
+      aadhar: { type: "Aadhar Number", number: "47X2 XXX3 9XX2" },
+      passport: { type: "Passport", number: "P1234567", expiry: "2030-03-22", issuedBy: "Govt of India" },
+      pan: { type: "PAN Number", number: "BHWPM4319K" }
     },
-    fatcaStatus: "Reportable (US Indicia)",
+    fatcaStatus: "Not applicable",
     leaStatus: "Non-Reportable",
     identification: [
-      { type: "Emirates ID", number: "784-1990-1234567-1", status: "Verified" }
+      { type: "Aadhar Number", number: "47X2 XXX3 9XX2", status: "Verified" },
+      { type: "Passport", number: "P1234567", status: "Verified", expiry: "2030-03-22" },
+      { type: "PAN Number", number: "BHWPM4319K", status: "Verified" }
     ],
     relationships: {
-      ubo: [
-        { name: "Suman Kumar", designation: "Shareholder", nationality: "Indian", residence: "Mumbai", ownership: 55, votingRights: 55 }
-      ],
+      ubo: [],
       family: [
-        { name: "Suman Kumar", relation: "Spouse", dob: "1985-05-12", hasAccount: true, kycStatus: "Verified" },
-        { name: "Arjun Kumar", relation: "Son", dob: "2010-08-20", hasAccount: true, kycStatus: "Verified" }
+        { name: "Priya Arjun Mehta", relation: "Spouse", dob: "1988-06-15", hasAccount: true, kycStatus: "Verified" },
+        { name: "Kunal Mehta", relation: "Son", dob: "2012-03-20", hasAccount: false, kycStatus: "Not Verified" }
       ],
-      associates: [
-        { name: "Mehul Choksi", relation: "Business Partner", hasAccount: false, risk: "High" },
-        { name: "Global Exports Ltd", relation: "Subsidiary", hasAccount: true, risk: "Medium" }
-      ],
+      associates: [],
       jointHolders: [
-        { name: "Suman Kumar", account: "ACC-9921", relation: "Spouse", hasAccount: true }
+        { name: "Priya Arjun Mehta", account: "ACC-1234", relation: "Spouse", hasAccount: true }
       ],
-      poa: [
-        { name: "Vikram Legal Services", authorizedPerson: "Vikram Singh", expiry: "2030-12-31", revocationHistory: "None" }
-      ],
+      poa: [],
       pep: {
-        isPep: true,
-        details: "Associate of PEP (Business Partner Mehul Choksi is politically connected)"
+        isPep: false,
+        details: ""
       }
     },
     screening: {
@@ -321,108 +317,32 @@ export const mockCustomers = [
         ]
     },
     subProfiles: {
-      "Cust-8829103": {
-        previousNames: "Raj V. Kumar",
-        dob: "15-08-1982",
-        placeOfBirth: "Mumbai, Maharashtra",
-        phone: "9876543210",
-        email: "rajesh.k@gmail.com",
+      "CUST-8159176": {
+        previousNames: "Arjun Mehta",
+        dob: "14-08-1985",
+        placeOfBirth: "Mumbai, Maharashtra, India",
+        phone: "+91-98204-67831",
+        email: "arjun.mehta@gmail.com",
         gender: "Male",
-        multipleCitizenships: ["United States"],
-        occupation: "Business Owner",
-        employer: "Kumar Global Traders",
-        businessSegment: "Retail Banking",
-        customerSegment: ["HNI", "High Risk"],
-        onboardingDate: "12-03-2018",
+        multipleCitizenships: ["India"],
+        occupation: "Software Engineer",
+        employer: "Infosys Limited",
+        businessSegment: "Salaried",
+        customerSegment: ["HNI", "HUF"],
+        onboardingDate: "15-10-2017",
         onboardingChannel: "Branch",
-        fatcaStatus: "Reportable (US Indicia)",
+        fatcaStatus: "Not applicable",
         leaStatus: "Non-Reportable",
         residentStatus: "Resident",
         relationships: {
-          ubo: [
-            { name: "Suman Kumar", designation: "Shareholder", nationality: "Indian", residence: "Mumbai", ownership: 55, votingRights: 55 }
-          ],
+          ubo: [],
           family: [
-            { name: "Suman Kumar", relation: "Spouse", dob: "1985-05-12", hasAccount: true, kycStatus: "Verified" },
-            { name: "Arjun Kumar", relation: "Son", dob: "2010-08-20", hasAccount: true, kycStatus: "Verified" }
+            { name: "Priya Arjun Mehta", relation: "Spouse", dob: "1988-06-15", hasAccount: true, kycStatus: "Verified" },
+            { name: "Kunal Mehta", relation: "Son", dob: "2012-03-20", hasAccount: false, kycStatus: "Not Verified" }
           ],
-          associates: [
-            { name: "Mehul Choksi", relation: "Business Partner", hasAccount: false, risk: "High" },
-            { name: "Global Exports Ltd", relation: "Subsidiary", hasAccount: true, risk: "Medium" }
-          ]
-        }
-      },
-      "Cust-7000362": {
-        previousNames: "Rajesh Kumar",
-        dob: "15-08-1982",
-        placeOfBirth: "Mumbai, Maharashtra",
-        phone: "9876543210",
-        email: "rajesh.k@gmail.com",
-        gender: "Male",
-        multipleCitizenships: ["United States"],
-        occupation: "Business Owner",
-        employer: "Raj Stationary",
-        businessSegment: "Retail Banking",
-        customerSegment: ["HNI", "High Risk"],
-        onboardingDate: "02-05-2019",
-        onboardingChannel: "Online",
-        fatcaStatus: "Reportable (US Indicia)",
-        leaStatus: "Non-Reportable",
-        residentStatus: "Resident",
-        dormantAccounts: "NO",
-        accountsProfile: {
-          summary: [
-            { id: "ACC-9921", institution: "HDFC Bank", type: "Savings Max", balance: "₹12,45,000", currency: "INR", status: "Active", openDate: "2018-03-12" },
-            { id: "ACC-3341", institution: "HDFC Bank", type: "Current Business", balance: "₹45,20,000", currency: "INR", status: "Active", openDate: "2020-06-15" }
-          ],
-          limits: {
-            transaction: "₹50,00,000 / day",
-            cash: "₹2,00,000 / day",
-            fx: "$50,000 / year"
-          },
-          products: ["Savings Account", "Current Account"],
-          dormant: []
-        },
-        relationships: {
-          ubo: [
-            { name: "Raj Gupta", designation: "Director", nationality: "Indian", residence: "Mumbai", ownership: 60, votingRights: 60 }
-          ],
-          family: [
-            { name: "Suman Kumar", relation: "Spouse", dob: "1985-05-12", hasAccount: true, kycStatus: "Verified" },
-            { name: "Arjun Kumar", relation: "Son", dob: "2010-08-20", hasAccount: true, kycStatus: "Verified" }
-          ],
-          associates: [
-            { name: "Raj Gupta", relation: "Business Partner", hasAccount: false, risk: "High" }
-          ]
-        }
-      },
-      "Cust-3668338": {
-        previousNames: "Rajesh Kumar",
-        dob: "15-08-1982",
-        placeOfBirth: "Mumbai, Maharashtra",
-        phone: "9999238467",
-        email: "rajesh.kumar82@gmail.com",
-        gender: "Male",
-        multipleCitizenships: ["United States"],
-        occupation: "Business Owner",
-        employer: "PlayPoker",
-        businessSegment: "Retail Banking",
-        customerSegment: ["HNI", "High Risk"],
-        onboardingDate: "12-03-2018",
-        onboardingChannel: "Branch",
-        fatcaStatus: "Reportable (US Indicia)",
-        leaStatus: "Non-Reportable",
-        residentStatus: "Resident",
-        relationships: {
-          ubo: [
-            { name: "Akshay Chopra", designation: "Director", nationality: "Indian", residence: "Mumbai", ownership: 25, votingRights: 25 }
-          ],
-          family: [
-            { name: "Suman Kumar", relation: "Spouse", dob: "1985-05-12", hasAccount: true, kycStatus: "Verified" },
-            { name: "Arjun Kumar", relation: "Son", dob: "2010-08-20", hasAccount: true, kycStatus: "Verified" }
-          ],
-          associates: [
-            { name: "Akshay Chopra", relation: "Business Partner", hasAccount: true, risk: "High" }
+          associates: [],
+          jointHolders: [
+            { name: "Priya Arjun Mehta", account: "ACC-1234", relation: "Spouse", hasAccount: true }
           ]
         }
       }
@@ -431,16 +351,16 @@ export const mockCustomers = [
 ];
 
 export const searchData = [
-   { name: "Rajesh Kumar", ucic: "UCO089874637", id: "Cust-8829103", branch: "Mumbai Main", customerIds: ["Cust-8829103", "Cust-7000362", "Cust-3668338"], accountNumber: "ACC-88291030", risk: "High Risk", time: "10 mins ago", initials: "RK", color: "blue", img: "https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMG1hbnxlbnwxfHx8fDE3Njc1NzAwMDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral", mobile: "9876543210", email: "rajesh.k@gmail.com", accounts: 2, balance: "₹4.5L", status: "Active", kyc: "Verified" },
-   { name: "Rajesh Gupta", ucic: "UCO089874638", id: "CUST-8829104", branch: "Delhi North", customerIds: ["CUST-8829104"], accountNumber: "ACC-88291040", risk: "Low Risk", time: "2 days ago", initials: "RG", color: "green", mobile: "+91 98765 43211", email: "rajesh.gupta@gmail.com", accounts: 1, balance: "₹1.5L", status: "Active", kyc: "Verified" },
-   { name: "Rajesh Singh", ucic: "UCO089874639", id: "CUST-8829105", branch: "Bangalore East", customerIds: ["CUST-8829105", "CUST-2293842"], accountNumber: "ACC-88291050", risk: "Medium Risk", time: "1 week ago", initials: "RS", color: "orange", mobile: "+91 98765 43212", email: "r.singh@outlook.com", accounts: 3, balance: "₹8.2L", status: "Active", kyc: "Verified" },
-   { name: "Rajesh & Sons Traders", ucic: "UCO089874640", id: "CORP-8829106", branch: "Mumbai Main", customerIds: ["CORP-8829106", "CORP-1102932"], accountNumber: "ACC-88291060", risk: "High Risk", time: "yesterday", initials: "RT", color: "blue", mobile: "+91 22 8877 6655", email: "info@rajeshsons.com", accounts: 5, balance: "₹45.5L", status: "Active", kyc: "Pending" },
-   { name: "Rahul Verma", ucic: "UCO089874641", id: "CUST-3344556", branch: "Pune City", customerIds: ["CUST-3344556"], accountNumber: "ACC-33445560", risk: "Medium Risk", time: "5 hours ago", initials: "RV", color: "orange", mobile: "+91 91234 56789", email: "rahul.v@gmail.com", accounts: 1, balance: "₹2.1L", status: "Active", kyc: "Verified" },
-   { name: "Ravi Patel", ucic: "UCO089874642", id: "CUST-9988776", branch: "Ahmedabad West", customerIds: ["CUST-9988776"], accountNumber: "ACC-99887760", risk: "Low Risk", time: "1 day ago", initials: "RP", color: "green", mobile: "+91 99882 23344", email: "ravi.patel@yahoo.com", accounts: 3, balance: "₹15.5L", status: "Active", kyc: "Verified" },
-   { name: "Rachel Green", ucic: "UCO089874643", id: "CUST-5566778", branch: "Mumbai Main", customerIds: ["CUST-5566778"], accountNumber: "ACC-55667780", risk: "Low Risk", time: "3 days ago", initials: "RG", color: "purple", mobile: "+91 77665 54433", email: "rachel.g@outlook.com", accounts: 2, balance: "₹5.2L", status: "Active", kyc: "Verified" },
-   { name: "Global Trade Corp", ucic: "UCO089874644", id: "CORP-9921102", branch: "Dubai Offshore", customerIds: ["CORP-9921102"], accountNumber: "ACC-99211020", risk: "Medium Risk", time: "2 hours ago", initials: "GT", color: "purple", mobile: "+91 22 2456 7890", email: "finance@globaltrade.com", accounts: 5, balance: "₹1.2Cr", status: "Active", kyc: "Verified" },
-   { name: "Priya Sharma", ucic: "UCO089874645", id: "CUST-7721992", branch: "Chennai South", customerIds: ["CUST-7721992"], accountNumber: "ACC-77219920", risk: "Low Risk", time: "yesterday", initials: "PS", color: "green", mobile: "+91 99887 76655", email: "priya.s@yahoo.com", accounts: 1, balance: "₹85,000", status: "Dormant", kyc: "Re-KYC Due" },
-   { name: "Vikram Singh", ucic: "UCO089874646", id: "CUST-1122334", branch: "Chandigarh", customerIds: ["CUST-1122334"], accountNumber: "ACC-11223340", risk: "Low Risk", time: "2 days ago", initials: "VS", color: "gray", mobile: "+91 88776 65544", email: "vikram.singh@outlook.com", accounts: 3, balance: "₹12.5L", status: "Active", kyc: "Verified" },
-   { name: "Sarah Chen", ucic: "UCO089874647", id: "CUST-9988771", branch: "Singapore Br", customerIds: ["CUST-9988771"], accountNumber: "ACC-99887710", risk: "Low Risk", time: "3 days ago", initials: "SC", color: "purple", mobile: "+91 77665 54433", email: "sarah.chen@gmail.com", accounts: 4, balance: "₹32.1L", status: "Active", kyc: "Verified" },
-   { name: "TechSoft Solutions", ucic: "UCO089874648", id: "CORP-5544332", branch: "Hyderabad", customerIds: ["CORP-5544332"], accountNumber: "ACC-55443320", risk: "High Risk", time: "1 week ago", initials: "TS", color: "blue", mobile: "+91 22 9988 7766", email: "admin@techsoft.io", accounts: 8, balance: "₹2.5Cr", status: "Active", kyc: "Pending Review" }
+   { name: "Arjun Mehta", ucic: "UCO089874637", id: "CUST-8159176", branch: "Mumbai Main", customerIds: ["CUST-8159176"], accountNumber: "ACC-88291030", risk: "High Risk", time: "10 mins ago", initials: "AM", color: "blue", img: "https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdCUyMG1hbnxlbnwxfHx8fDE3Njc1NzAwMDR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral", mobile: "+91-98204-67831", email: "arjun.mehta@gmail.com", accounts: 1, balance: "₹4.5L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Rajesh Gupta", ucic: "UCO089874638", id: "CUST-8829104", branch: "Delhi North", customerIds: ["CUST-8829104"], accountNumber: "ACC-88291040", risk: "Low Risk", time: "2 days ago", initials: "RG", color: "green", mobile: "+91 98765 43211", email: "rajesh.gupta@gmail.com", accounts: 1, balance: "₹1.5L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Rajesh Singh", ucic: "UCO089874639", id: "CUST-8829105", branch: "Bangalore East", customerIds: ["CUST-8829105", "CUST-2293842"], accountNumber: "ACC-88291050", risk: "Medium Risk", time: "1 week ago", initials: "RS", color: "orange", mobile: "+91 98765 43212", email: "r.singh@outlook.com", accounts: 3, balance: "₹8.2L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Rajesh & Sons Traders", ucic: "UCO089874640", id: "CORP-8829106", branch: "Mumbai Main", customerIds: ["CORP-8829106", "CORP-1102932"], accountNumber: "ACC-88291060", risk: "High Risk", time: "yesterday", initials: "RT", color: "blue", mobile: "+91 22 8877 6655", email: "info@rajeshsons.com", accounts: 5, balance: "₹45.5L", status: "Active", kyc: "Pending", type: "Corporate" },
+   { name: "Rahul Verma", ucic: "UCO089874641", id: "CUST-3344556", branch: "Pune City", customerIds: ["CUST-3344556"], accountNumber: "ACC-33445560", risk: "Medium Risk", time: "5 hours ago", initials: "RV", color: "orange", mobile: "+91 91234 56789", email: "rahul.v@gmail.com", accounts: 1, balance: "₹2.1L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Ravi Patel", ucic: "UCO089874642", id: "CUST-9988776", branch: "Ahmedabad West", customerIds: ["CUST-9988776"], accountNumber: "ACC-99887760", risk: "Low Risk", time: "1 day ago", initials: "RP", color: "green", mobile: "+91 99882 23344", email: "ravi.patel@yahoo.com", accounts: 3, balance: "₹15.5L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Rachel Green", ucic: "UCO089874643", id: "CUST-5566778", branch: "Mumbai Main", customerIds: ["CUST-5566778"], accountNumber: "ACC-55667780", risk: "Low Risk", time: "3 days ago", initials: "RG", color: "purple", mobile: "+91 77665 54433", email: "rachel.g@outlook.com", accounts: 2, balance: "₹5.2L", status: "Active", kyc: "Verified", type: "US Citizenship" },
+   { name: "Global Trade Corp", ucic: "UCO089874644", id: "CORP-9921102", branch: "Dubai Offshore", customerIds: ["CORP-9921102"], accountNumber: "ACC-99211020", risk: "Medium Risk", time: "2 hours ago", initials: "GT", color: "purple", mobile: "+91 22 2456 7890", email: "finance@globaltrade.com", accounts: 5, balance: "₹1.2Cr", status: "Active", kyc: "Verified", type: "Corporate" },
+   { name: "Priya Sharma", ucic: "UCO089874645", id: "CUST-7721992", branch: "Chennai South", customerIds: ["CUST-7721992"], accountNumber: "ACC-77219920", risk: "Low Risk", time: "yesterday", initials: "PS", color: "green", mobile: "+91 99887 76655", email: "priya.s@yahoo.com", accounts: 1, balance: "₹85,000", status: "Dormant", kyc: "Re-KYC Due", type: "Individual" },
+   { name: "Vikram Singh", ucic: "UCO089874646", id: "CUST-1122334", branch: "Chandigarh", customerIds: ["CUST-1122334"], accountNumber: "ACC-11223340", risk: "Low Risk", time: "2 days ago", initials: "VS", color: "gray", mobile: "+91 88776 65544", email: "vikram.singh@outlook.com", accounts: 3, balance: "₹12.5L", status: "Active", kyc: "Verified", type: "Individual" },
+   { name: "Sarah Chen", ucic: "UCO089874647", id: "CUST-9988771", branch: "Singapore Br", customerIds: ["CUST-9988771"], accountNumber: "ACC-99887710", risk: "Low Risk", time: "3 days ago", initials: "SC", color: "purple", mobile: "+91 77665 54433", email: "sarah.chen@gmail.com", accounts: 4, balance: "₹32.1L", status: "Active", kyc: "Verified", type: "US Citizenship" },
+   { name: "TechSoft Solutions", ucic: "UCO089874648", id: "CORP-5544332", branch: "Hyderabad", customerIds: ["CORP-5544332"], accountNumber: "ACC-55443320", risk: "High Risk", time: "1 week ago", initials: "TS", color: "blue", mobile: "+91 22 9988 7766", email: "admin@techsoft.io", accounts: 8, balance: "₹2.5Cr", status: "Active", kyc: "Pending Review", type: "Corporate" }
 ];

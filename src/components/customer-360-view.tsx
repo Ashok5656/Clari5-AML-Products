@@ -111,6 +111,7 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
             customerIds: customerPreview.customerIds || [customerPreview.id],
             email: customerPreview.email,
             phone: customerPreview.mobile,
+            type: customerPreview.type || mockCustomers[0].type,
             riskScore: customerPreview.risk?.replace(' Risk', '') || 'Low',
             riskLevel: customerPreview.risk?.includes('High') ? 85 : customerPreview.risk?.includes('Medium') ? 45 : 15,
             kycStatus: customerPreview.kyc || 'Verified',
