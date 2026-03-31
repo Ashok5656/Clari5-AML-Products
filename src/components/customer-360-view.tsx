@@ -102,28 +102,33 @@ const Customer360ViewInner = (props: Customer360ViewProps, ref: ForwardedRef<Cus
   const handleSearch = (customerPreview?: any) => {
     setIsLoading(true);
     setTimeout(() => {
-      if (customerPreview && customerPreview.name) {
-         const fullDetails = {
-            ...mockCustomers[0],
-            name: customerPreview.name,
-            ucic: customerPreview.ucic,
-            id: customerPreview.id,
-            customerIds: customerPreview.customerIds || [customerPreview.id],
-            email: customerPreview.email,
-            phone: customerPreview.mobile,
-            type: customerPreview.type || mockCustomers[0].type,
-            riskScore: customerPreview.risk?.replace(' Risk', '') || 'Low',
-            riskLevel: customerPreview.risk?.includes('High') ? 85 : customerPreview.risk?.includes('Medium') ? 45 : 15,
-            kycStatus: customerPreview.kyc || 'Verified',
-            status: customerPreview.status || 'Active',
-            accountsProfile: {
-                ...mockCustomers[0].accountsProfile,
-                summary: [
-                    { ...mockCustomers[0].accountsProfile.summary[0], balance: customerPreview.balance || "₹0" }
-                ]
-            }
-         };
-         setSelectedCustomer(fullDetails);
+      if (customerPreview && customerPreview.id) {
+         const fullCustomer = mockCustomers.find(c => c.id === customerPreview.id);
+         if (fullCustomer) {
+            setSelectedCustomer(fullCustomer);
+         } else {
+            const fullDetails = {
+               ...mockCustomers[0],
+               name: customerPreview.name,
+               ucic: customerPreview.ucic,
+               id: customerPreview.id,
+               customerIds: customerPreview.customerIds || [customerPreview.id],
+               email: customerPreview.email,
+               phone: customerPreview.mobile,
+               type: customerPreview.type || mockCustomers[0].type,
+               riskScore: customerPreview.risk?.replace(' Risk', '') || 'Low',
+               riskLevel: customerPreview.risk?.includes('High') ? 85 : customerPreview.risk?.includes('Medium') ? 45 : 15,
+               kycStatus: customerPreview.kyc || 'Verified',
+               status: customerPreview.status || 'Active',
+               accountsProfile: {
+                  ...mockCustomers[0].accountsProfile,
+                  summary: [
+                     { ...mockCustomers[0].accountsProfile.summary[0], balance: customerPreview.balance || "₹0" }
+                  ]
+               }
+            };
+            setSelectedCustomer(fullDetails);
+         }
       } else {
          setSelectedCustomer(mockCustomers[0]);
       }

@@ -400,6 +400,11 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     type: [] as string[]
   });
 
+  // Per-row action state defaulting to "Under Review"
+  const [rowActions, setRowActions] = useState<Record<string, string>>(
+    () => Object.fromEntries(MOCK_RESULTS.map(r => [r.id, "Under Review"]))
+  );
+
   const handleStartScreening = () => {
     setView("results");
   };
@@ -978,7 +983,6 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
             </Button>
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">Screening Results</h1>
-              <p className="text-xs text-gray-500">Ref ID: SCR-2026-X8291 • {new Date().toLocaleDateString()}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -1121,40 +1125,40 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         <SortableHeader column="custId" label="Cust ID" sortConfig={sortConfig} onSort={requestSort} />
                       </TableHead>
                       <TableHead className="px-4 font-medium text-[15px] text-[#2A53A0] dark:text-[#6b93e6] bg-[#F0F0F0] dark:bg-gray-800 align-middle whitespace-nowrap">
-                        <SortableHeader column="matchedLists" label="Matched Lists" sortConfig={sortConfig} onSort={requestSort} />
+                        <SortableHeader column="matchedLists" label="Number Of Matched List" sortConfig={sortConfig} onSort={requestSort} />
                       </TableHead>
                       <TableHead className="px-4 font-medium text-[15px] text-[#2A53A0] dark:text-[#6b93e6] bg-[#F0F0F0] dark:bg-gray-800 align-middle whitespace-nowrap">
-                        <SortableHeader column="score" label="Match Score" sortConfig={sortConfig} onSort={requestSort} />
+                        <SortableHeader column="score" label="Highest Match Score" sortConfig={sortConfig} onSort={requestSort} />
                       </TableHead>
                       <TableHead className="px-4 font-medium text-[15px] text-[#2A53A0] dark:text-[#6b93e6] bg-[#F0F0F0] dark:bg-gray-800 align-middle whitespace-nowrap">
                         <div className="flex items-center gap-1">
-                          <FilterPopover 
-                            title="Top List" 
-                            options={uniqueTopLists} 
-                            selected={filters.topList} 
-                            onChange={(val) => setFilters({...filters, topList: val})} 
+                          <FilterPopover
+                            title="List Name With Highest Match Score"
+                            options={uniqueTopLists}
+                            selected={filters.topList}
+                            onChange={(val) => setFilters({...filters, topList: val})}
                           />
                           <SortableHeader column="topList" label="" sortConfig={sortConfig} onSort={requestSort} className="ml-0" />
                         </div>
                       </TableHead>
                       <TableHead className="px-4 font-medium text-[15px] text-[#2A53A0] dark:text-[#6b93e6] bg-[#F0F0F0] dark:bg-gray-800 align-middle whitespace-nowrap">
                         <div className="flex items-center gap-1">
-                          <FilterPopover 
-                            title="Category" 
-                            options={uniqueCategories} 
-                            selected={filters.category} 
-                            onChange={(val) => setFilters({...filters, category: val})} 
+                          <FilterPopover
+                            title="Match Category"
+                            options={uniqueCategories}
+                            selected={filters.category}
+                            onChange={(val) => setFilters({...filters, category: val})}
                           />
                           <SortableHeader column="category" label="" sortConfig={sortConfig} onSort={requestSort} className="ml-0" />
                         </div>
                       </TableHead>
                       <TableHead className="px-4 font-medium text-[15px] text-[#2A53A0] dark:text-[#6b93e6] bg-[#F0F0F0] dark:bg-gray-800 align-middle whitespace-nowrap">
                         <div className="flex items-center gap-1">
-                          <FilterPopover 
-                            title="Type" 
-                            options={uniqueTypes} 
-                            selected={filters.type} 
-                            onChange={(val) => setFilters({...filters, type: val})} 
+                          <FilterPopover
+                            title="Match Type"
+                            options={uniqueTypes}
+                            selected={filters.type}
+                            onChange={(val) => setFilters({...filters, type: val})}
                           />
                           <SortableHeader column="type" label="" sortConfig={sortConfig} onSort={requestSort} className="ml-0" />
                         </div>
@@ -1245,17 +1249,21 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
 
                          {/* ACTIONS */}
                          <TableCell className="px-4 py-3 align-middle text-right">
-                            <div className="flex items-center justify-end gap-2">
-                               <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50" title="Mark as False Positive">
-                                  <CheckCircle className="size-4" />
-                               </Button>
-                               <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50" title="Confirm Match">
-                                  <AlertTriangle className="size-4" />
-                               </Button>
-                               <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                                  <MoreVertical className="size-4 text-gray-500" />
-                               </Button>
-                            </div>
+                            <Select
+                              value={rowActions[result.id]}
+                              onValueChange={(v) => setRowActions(prev => ({ ...prev, [result.id]: v }))}
+                            >
+                              <SelectTrigger className="h-8 w-44 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Move to Case">Move to Case</SelectItem>
+                                <SelectItem value="False Hits">False Hits</SelectItem>
+                                <SelectItem value="Under Review">Under Review</SelectItem>
+                                <SelectItem value="Move to Whitelist">Move to Whitelist</SelectItem>
+                                <SelectItem value="View Summary">View Summary</SelectItem>
+                              </SelectContent>
+                            </Select>
                          </TableCell>
                       </TableRow>
                    )))}

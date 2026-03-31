@@ -12,24 +12,25 @@ interface CustomerDetailsSectionProps {
   getRiskBadgeColor: (level: string, solid?: boolean) => string;
 }
 
-export const CustomerDetailsSection = ({ 
-  selectedCustomer, 
-  isDetailsExpanded, 
-  hoveredRiskScore, 
+export const CustomerDetailsSection = ({
+  selectedCustomer,
+  isDetailsExpanded,
+  hoveredRiskScore,
   setHoveredRiskScore,
-  getRiskBadgeColor 
+  getRiskBadgeColor
 }: CustomerDetailsSectionProps) => {
-  
+  const isCorporate = selectedCustomer.type === "Corporate";
+
   return (
     <div className="bg-white border-b border-gray-200 pt-2 pb-6 transition-all duration-300">
       <div className="px-6 flex flex-col gap-8">
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
               {/* Demographics Section (4 Cards) */}
               <div className={cn("grid gap-4", isDetailsExpanded ? "xl:col-span-3 grid-cols-1 md:grid-cols-2" : "xl:col-span-4 grid-cols-2 md:grid-cols-4")}>
-                  {/* Card 1: Personal */}
+                  {/* Card 1: Personal / Company */}
                   <div className={cn("transition-all duration-300", isDetailsExpanded ? "bg-white rounded-lg border border-gray-200 p-5 shadow-sm space-y-4" : "p-2")}>
                       <h4 className={cn("text-xs font-bold text-gray-700 tracking-wider flex items-center gap-1.5", isDetailsExpanded && "mb-2 pb-2 border-b border-gray-100")}>
-                          <UserIcon className="size-3.5 text-[#2A53A0]" /> Personal Details
+                          <UserIcon className="size-3.5 text-[#2A53A0]" /> {isCorporate ? "Company Details" : "Personal Details"}
                       </h4>
                       {isDetailsExpanded && (
                           <div className="space-y-3 animate-in slide-in-from-top-1 fade-in duration-300">
@@ -38,48 +39,61 @@ export const CustomerDetailsSection = ({
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.previousNames || 'N/A'}</span>
                               </div>
                               <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Date of Birth :</span>
+                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">{isCorporate ? "Date of Incorporation :" : "Date of Birth :"}</span>
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.dob}</span>
                               </div>
                               <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Place of Birth :</span>
+                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">{isCorporate ? "Place of Incorporation :" : "Place of Birth :"}</span>
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.placeOfBirth}</span>
                               </div>
                               <div className="flex items-baseline justify-between gap-4">
                                   <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Mobile :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.phone}</span>
+                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.phone || '—'}</span>
                               </div>
                               <div className="flex items-baseline justify-between gap-4">
                                   <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Email :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.email}</span>
+                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.email || '—'}</span>
                               </div>
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Gender :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.gender}</span>
-                              </div>
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Citizenships :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.multipleCitizenships?.join(", ") || "None"}</span>
-                              </div>
+                              {!isCorporate && (
+                                  <div className="flex items-baseline justify-between gap-4">
+                                      <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Gender :</span>
+                                      <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.gender}</span>
+                                  </div>
+                              )}
+                              {!isCorporate && (
+                                  <div className="flex items-baseline justify-between gap-4">
+                                      <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Citizenships :</span>
+                                      <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.multipleCitizenships?.join(", ") || "None"}</span>
+                                  </div>
+                              )}
                           </div>
                       )}
                   </div>
 
-                  {/* Card 2: Employment */}
+                  {/* Card 2: Employment / Business */}
                   <div className={cn("transition-all duration-300", isDetailsExpanded ? "bg-white rounded-lg border border-gray-200 p-5 shadow-sm space-y-4" : "p-2")}>
                       <h4 className={cn("text-xs font-bold text-gray-700 tracking-wider flex items-center gap-1.5", isDetailsExpanded && "mb-2 pb-2 border-b border-gray-100")}>
-                          <Briefcase className="size-3.5 text-[#2A53A0]" /> Employment & Segment
+                          <Briefcase className="size-3.5 text-[#2A53A0]" /> {isCorporate ? "Business & Segment" : "Employment & Segment"}
                       </h4>
                       {isDetailsExpanded && (
                           <div className="space-y-3 animate-in slide-in-from-top-1 fade-in duration-300">
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Occupation :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.occupation}</span>
-                              </div>
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Employer :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.employer}</span>
-                              </div>
+                              {isCorporate ? (
+                                  <div className="flex items-baseline justify-between gap-4">
+                                      <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Nature of Business :</span>
+                                      <span className="text-sm text-gray-900 font-normal text-right truncate">{(selectedCustomer as any).natureOfBusiness || '—'}</span>
+                                  </div>
+                              ) : (
+                                  <>
+                                      <div className="flex items-baseline justify-between gap-4">
+                                          <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Occupation :</span>
+                                          <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.occupation}</span>
+                                      </div>
+                                      <div className="flex items-baseline justify-between gap-4">
+                                          <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Employer :</span>
+                                          <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.employer}</span>
+                                      </div>
+                                  </>
+                              )}
                               <div className="flex items-baseline justify-between gap-4">
                                   <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Business Segment :</span>
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.businessSegment || "N/A"}</span>
@@ -111,18 +125,22 @@ export const CustomerDetailsSection = ({
                                   <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Onboarding Channel :</span>
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.onboardingChannel || 'Branch'}</span>
                               </div>
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">FATCA Status :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.fatcaStatus}</span>
-                              </div>
+                              {!isCorporate && (
+                                  <div className="flex items-baseline justify-between gap-4">
+                                      <span className="text-sm text-gray-500 font-normal whitespace-nowrap">FATCA Status :</span>
+                                      <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.fatcaStatus}</span>
+                                  </div>
+                              )}
                               <div className="flex items-baseline justify-between gap-4">
                                   <span className="text-sm text-gray-500 font-normal whitespace-nowrap">LEA Status :</span>
                                   <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.leaStatus}</span>
                               </div>
-                              <div className="flex items-baseline justify-between gap-4">
-                                  <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Resident Status :</span>
-                                  <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.residentStatus}</span>
-                              </div>
+                              {!isCorporate && (
+                                  <div className="flex items-baseline justify-between gap-4">
+                                      <span className="text-sm text-gray-500 font-normal whitespace-nowrap">Resident Status :</span>
+                                      <span className="text-sm text-gray-900 font-normal text-right truncate">{selectedCustomer.residentStatus}</span>
+                                  </div>
+                              )}
                           </div>
                       )}
                   </div>
@@ -134,10 +152,19 @@ export const CustomerDetailsSection = ({
                       </h4>
                       {isDetailsExpanded && (
                           <div className="space-y-3 animate-in slide-in-from-top-1 fade-in duration-300">
-                              <div className="space-y-1">
-                                  <span className="text-sm text-gray-500 font-normal block">Primary Address :</span>
-                                  <p className="text-sm text-gray-900 font-normal leading-relaxed">{selectedCustomer.primaryAddress}</p>
-                              </div>
+                              {selectedCustomer.primaryAddress ? (
+                                  <div className="space-y-1">
+                                      <span className="text-sm text-gray-500 font-normal block">Primary Address :</span>
+                                      <p className="text-sm text-gray-900 font-normal leading-relaxed">{selectedCustomer.primaryAddress}</p>
+                                  </div>
+                              ) : isCorporate && selectedCustomer.address ? (
+                                  <div className="space-y-1">
+                                      <span className="text-sm text-gray-500 font-normal block">Registered Address :</span>
+                                      <p className="text-sm text-gray-900 font-normal leading-relaxed">{`${selectedCustomer.address.line1}, ${selectedCustomer.address.city} – ${selectedCustomer.address.zip}`}</p>
+                                  </div>
+                              ) : (
+                                  <span className="text-sm text-gray-400">—</span>
+                              )}
                               {selectedCustomer.secondaryAddresses && selectedCustomer.secondaryAddresses.length > 0 && (
                                   <div className="space-y-1 pt-2 border-t border-gray-50">
                                       <span className="text-sm text-gray-500 font-normal block">Secondary Address :</span>

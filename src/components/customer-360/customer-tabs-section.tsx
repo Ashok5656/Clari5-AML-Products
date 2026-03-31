@@ -212,7 +212,7 @@ export const CustomerTabsSection = ({
                                           <span className="text-[10px] text-gray-500">{rel.designation || rel.relation}</span>
                                        </div>
                                     </div>
-                                    <Badge variant="outline" className="text-[9px] h-5">{rel.ownership}% Own</Badge>
+                                    <Badge variant="outline" className="text-[9px] h-5">{rel.ownership != null ? `${rel.ownership}% Own` : rel.share || '—'}</Badge>
                                  </div>
                               ))}
                            </div>
@@ -472,16 +472,36 @@ export const CustomerTabsSection = ({
                                      <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="name" label="Name" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
                                      <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="designation" label="Designation" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
                                      <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="nationality" label="Nationality" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
-                                     <TableHead className="h-9 text-xs font-bold uppercase text-right"><SortableHeader column="ownership" label="Ownership" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="din" label="DIN / ID" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="dob" label="Date of Birth" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="pan" label="PAN" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="pepStatus" label="PEP" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase"><SortableHeader column="sanctions" label="Sanctions" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
+                                     <TableHead className="h-9 text-xs font-bold uppercase text-right"><SortableHeader column="ownership" label="Ownership %" sortConfig={uboSortConfig} onSort={sortUbo} /></TableHead>
                                   </TableRow>
                                </TableHeader>
                                <TableBody>
                                   {sortedUbo.map((ubo: any, i: number) => (
                                      <TableRow key={i}>
-                                        <TableCell className="font-bold text-sm text-[#2A53A0]">{ubo.name}</TableCell>
-                                        <TableCell className="text-sm text-gray-600">{ubo.designation}</TableCell>
-                                        <TableCell className="text-sm text-gray-600">{ubo.nationality}</TableCell>
-                                        <TableCell className="text-sm font-bold text-gray-900 text-right">{ubo.ownership}%</TableCell>
+                                        <TableCell className="font-bold text-sm text-[#2A53A0] whitespace-nowrap">{ubo.name}</TableCell>
+                                        <TableCell className="text-sm text-gray-600 whitespace-nowrap">{ubo.designation || '—'}</TableCell>
+                                        <TableCell className="text-sm text-gray-600 whitespace-nowrap">{ubo.nationality || '—'}</TableCell>
+                                        <TableCell className="text-sm text-gray-600 font-mono">{ubo.din || '—'}</TableCell>
+                                        <TableCell className="text-sm text-gray-600 whitespace-nowrap">{ubo.dob || '—'}</TableCell>
+                                        <TableCell className="text-sm text-gray-600 font-mono">{ubo.pan || '—'}</TableCell>
+                                        <TableCell>
+                                           <Badge variant="outline" className={cn("text-[10px] h-5", ubo.pepStatus === 'Not a PEP' || ubo.pepStatus === 'No' ? "bg-green-50 text-green-700 border-green-200" : ubo.pepStatus === '—' ? "bg-gray-50 text-gray-500 border-gray-200" : "bg-red-50 text-red-700 border-red-200")}>
+                                              {ubo.pepStatus || '—'}
+                                           </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                           <Badge variant="outline" className={cn("text-[10px] h-5", ubo.sanctions === 'Clear' ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200")}>
+                                              {ubo.sanctions || '—'}
+                                           </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-sm font-bold text-gray-900 text-right whitespace-nowrap">
+                                           {ubo.ownership != null ? `${ubo.ownership}%` : '—'}
+                                        </TableCell>
                                      </TableRow>
                                   ))}
                                </TableBody>

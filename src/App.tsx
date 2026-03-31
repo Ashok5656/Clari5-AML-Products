@@ -649,7 +649,7 @@ export default function App() {
               />
             </div>
 
-            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && (
+            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && !activeItem.startsWith("sanctions-manual-screening") && (
               <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm px-4 py-2 flex items-center justify-between relative">
                 <div className="flex items-center gap-3">
                    {extraBreadcrumbs.length > 0 && activeItem.includes("customer-360-view") ? (
