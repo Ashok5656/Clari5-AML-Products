@@ -68,79 +68,79 @@ const MOCK_RESULTS = [
   {
     id: "M-2024-001",
     custId: "CUST-88291",
-    name: "Muhammad Al-Thani",
-    originalName: "محمد آل ثاني",
+    name: "William James Harrington",
+    originalName: "",
     matchedLists: 3,
-    score: 95,
-    topList: "UAE Compliance Watchlist",
+    score: 92,
+    topList: "Singapore High-Risk Screening",
     category: "Sanctions",
     type: "Individual",
-    matchDate: "21-01-2026",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   },
   {
     id: "M-2024-002",
     custId: "CUST-11234",
-    name: "Mohammed Bin Ali",
-    originalName: "محمد بن علي",
+    name: "William J. Harrington",
+    originalName: "",
     matchedLists: 1,
-    score: 88,
-    topList: "UN Security Council",
+    score: 85,
+    topList: "MAS Watchlist",
     category: "PEP",
     type: "Individual",
-    matchDate: "21-01-2026",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   },
   {
     id: "M-2024-003",
     custId: "CUST-99210",
-    name: "Al Muhammad Trading LLC",
-    originalName: "شركة المحمد للتجارة",
+    name: "W.J. Harrington Trading Pte Ltd",
+    originalName: "",
     matchedLists: 2,
-    score: 76,
+    score: 74,
     topList: "OFAC SDN List",
     category: "Embargo",
     type: "Organization",
-    matchDate: "21-01-2026",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   },
   {
     id: "M-2024-004",
     custId: "CUST-45120",
-    name: "Ahmad Hassan",
-    originalName: "أحمد حسن",
+    name: "Harrington William",
+    originalName: "",
     matchedLists: 1,
-    score: 65,
-    topList: "EU Consolidated List",
+    score: 68,
+    topList: "UN Security Council",
     category: "Sanctions",
     type: "Individual",
-    matchDate: "21-01-2026",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   },
   {
     id: "M-2024-005",
     custId: "CUST-78901",
-    name: "Global Shipping Corp",
-    originalName: "شركة الشحن العالمية",
-    matchedLists: 4,
-    score: 92,
+    name: "James Harrington",
+    originalName: "",
+    matchedLists: 2,
+    score: 80,
     topList: "OFAC SDN List",
     category: "Embargo",
-    type: "Organization",
-    matchDate: "21-01-2026",
+    type: "Individual",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   },
   {
     id: "M-2024-006",
     custId: "CUST-33211",
-    name: "Elena Petrova",
-    originalName: "Елена Петрова",
-    matchedLists: 2,
-    score: 81,
-    topList: "UK HMT Sanctions",
+    name: "William Harrington",
+    originalName: "",
+    matchedLists: 1,
+    score: 77,
+    topList: "EU Consolidated List",
     category: "Sanctions",
     type: "Individual",
-    matchDate: "21-01-2026",
+    matchDate: "06-04-2026",
     status: "Potential Match"
   }
 ];
@@ -149,64 +149,66 @@ const MOCK_RESULTS = [
 const MOCK_MATCH_DETAILS: Record<string, any[]> = {
   "M-2024-001": [
     {
-      watchlistName: "UAE Local Lists (Terrorist & Sanction)",
-      watchlistKey: "UAE_004",
-      score: 97,
+      watchlistName: "Singapore High-Risk Screening List",
+      watchlistKey: "SGP_HRS_001",
+      score: 92,
       category: "Sanctions",
-      subCategory: "Terrorist & Sanction",
-      url: "https://www.uaecabinet.ae/en/sanctions",
-      source: "UAE Cabinet",
-      furtherInfo: "United Arab Emirates designated terrorist and sanctioned entities list maintained by the UAE Cabinet. Cabinet Resolution No. (18) of 2017",
+      subCategory: "High-Risk Individual",
+      url: "https://www.mas.gov.sg/regulation/anti-money-laundering",
+      source: "Monetary Authority of Singapore (MAS)",
+      furtherInfo: "Singapore MAS-designated high-risk individuals subject to enhanced due diligence under the MAS Notice on Prevention of Money Laundering and Countering the Financing of Terrorism.",
       details: [
-        { attribute: "Name", customer: "MUHAMMAD", watchlist: "IBRAHIM ISA HAJJI MUHAMMAD AL-BAKR", score: 95, weight: 60 },
-        { attribute: "ID Number", customer: "SCR-2026012100724", watchlist: "01016648", score: 0, weight: 0 },
-        { attribute: "Nationality", customer: "Qatar", watchlist: "Qatar", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "WILLIAM JAMES HARRINGTON", score: 92, weight: 60 },
+        { attribute: "Date of Birth", customer: "1972-09-20", watchlist: "1971-09-04", score: 78, weight: 20 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 10 },
+        { attribute: "Place of Birth", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 10 }
       ]
     },
     {
-      watchlistName: "UAE Local Lists (Terrorist & Sanction)",
-      watchlistKey: "UAE_008",
-      score: 97,
+      watchlistName: "MAS Watchlist – Persons of Interest",
+      watchlistKey: "SGP_MAS_112",
+      score: 88,
       category: "Sanctions",
-      subCategory: "Terrorist & Sanction",
-      url: "https://www.uaecabinet.ae/en/sanctions",
-      source: "UAE Cabinet",
-      furtherInfo: "United Arab Emirates designated terrorist and sanctioned entities list maintained by the UAE Cabinet. Cabinet Resolution No. (18) of 2017",
+      subCategory: "Person of Interest",
+      url: "https://www.mas.gov.sg/regulation/anti-money-laundering",
+      source: "Monetary Authority of Singapore (MAS)",
+      furtherInfo: "Watchlist of persons flagged under MAS regulatory notices for suspicious financial activity originating from Singapore.",
       details: [
-        { attribute: "Name", customer: "MUHAMMAD", watchlist: "SAD BIN SAD MUHAMMAD SHARIAN AL-KABI", score: 95, weight: 60 },
-        { attribute: "ID Number", customer: "SCR-2026012100724", watchlist: "N/A", score: 0, weight: 0 },
-        { attribute: "Nationality", customer: "Qatar", watchlist: "Qatar", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "WILLIAM JAMES HARRINGTON", score: 88, weight: 60 },
+        { attribute: "Passport Number", customer: "7234580J", watchlist: "K2947631B", score: 0, weight: 15 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 15 },
+        { attribute: "Gender", customer: "Male", watchlist: "Male", score: 100, weight: 10 }
       ]
     },
     {
-      watchlistName: "UN Security Council Consolidated List",
-      watchlistKey: "UN_SC_201",
-      score: 85,
+      watchlistName: "OFAC SDN List",
+      watchlistKey: "OFAC_SDN_881",
+      score: 75,
       category: "Sanctions",
-      subCategory: "UN Sanctions",
-      url: "https://sc.un.org/sanctions",
-      source: "UN Security Council",
-      furtherInfo: "Consolidated List of individuals and entities subject to sanctions measures imposed by the UN Security Council.",
+      subCategory: "Specially Designated Nationals",
+      url: "https://sanctionssearch.ofac.treas.gov/",
+      source: "US Treasury / OFAC",
+      furtherInfo: "Specially Designated Nationals and Blocked Persons list maintained by the US Department of Treasury Office of Foreign Assets Control.",
       details: [
-        { attribute: "Name", customer: "MUHAMMAD", watchlist: "MUHAMMAD AL-THANI", score: 85, weight: 60 },
-        { attribute: "ID Number", customer: "SCR-2026012100724", watchlist: "N/A", score: 0, weight: 0 },
-        { attribute: "Nationality", customer: "Qatar", watchlist: "Qatar", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "HARRINGTON, WILLIAM JAMES", score: 75, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 25 },
+        { attribute: "Date of Birth", customer: "1972-09-20", watchlist: "1971-09-04", score: 60, weight: 15 }
       ]
     }
   ],
   "M-2024-002": [
     {
-      watchlistName: "UN Security Council Consolidated List",
-      watchlistKey: "UN_SC_998",
-      score: 88,
+      watchlistName: "MAS Watchlist – Persons of Interest",
+      watchlistKey: "SGP_MAS_998",
+      score: 85,
       category: "PEP",
       subCategory: "Politically Exposed Person",
-      url: "https://sc.un.org/sanctions",
-      source: "UN Security Council",
-      furtherInfo: "Individuals holding prominent public functions.",
+      url: "https://www.mas.gov.sg/regulation/anti-money-laundering",
+      source: "Monetary Authority of Singapore (MAS)",
+      furtherInfo: "Individuals holding prominent public functions in Singapore or with close associations to political figures.",
       details: [
-        { attribute: "Name", customer: "Mohammed Bin Ali", watchlist: "MOHAMMED BIN ALI AL-KHATIB", score: 88, weight: 60 },
-        { attribute: "Nationality", customer: "UAE", watchlist: "UAE", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "WILLIAM J. HARRINGTON", score: 85, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 40 }
       ]
     }
   ],
@@ -221,8 +223,8 @@ const MOCK_MATCH_DETAILS: Record<string, any[]> = {
       source: "US Treasury",
       furtherInfo: "Specially Designated Nationals and Blocked Persons list.",
       details: [
-        { attribute: "Name", customer: "Al Muhammad Trading LLC", watchlist: "AL-MUHAMMAD TRADING COMPANY", score: 76, weight: 70 },
-        { attribute: "Country", customer: "Qatar", watchlist: "Qatar", score: 100, weight: 30 }
+        { attribute: "Name", customer: "Sin Huat Alan", watchlist: "W.J. HARRINGTON TRADING PTE LTD", score: 76, weight: 70 },
+        { attribute: "Country", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 30 }
       ]
     },
     {
@@ -235,8 +237,8 @@ const MOCK_MATCH_DETAILS: Record<string, any[]> = {
       source: "European Union",
       furtherInfo: "Consolidated list of persons, groups and entities subject to EU financial sanctions.",
       details: [
-        { attribute: "Name", customer: "Al Muhammad Trading LLC", watchlist: "MUHAMMAD TRADING ESTABLISHMENT", score: 70, weight: 70 },
-        { attribute: "Country", customer: "Qatar", watchlist: "Qatar", score: 100, weight: 30 }
+        { attribute: "Name", customer: "Sin Huat Alan", watchlist: "W.J. HARRINGTON TRADING ESTABLISHMENT", score: 70, weight: 70 },
+        { attribute: "Country", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 30 }
       ]
     }
   ],
@@ -251,8 +253,8 @@ const MOCK_MATCH_DETAILS: Record<string, any[]> = {
       source: "European Union",
       furtherInfo: "Consolidated list of persons, groups and entities subject to EU financial sanctions.",
       details: [
-        { attribute: "Name", customer: "Ahmad Hassan", watchlist: "AHMAD HASAN", score: 65, weight: 60 },
-        { attribute: "Nationality", customer: "Syria", watchlist: "Syria", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "HARRINGTON WILLIAM", score: 65, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 40 }
       ]
     }
   ],
@@ -267,50 +269,50 @@ const MOCK_MATCH_DETAILS: Record<string, any[]> = {
       source: "US Treasury",
       furtherInfo: "Specially Designated Nationals and Blocked Persons list.",
       details: [
-        { attribute: "Name", customer: "Global Shipping Corp", watchlist: "GLOBAL SHIPPING CORPORATION", score: 95, weight: 70 },
-        { attribute: "Country", customer: "Iran", watchlist: "Iran", score: 100, weight: 30 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "JAMES HARRINGTON", score: 80, weight: 70 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 30 }
       ]
     },
     {
       watchlistName: "UN Security Council Consolidated List",
       watchlistKey: "UN_SC_551",
-      score: 88,
+      score: 75,
       category: "Sanctions",
       subCategory: "UN Sanctions",
       url: "https://sc.un.org/sanctions",
       source: "UN Security Council",
       furtherInfo: "Consolidated List of individuals and entities subject to sanctions measures imposed by the UN Security Council.",
       details: [
-        { attribute: "Name", customer: "Global Shipping Corp", watchlist: "GLOBAL MARITIME SHIPPING", score: 85, weight: 60 },
-        { attribute: "Country", customer: "Iran", watchlist: "Iran", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "HARRINGTON JAMES", score: 72, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 40 }
       ]
     },
     {
       watchlistName: "EU Consolidated List",
       watchlistKey: "EU_FS_223",
-      score: 80,
+      score: 68,
       category: "Sanctions",
       subCategory: "Financial Sanctions",
       url: "https://data.europa.eu/euodp/en/data/dataset/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions",
       source: "European Union",
       furtherInfo: "Consolidated list of persons, groups and entities subject to EU financial sanctions.",
       details: [
-        { attribute: "Name", customer: "Global Shipping Corp", watchlist: "GLOBAL TRANSPORT & SHIPPING", score: 75, weight: 70 },
-        { attribute: "Country", customer: "Iran", watchlist: "Iran", score: 100, weight: 30 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "J. HARRINGTON", score: 65, weight: 70 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 30 }
       ]
     },
     {
       watchlistName: "UK HMT Sanctions",
       watchlistKey: "UK_HMT_112",
-      score: 75,
+      score: 62,
       category: "Sanctions",
       subCategory: "Financial Sanctions",
       url: "https://www.gov.uk/government/publications/financial-sanctions-consolidated-list-of-targets",
       source: "HM Treasury",
       furtherInfo: "Consolidated List of Financial Sanctions Targets in the UK.",
       details: [
-        { attribute: "Name", customer: "Global Shipping Corp", watchlist: "GLOBAL SHIPPING LINES", score: 70, weight: 70 },
-        { attribute: "Country", customer: "Iran", watchlist: "Iran", score: 100, weight: 30 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "JAMES W. HARRINGTON", score: 60, weight: 70 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 30 }
       ]
     }
   ],
@@ -325,22 +327,22 @@ const MOCK_MATCH_DETAILS: Record<string, any[]> = {
       source: "HM Treasury",
       furtherInfo: "Consolidated List of Financial Sanctions Targets in the UK.",
       details: [
-        { attribute: "Name", customer: "Elena Petrova", watchlist: "ELENA PETROVNA", score: 80, weight: 60 },
-        { attribute: "Nationality", customer: "Russia", watchlist: "Russia", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "WILLIAM HARRINGTON", score: 77, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 40 }
       ]
     },
     {
       watchlistName: "EU Consolidated List",
       watchlistKey: "EU_FS_991",
-      score: 75,
+      score: 70,
       category: "Sanctions",
       subCategory: "Financial Sanctions",
       url: "https://data.europa.eu/euodp/en/data/dataset/consolidated-list-of-persons-groups-and-entities-subject-to-eu-financial-sanctions",
       source: "European Union",
       furtherInfo: "Consolidated list of persons, groups and entities subject to EU financial sanctions.",
       details: [
-        { attribute: "Name", customer: "Elena Petrova", watchlist: "ELENA VIKTOROVNA PETROVA", score: 70, weight: 60 },
-        { attribute: "Nationality", customer: "Russia", watchlist: "Russia", score: 100, weight: 40 }
+        { attribute: "Full Name", customer: "Sin Huat Alan", watchlist: "W. HARRINGTON", score: 68, weight: 60 },
+        { attribute: "Nationality", customer: "Singapore", watchlist: "Singapore", score: 100, weight: 40 }
       ]
     }
   ]
@@ -350,12 +352,13 @@ import { useSortableData } from "../hooks/use-sortable-data";
 import { SortableHeader } from "./ui/sortable-header";
 
 export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScreeningProps) {
-  const [view, setView] = useState<"form" | "results" | "details">("form");
+  const [view, setView] = useState<"form" | "results" | "details" | "row-summary">("form");
   const [activeTab, setActiveTab] = useState("individual");
   const [detailsTab, setDetailsTab] = useState("ai-summary");
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [selectedSummaryId, setSelectedSummaryId] = useState<string | null>(null);
   
-  // Form State - Empty by default
+  // Form State
   const [entityType, setEntityType] = useState("individual");
   const [watchlistProfile, setWatchlistProfile] = useState("");
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -424,6 +427,16 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     setView("details");
   };
 
+  const handleViewSummary = (id: string) => {
+    setSelectedSummaryId(id);
+    setView("row-summary");
+  };
+
+  const handleBackFromSummary = () => {
+    setView("results");
+    setSelectedSummaryId(null);
+  };
+
   const resetForm = () => {
     setFormData({
       primaryName: "",
@@ -436,9 +449,17 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
       nationality: "",
       countryBirth: "",
       residence: "",
+      address: "",
+      jointAccountHolder: "",
       purpose: "",
       industry: "",
       registrationType: "",
+      taxId: "",
+      registeredAddress: "",
+      operatingCountries: "",
+      corporateShareholders: "",
+      directors: "",
+      trustees: "",
       vesselType: "",
       callSign: "",
       flagState: "",
@@ -572,24 +593,192 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
               <Sparkles className={cn("size-4", detailsTab === "ai-summary" ? "text-[#2A53A0]" : "text-gray-400")} />
               AI Summary
             </button>
-            <button 
+            <button
               onClick={() => setDetailsTab("match-details")}
               className={cn(
                 "h-full px-1 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2",
-                detailsTab === "match-details" 
-                  ? "border-[#2A53A0] text-[#2A53A0]" 
+                detailsTab === "match-details"
+                  ? "border-[#2A53A0] text-[#2A53A0]"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               )}
             >
               <ListFilter className={cn("size-4", detailsTab === "match-details" ? "text-[#2A53A0]" : "text-gray-400")} />
               Match Details
             </button>
+            <button
+              onClick={() => setDetailsTab("view-summary")}
+              className={cn(
+                "h-full px-1 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2",
+                detailsTab === "view-summary"
+                  ? "border-[#2A53A0] text-[#2A53A0]"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              )}
+            >
+              <TrendingUp className={cn("size-4", detailsTab === "view-summary" ? "text-[#2A53A0]" : "text-gray-400")} />
+              View Summary
+            </button>
           </div>
         </div>
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
-          {detailsTab === "ai-summary" ? (
+          {detailsTab === "view-summary" ? (
+            (() => {
+              const summaryAttributes = [
+                { attribute: "Name",         weight: 40, customerValue: "William James Harrington", unscr: { value: "William Jame Harrington", score: 98 }, ofac: { value: "Wm. James Harrington",    score: 88 } },
+                { attribute: "Passport No.", weight:  7, customerValue: "K2947681B",                unscr: { value: "K2947681B",               score: 89 }, ofac: { value: "K2947600B",               score: 85 } },
+                { attribute: "Date of Birth",weight: 25, customerValue: "1971-09-04",               unscr: { value: "1971-09-04",              score: 100}, ofac: { value: "1971-09-04",              score: 100} },
+                { attribute: "Nationality",  weight: 12, customerValue: "Singapore",                unscr: { value: "SGP",                     score: 33 }, ofac: { value: "Singapore",               score: 100} },
+                { attribute: "Place of Birth",weight:11, customerValue: "Singapore",                unscr: { value: "Singapore",               score: 100}, ofac: { value: "Singapore",               score: 100} },
+                { attribute: "Gender",       weight:  5, customerValue: "Male",                     unscr: { value: "Male",                    score: 25 }, ofac: { value: "Male",                    score: 100} },
+              ];
+              return (
+                <div className="p-4 space-y-4">
+                  {/* Top 3 Info Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Customer Information */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Customer Information</h3>
+                      <div className="space-y-0">
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Customer ID</span>
+                          <span className="text-sm font-semibold text-[#2A53A0] font-mono">CUST-2025-08355</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Customer Type</span>
+                          <span className="text-sm font-semibold text-[#2A53A0]">Individual</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Overall CRC Score</span>
+                          <span className="text-sm font-bold text-[#2A53A0]">85</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5">
+                          <span className="text-sm text-gray-500">CRC Category</span>
+                          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-0 font-semibold">Medium</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Match Statistics */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Match Statistics</h3>
+                      <div className="space-y-0">
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Total List Matches</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">2</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Highest Match Score</span>
+                          <span className="text-sm font-bold text-[#2A53A0]">92.00%</span>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5">
+                          <span className="text-sm text-gray-500">Used for Calculation</span>
+                          <span className="text-xs text-gray-400 italic text-right">Highest match score</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Risk Assessment */}
+                    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Risk Assessment</h3>
+                      <div className="space-y-0">
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Sanctions Risk</span>
+                          <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-0 font-bold">High</Badge>
+                        </div>
+                        <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                          <span className="text-sm text-gray-500">Cut-off Threshold</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">80%</span>
+                        </div>
+                        <div className="py-2.5 space-y-1.5">
+                          <div className="text-xs font-semibold text-gray-500 mb-2">Risk Ranges:</div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-500">Low:</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">50 – 70%</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-500">Medium:</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">70.1 – 90%</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-500">High:</span>
+                            <span className="font-medium text-gray-700 dark:text-gray-300">&gt;90.1%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Attribute Comparison */}
+                  <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div className="bg-[#2A53A0] px-6 py-4">
+                      <h3 className="text-base font-bold text-white">Detailed Attribute Comparison</h3>
+                      <p className="text-xs text-blue-200 mt-0.5">Customer details vs. watchlist records</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/50">
+                            <th className="text-left py-3 px-5 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-28">
+                              Score<br />WL Key
+                            </th>
+                            <th className="text-left py-3 px-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-44">
+                              Attribute<br />Weight %
+                            </th>
+                            <th className="text-left py-3 px-4 text-[10px] font-bold text-[#2A53A0] uppercase tracking-wider">
+                              Customer Value
+                            </th>
+                            <th className="text-center py-3 px-4 text-[10px] font-bold text-[#2A53A0] uppercase tracking-wider border-l border-gray-200 dark:border-gray-700" colSpan={2}>
+                              Watchlist Records
+                            </th>
+                          </tr>
+                          <tr className="border-b border-gray-200 dark:border-gray-700 bg-blue-50/40 dark:bg-blue-900/10">
+                            <td className="py-2.5 px-5 text-sm font-bold text-[#2A53A0]">92.0%</td>
+                            <td className="py-2.5 px-4" />
+                            <td className="py-2.5 px-4" />
+                            <td className="py-2.5 px-4 text-center border-l border-gray-200 dark:border-gray-700 w-56">
+                              <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">UN Security Council Consolidated List (UNSCR 1267)</div>
+                              <div className="text-sm font-bold text-[#2A53A0] mt-0.5">92.00%</div>
+                            </td>
+                            <td className="py-2.5 px-4 text-center border-l border-gray-200 dark:border-gray-700 w-44">
+                              <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">OFAC SDN</div>
+                              <div className="text-sm font-bold text-[#2A53A0] mt-0.5">75.00%</div>
+                            </td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {summaryAttributes.map((row, idx) => (
+                            <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                              <td className="py-3 px-5 text-xs text-gray-400 font-mono align-middle" />
+                              <td className="py-3 px-4 align-middle">
+                                <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{row.attribute}</div>
+                                <div className="text-[11px] text-gray-400 mt-0.5">{row.weight}%</div>
+                              </td>
+                              <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300 align-middle">{row.customerValue}</td>
+                              <td className="py-3 px-4 text-center border-l border-gray-100 dark:border-gray-800 align-middle">
+                                <div className="text-sm text-gray-800 dark:text-gray-200">{row.unscr.value}</div>
+                                <div className={cn(
+                                  "text-xs font-bold mt-0.5",
+                                  row.unscr.score >= 90 ? "text-red-600" : row.unscr.score >= 70 ? "text-orange-500" : "text-[#2A53A0]"
+                                )}>{row.unscr.score}%</div>
+                              </td>
+                              <td className="py-3 px-4 text-center border-l border-gray-100 dark:border-gray-800 align-middle">
+                                <div className="text-sm text-gray-800 dark:text-gray-200">{row.ofac.value}</div>
+                                <div className={cn(
+                                  "text-xs font-bold mt-0.5",
+                                  row.ofac.score >= 90 ? "text-red-600" : row.ofac.score >= 70 ? "text-orange-500" : "text-[#2A53A0]"
+                                )}>{row.ofac.score}%</div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          ) : detailsTab === "ai-summary" ? (
             <div className="p-4 space-y-4">
               {/* Critical Alert Box */}
               <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg p-4 flex items-start gap-4">
@@ -599,7 +788,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                 <div className="space-y-1">
                   <h4 className="font-bold text-red-800 dark:text-red-400">High-Confidence Sanctions Match — Immediate Action Required</h4>
                   <p className="text-sm text-red-700 dark:text-red-300 leading-relaxed">
-                    {mainResult?.name} ({mainResult?.custId}) has returned <span className="font-bold">{details.length} watchlist hits</span> — 2 on the UAE Cabinet Terrorist & Sanctions list (Critical, 97%) and 1 on the UN Security Council Consolidated List (High, 85%). Legal obligations apply. Do not transact until resolved.
+                    {mainResult?.name} ({mainResult?.custId}) has returned <span className="font-bold">{details.length} watchlist hits</span> — 1 on the Singapore High-Risk Screening List (Critical, 92%) and 1 on the MAS Watchlist – Persons of Interest (High, 88%). MAS regulatory obligations apply. Do not transact until resolved.
                   </p>
                 </div>
               </div>
@@ -620,13 +809,13 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
 
                 <div className="text-[15px] leading-relaxed text-gray-700 dark:text-gray-300 space-y-4 bg-white dark:bg-gray-800/50 p-6 rounded-xl border border-gray-100 dark:border-gray-800">
                   <p>
-                    The customer <span className="font-bold text-[#2A53A0] underline decoration-blue-200 underline-offset-4">{mainResult?.name} ({mainResult?.custId}, {formData.nationality === 'qa' ? 'Qatari' : 'Qatari'} national)</span> has produced an overall risk score of <span className="font-bold text-red-600 bg-red-50 px-1 rounded">{mainResult?.score}/100 (Critical)</span> across {details.length} watchlist hits. The two highest-scoring hits originate from the <span className="font-bold bg-red-50 px-1 rounded text-red-700">UAE Cabinet Resolution No. 18 of 2017</span> — a mandatory government list designating terrorists and sanctioned entities in the UAE. Any financial activity involving a designated individual on this list constitutes a criminal offence under UAE AML law.
+                    The customer <span className="font-bold text-[#2A53A0] underline decoration-blue-200 underline-offset-4">{mainResult?.name} ({mainResult?.custId}, Singaporean national)</span> has produced an overall risk score of <span className="font-bold text-red-600 bg-red-50 px-1 rounded">{mainResult?.score}/100 (Critical)</span> across {details.length} watchlist hits. The highest-scoring hit originates from the <span className="font-bold bg-red-50 px-1 rounded text-red-700">Singapore MAS High-Risk Screening List (SGP_HRS_001)</span> — a MAS-designated list of individuals subject to enhanced due diligence under the MAS Notice on Prevention of Money Laundering and Countering the Financing of Terrorism. Any financial activity involving a designated individual on this list requires mandatory EDD under Singapore AML/CFT law.
                   </p>
                   <p>
-                    The matched entities are <span className="italic">IBRAHIM ISA HAJJI MUHAMMAD AL-BAKR</span> (97%) and <span className="italic">SAD BIN SAD MUHAMMAD SHARIAN AL-KABI</span> (97%), both Qatari nationals. The third hit is <span className="italic">MUHAMMAD AL-THANI</span> on the <span className="font-semibold text-orange-700 bg-orange-50 px-1 rounded">UN Security Council Consolidated List</span> (85%) — carrying international asset-freeze obligations. Across all three hits, <span className="font-bold bg-orange-50 px-1 rounded">Qatari nationality scored 100%</span>, and name similarity ranged from 85%–95%. No ID number was available for screening, meaning these matches <span className="bg-yellow-100 px-1 rounded font-medium">cannot be ruled out through existing record data alone</span>.
+                    The top watchlist match is <span className="italic">WILLIAM JAMES HARRINGTON</span> (92%) on the Singapore MAS High-Risk Screening List, and <span className="italic">WILLIAM J. HARRINGTON</span> (88%) on the MAS Watchlist – Persons of Interest. A third hit on the <span className="font-semibold text-orange-700 bg-orange-50 px-1 rounded">OFAC SDN List</span> (75%) carries international asset-freeze obligations. Across all hits, <span className="font-bold bg-orange-50 px-1 rounded">Singaporean nationality scored 100%</span>, and name similarity ranged from 75%–92%. The provided passport number (7234580J) did not match the watchlist record (K2947631B), meaning the match <span className="bg-yellow-100 px-1 rounded font-medium">cannot be ruled out through passport comparison alone</span>.
                   </p>
                   <p>
-                    The absence of documentary ID evidence, combined with dual mandatory-list exposure and a 95/100 risk score, makes this a <span className="font-bold text-red-600 underline decoration-red-200 underline-offset-4">non-dismissible match</span>. <span className="font-bold text-green-700">Recommended action: escalate to a sanctions case immediately and initiate EDD to collect identity documentation</span> (passport/Emirates ID) to attempt disambiguation.
+                    The combination of high name similarity, matching nationality, and dual MAS-list exposure makes this a <span className="font-bold text-red-600 underline decoration-red-200 underline-offset-4">non-dismissible match</span>. <span className="font-bold text-green-700">Recommended action: escalate to a sanctions case immediately and initiate EDD to collect full identity documentation</span> (NRIC/Passport) to attempt disambiguation.
                   </p>
                 </div>
               </div>
@@ -642,8 +831,8 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <Ban className="size-6 text-red-600" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">UAE Cabinet Terrorist Designation</h4>
-                      <p className="text-xs text-gray-500 leading-relaxed">2 Critical hits on UAE Cabinet Resolution 18 of 2017. Transacting with a designated entity is a criminal offence.</p>
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">MAS High-Risk Designation (Singapore)</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed">Critical hit on Singapore MAS High-Risk Screening List (SGP_HRS_001, 92%). Enhanced due diligence is mandatory under MAS AML/CFT Notice.</p>
                     </div>
                   </div>
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex gap-4 shadow-sm group hover:border-[#2A53A0]/30 transition-all">
@@ -651,17 +840,17 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <Globe className="size-6 text-[#2A53A0]" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">UN Security Council Sanctions</h4>
-                      <p className="text-xs text-gray-500 leading-relaxed">International asset freeze obligation. Financial institutions must freeze assets and report without delay.</p>
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">OFAC SDN Exposure</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed">Third-party exposure via OFAC SDN List (75%). International asset-freeze obligations may apply if match is confirmed.</p>
                     </div>
                   </div>
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex gap-4 shadow-sm group hover:border-[#2A53A0]/30 transition-all">
                     <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
-                      <div className="text-xs font-black text-orange-600">QA</div>
+                      <div className="text-xs font-black text-orange-600">SG</div>
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">Nationality Match: 100% Across All Hits</h4>
-                      <p className="text-xs text-gray-500 leading-relaxed">Qatari nationality is the top-scoring attribute in all 3 hits. No differentiation possible without ID evidence.</p>
+                      <p className="text-xs text-gray-500 leading-relaxed">Singaporean nationality is the top-scoring attribute across all 3 hits. Passport mismatch (0%) does not exclude the match alone.</p>
                     </div>
                   </div>
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex gap-4 shadow-sm group hover:border-[#2A53A0]/30 transition-all">
@@ -669,8 +858,8 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <Fingerprint className="size-6 text-gray-400" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">No ID Provided — Cannot Disambiguate</h4>
-                      <p className="text-xs text-gray-500 leading-relaxed">Missing ID number prevents documentary exclusion. EDD required before any determination of false positive.</p>
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">Passport Mismatch — Cannot Exclude Match</h4>
+                      <p className="text-xs text-gray-500 leading-relaxed">Submitted passport (7234580J) differs from watchlist record (K2947631B). EDD required before determining false positive.</p>
                     </div>
                   </div>
                 </div>
@@ -693,19 +882,19 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <TableBody>
                         <TableRow className="h-12">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Name</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">MUHAMMAD</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">SIN HUAT ALAN</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-red-600 rounded-full" style={{ width: '95%' }} />
+                                <div className="h-full bg-red-600 rounded-full" style={{ width: '92%' }} />
                               </div>
-                              <span className="text-xs font-bold text-red-600">95%</span>
+                              <span className="text-xs font-bold text-red-600">92%</span>
                             </div>
                           </TableCell>
                         </TableRow>
                         <TableRow className="h-12">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Nationality</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">Qatar</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">Singapore</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -716,22 +905,26 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                           </TableCell>
                         </TableRow>
                         <TableRow className="h-12">
-                          <TableCell className="text-sm font-bold text-gray-900 dark:text-white">ID Number</TableCell>
-                          <TableCell className="text-sm text-gray-400 italic">Not provided</TableCell>
+                          <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Passport Number</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">7234580J</TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-end gap-3 opacity-20">
-                              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden" />
-                              <span className="text-xs font-bold">0%</span>
+                            <div className="flex items-center justify-end gap-3">
+                              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-gray-300 rounded-full" style={{ width: '0%' }} />
+                              </div>
+                              <span className="text-xs font-bold text-gray-400">0%</span>
                             </div>
                           </TableCell>
                         </TableRow>
                         <TableRow className="h-12 border-b-0">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Date of Birth</TableCell>
-                          <TableCell className="text-sm text-gray-400 italic">Not provided</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">1972-09-20</TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-end gap-3 opacity-20">
-                              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden" />
-                              <span className="text-xs font-bold">0%</span>
+                            <div className="flex items-center justify-end gap-3">
+                              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-orange-400 rounded-full" style={{ width: '78%' }} />
+                              </div>
+                              <span className="text-xs font-bold text-orange-500">78%</span>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -747,8 +940,8 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                     <div className="space-y-2">
                       <div className="flex justify-between items-end">
                         <div className="space-y-0.5">
-                          <div className="text-sm font-bold text-gray-900 dark:text-white">UAE Local Lists (Terrorist & Sanction)</div>
-                          <div className="text-[10px] text-gray-400 font-medium">UAE Cabinet • Mandatory</div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white">Singapore MAS High-Risk Screening</div>
+                          <div className="text-[10px] text-gray-400 font-medium">MAS Singapore • Mandatory EDD</div>
                         </div>
                         <div className="text-xs font-bold text-red-700 uppercase">2 hits</div>
                       </div>
@@ -760,21 +953,21 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                     <div className="space-y-2">
                       <div className="flex justify-between items-end">
                         <div className="space-y-0.5">
-                          <div className="text-sm font-bold text-gray-900 dark:text-white">UN Security Council Consolidated</div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white">OFAC Specially Designated Nationals</div>
                         </div>
                         <div className="text-xs font-bold text-orange-600 uppercase">1 hit</div>
                       </div>
                       <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-orange-500 rounded-full" style={{ width: '40%' }} />
                       </div>
-                      <div className="text-[10px] text-gray-400 font-medium">UN Security Council • International</div>
+                      <div className="text-[10px] text-gray-400 font-medium">US Treasury / OFAC • International</div>
                     </div>
 
                     <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-lg p-3 space-y-1">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-red-800 dark:text-red-400 uppercase">
-                        <AlertTriangle className="size-3" /> Both lists carry zero-tolerance obligations
+                        <AlertTriangle className="size-3" /> MAS EDD and OFAC compliance obligations apply
                       </div>
-                      <p className="text-[11px] text-red-700 dark:text-red-300">Assets must be frozen and STR filed with the Financial Intelligence Unit.</p>
+                      <p className="text-[11px] text-red-700 dark:text-red-300">Enhanced due diligence required. STR must be filed with MAS if match is confirmed.</p>
                     </div>
                   </div>
                 </div>
@@ -972,6 +1165,221 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     );
   }
 
+  if (view === "row-summary" && selectedSummaryId) {
+    const result = MOCK_RESULTS.find(r => r.id === selectedSummaryId)!;
+    const matches = MOCK_MATCH_DETAILS[selectedSummaryId] || [];
+
+    // Build unified attribute list preserving order of first appearance
+    const allAttributes: string[] = [];
+    const customerValues: Record<string, string> = {};
+    const weightMap: Record<string, number> = {};
+    matches.forEach((match: any) => {
+      match.details.forEach((d: any) => {
+        if (!allAttributes.includes(d.attribute)) {
+          allAttributes.push(d.attribute);
+          customerValues[d.attribute] = d.customer;
+          weightMap[d.attribute] = d.weight;
+        }
+      });
+    });
+
+    const riskLevel = result.score >= 90 ? "Critical" : result.score >= 80 ? "High" : result.score >= 70 ? "Medium" : "Low";
+    const riskBadgeClass = result.score >= 90 ? "bg-red-100 text-red-700 hover:bg-red-100" : result.score >= 80 ? "bg-orange-100 text-orange-700 hover:bg-orange-100" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100";
+    const crcCategory = result.score >= 90 ? "Critical" : result.score >= 80 ? "High" : "Medium";
+    const crcBadgeClass = result.score >= 90 ? "bg-red-100 text-red-700 hover:bg-red-100" : result.score >= 80 ? "bg-orange-100 text-orange-700 hover:bg-orange-100" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100";
+
+    return (
+      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
+        {/* Header */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-4 flex items-center justify-between shrink-0 shadow-sm z-10">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={handleBackFromSummary} className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+              <ArrowLeft className="size-5 text-gray-600 dark:text-gray-400" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">View Summary</h1>
+              <p className="text-xs text-gray-500">
+                Ref ID: <span className="font-mono text-gray-700">{selectedSummaryId}</span>
+                <span className="mx-2 text-gray-300">|</span>
+                <span className="font-semibold text-gray-700">{result.name}</span>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="h-[40px] rounded-[8px] border-gray-300 dark:border-gray-700">
+              <Download className="size-4 mr-2" /> Report
+            </Button>
+            <div className="h-6 w-px bg-gray-300" />
+            <Button className="h-[40px] bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-[8px]">
+              <CheckCircle className="size-4 mr-2 text-green-600" /> False Positive
+            </Button>
+            <Button className="h-[40px] bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">
+              <AlertTriangle className="size-4 mr-2" /> Confirm Match
+            </Button>
+          </div>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+          {/* Top 3 Info Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Customer Information */}
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Customer Information</h3>
+              <div className="space-y-0">
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Customer ID</span>
+                  <span className="text-sm font-semibold text-[#2A53A0] font-mono">{result.custId}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Customer Type</span>
+                  <span className="text-sm font-semibold text-[#2A53A0]">{result.type}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Overall CRC Score</span>
+                  <span className="text-sm font-bold text-[#2A53A0]">{result.score}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5">
+                  <span className="text-sm text-gray-500">CRC Category</span>
+                  <Badge className={cn("border-0 font-semibold", crcBadgeClass)}>{crcCategory}</Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Match Statistics */}
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Match Statistics</h3>
+              <div className="space-y-0">
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Total List Matches</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">{result.matchedLists}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Highest Match Score</span>
+                  <span className="text-sm font-bold text-[#2A53A0]">{result.score}.00%</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Match Category</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{result.category}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5">
+                  <span className="text-sm text-gray-500">Used for Calculation</span>
+                  <span className="text-xs text-gray-400 italic">Highest match score</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Risk Assessment */}
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200 mb-4">Risk Assessment</h3>
+              <div className="space-y-0">
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Sanctions Risk</span>
+                  <Badge className={cn("border-0 font-bold", riskBadgeClass)}>{riskLevel}</Badge>
+                </div>
+                <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500">Cut-off Threshold</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">80%</span>
+                </div>
+                <div className="py-2.5 space-y-1.5">
+                  <div className="text-xs font-semibold text-gray-500 mb-2">Risk Ranges:</div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">Low:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">50 – 70%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">Medium:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">70.1 – 90%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">High:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">&gt;90.1%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Attribute Comparison */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-[#2A53A0] px-6 py-4">
+              <h3 className="text-base font-bold text-white">Detailed Attribute Comparison</h3>
+              <p className="text-xs text-blue-200 mt-0.5">Customer details vs. watchlist records</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/50">
+                    <th className="text-left py-3 px-5 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-28">
+                      Score<br />WL Key
+                    </th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider w-44">
+                      Attribute<br />Weight %
+                    </th>
+                    <th className="text-left py-3 px-4 text-[10px] font-bold text-[#2A53A0] uppercase tracking-wider">
+                      Customer Value
+                    </th>
+                    {matches.map((_: any, i: number) => (
+                      <th key={i} className="text-center py-3 px-4 text-[10px] font-bold text-[#2A53A0] uppercase tracking-wider border-l border-gray-200 dark:border-gray-700 min-w-[160px]">
+                        Watchlist Record {i + 1}
+                      </th>
+                    ))}
+                  </tr>
+                  {/* Watchlist name + score sub-header row */}
+                  <tr className="border-b border-gray-200 dark:border-gray-700 bg-blue-50/40 dark:bg-blue-900/10">
+                    <td className="py-2.5 px-5 text-sm font-bold text-[#2A53A0]">{result.score}.0%</td>
+                    <td className="py-2.5 px-4" />
+                    <td className="py-2.5 px-4" />
+                    {matches.map((match: any, i: number) => (
+                      <td key={i} className="py-2.5 px-4 text-center border-l border-gray-200 dark:border-gray-700">
+                        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 leading-tight">{match.watchlistName}</div>
+                        <div className="text-sm font-bold text-[#2A53A0] mt-0.5">{match.score}.00%</div>
+                      </td>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {allAttributes.map((attr, idx) => (
+                    <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                      <td className="py-3 px-5 align-middle" />
+                      <td className="py-3 px-4 align-middle">
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{attr}</div>
+                        <div className="text-[11px] text-gray-400 mt-0.5">{weightMap[attr]}%</div>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300 align-middle">
+                        {customerValues[attr] || "—"}
+                      </td>
+                      {matches.map((match: any, i: number) => {
+                        const detail = match.details.find((d: any) => d.attribute === attr);
+                        return (
+                          <td key={i} className="py-3 px-4 text-center border-l border-gray-100 dark:border-gray-800 align-middle">
+                            {detail ? (
+                              <>
+                                <div className="text-sm text-gray-800 dark:text-gray-200">{detail.watchlist}</div>
+                                <div className={cn(
+                                  "text-xs font-bold mt-0.5",
+                                  detail.score >= 90 ? "text-red-600" : detail.score === 0 ? "text-gray-400" : detail.score >= 70 ? "text-orange-500" : "text-[#2A53A0]"
+                                )}>{detail.score}%</div>
+                              </>
+                            ) : (
+                              <span className="text-xs text-gray-300">—</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
   if (view === "results") {
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
@@ -1003,27 +1411,39 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
              <div className="flex flex-wrap gap-6 items-center">
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Primary Name</span>
-                   <div className="text-lg font-bold text-gray-900 dark:text-white">{formData.primaryName || "MUHAMMAD"}</div>
+                   <div className="text-lg font-bold text-gray-900 dark:text-white">{formData.primaryName}</div>
+                </div>
+                <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
+                <div className="space-y-1">
+                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">ID Number</span>
+                   <div className="font-mono font-bold text-gray-900 dark:text-white">{formData.idNumber || "—"}</div>
+                </div>
+                <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
+                <div className="space-y-1">
+                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date of Birth</span>
+                   <div className="font-medium text-gray-900 dark:text-white">{formData.dob || "—"}</div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nationality</span>
                    <div className="flex items-center gap-2 font-medium text-gray-900 dark:text-white">
-                      <span className="text-lg">{formData.nationality === 'qa' ? 'Qatar' : formData.nationality || 'Qatar'}</span>
-                      {formData.nationality === 'qa' && <img src="https://flagcdn.com/w20/qa.png" alt="Qatar Flag" className="h-4 w-6 object-cover rounded shadow-sm" />}
+                      <span className="text-lg">{formData.nationality === 'sg' ? 'Singapore' : formData.nationality || "—"}</span>
+                      {formData.nationality === 'sg' && <img src="https://flagcdn.com/w20/sg.png" alt="Singapore Flag" className="h-4 w-6 object-cover rounded shadow-sm" />}
                    </div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Watchlist Profile</span>
                    <div className="flex items-center gap-2">
-                      <Badge className="bg-blue-100 text-[#2A53A0] hover:bg-blue-200 border-0 rounded-full px-3">UAE Compliance Watchlist</Badge>
+                      <Badge className="bg-blue-100 text-[#2A53A0] hover:bg-blue-200 border-0 rounded-full px-3">
+                        {watchlistProfile === 'singapore-high-risk' ? 'Singapore High-Risk Screening' : watchlistProfile}
+                      </Badge>
                    </div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Purpose</span>
-                   <div className="font-medium text-gray-900 dark:text-white">Periodic Review</div>
+                   <div className="font-medium text-gray-900 dark:text-white">{formData.purpose === 'onboarding' ? 'Customer Onboarding' : formData.purpose || "—"}</div>
                 </div>
              </div>
           </div>
@@ -1049,13 +1469,13 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                   
                   <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
                     <p>
-                      Screening for <span className="font-bold text-[#2A53A0] bg-[#2A53A0]/5 px-1 rounded">MUHAMMAD (Qatar)</span> returned <span className="font-bold text-red-600 bg-red-50 px-1 rounded">6 potential customer matches</span> across active watchlists. <span className="font-bold text-red-700">2 records are Critical</span> (≥90% score) — both linked to the <span className="font-bold bg-red-50 px-1 rounded">UAE Cabinet Terrorist & Sanctions list</span>, which carries mandatory legal obligations.
+                      Screening for <span className="font-bold text-[#2A53A0] bg-[#2A53A0]/5 px-1 rounded">SIN HUAT ALAN (Singapore)</span> returned <span className="font-bold text-red-600 bg-red-50 px-1 rounded">6 potential watchlist matches</span> across active lists. <span className="font-bold text-red-700">1 record is Critical</span> (92% score) — linked to the <span className="font-bold bg-red-50 px-1 rounded">Singapore MAS High-Risk Screening List</span>, which carries mandatory EDD obligations under MAS AML/CFT Notice.
                     </p>
                     <p>
-                      <span className="font-bold text-orange-600">3 records are High severity</span> spanning OFAC SDN, UN Security Council, and EU Consolidated lists. <span className="font-bold text-[#2A53A0]">1 record is Medium risk</span> on the EU list requiring further review.
+                      <span className="font-bold text-orange-600">3 records are High severity</span> spanning MAS Watchlist, OFAC SDN, and EU Consolidated lists. <span className="font-bold text-[#2A53A0]">2 records are Medium risk</span> on the UN Security Council and EU lists requiring further review.
                     </p>
                     <p>
-                      Nationality <span className="font-semibold text-gray-900 dark:text-white">(Qatar)</span> is the <span className="font-bold bg-yellow-50 text-yellow-800 px-1 rounded">strongest common match driver</span> across all 6 results — ID number was not provided, limiting disambiguation. <span className="text-green-600 font-medium bg-green-50 px-1 rounded italic">Click any row to view the full AI analysis and watchlist hit details for that customer.</span>
+                      Nationality <span className="font-semibold text-gray-900 dark:text-white">(Singapore)</span> is the <span className="font-bold bg-yellow-50 text-yellow-800 px-1 rounded">strongest common match driver</span> across all results — passport number mismatch (0%) does not exclude the match without additional EDD. <span className="text-green-600 font-medium bg-green-50 px-1 rounded italic">Click any row to view the full AI analysis and watchlist hit details for that customer.</span>
                     </p>
                   </div>
 
@@ -1251,7 +1671,13 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                          <TableCell className="px-4 py-3 align-middle text-right">
                             <Select
                               value={rowActions[result.id]}
-                              onValueChange={(v) => setRowActions(prev => ({ ...prev, [result.id]: v }))}
+                              onValueChange={(v) => {
+                                if (v === "View Summary") {
+                                  handleViewSummary(result.id);
+                                } else {
+                                  setRowActions(prev => ({ ...prev, [result.id]: v }));
+                                }
+                              }}
                             >
                               <SelectTrigger className="h-8 w-44 text-xs">
                                 <SelectValue />
@@ -1412,6 +1838,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="sg">Singapore</SelectItem>
                           <SelectItem value="us">United States</SelectItem>
                           <SelectItem value="uk">United Kingdom</SelectItem>
                           <SelectItem value="in">India</SelectItem>
@@ -1431,6 +1858,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="sg">Singapore</SelectItem>
                           <SelectItem value="us">United States</SelectItem>
                           <SelectItem value="uk">United Kingdom</SelectItem>
                           <SelectItem value="in">India</SelectItem>
@@ -1450,6 +1878,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="sg">Singapore</SelectItem>
                           <SelectItem value="us">United States</SelectItem>
                           <SelectItem value="uk">United Kingdom</SelectItem>
                           <SelectItem value="in">India</SelectItem>
@@ -1836,12 +2265,46 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       </div>
                     </div>
 
-                    {/* UAE Compliance */}
-                    <div 
+                    {/* Singapore High-Risk Screening */}
+                    <div
                       className={cn(
                         "relative rounded-[8px] border p-4 cursor-pointer transition-all hover:border-[#2A53A0]",
-                        watchlistProfile === "uae" 
-                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]" 
+                        watchlistProfile === "singapore-high-risk"
+                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]"
+                          : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+                      )}
+                      onClick={() => setWatchlistProfile("singapore-high-risk")}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "mt-1 w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center shrink-0",
+                          watchlistProfile === "singapore-high-risk" && "border-[#2A53A0]"
+                        )}>
+                          {watchlistProfile === "singapore-high-risk" && <div className="w-2 h-2 rounded-full bg-[#2A53A0]" />}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900 dark:text-white">Singapore High-Risk Screening</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">MAS Regulatory</span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">MAS-designated high-risk individuals and entities subject to enhanced due diligence under Singapore AML/CFT requirements</p>
+                          <div className="flex gap-4 text-xs text-gray-500 font-medium mt-1">
+                            <span>4 Lists</span>
+                            <span>•</span>
+                            <span>Threshold: 70%</span>
+                            <span>•</span>
+                            <span>Phonetic Match: Enabled</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* UAE Compliance */}
+                    <div
+                      className={cn(
+                        "relative rounded-[8px] border p-4 cursor-pointer transition-all hover:border-[#2A53A0]",
+                        watchlistProfile === "uae"
+                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]"
                           : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
                       )}
                       onClick={() => setWatchlistProfile("uae")}
@@ -2056,12 +2519,46 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       </div>
                     </div>
 
-                    {/* UAE Compliance */}
-                    <div 
+                    {/* Singapore High-Risk Screening */}
+                    <div
                       className={cn(
                         "relative rounded-[8px] border p-4 cursor-pointer transition-all hover:border-[#2A53A0]",
-                        watchlistProfile === "uae" 
-                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]" 
+                        watchlistProfile === "singapore-high-risk"
+                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]"
+                          : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+                      )}
+                      onClick={() => setWatchlistProfile("singapore-high-risk")}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={cn(
+                          "mt-1 w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center shrink-0",
+                          watchlistProfile === "singapore-high-risk" && "border-[#2A53A0]"
+                        )}>
+                          {watchlistProfile === "singapore-high-risk" && <div className="w-2 h-2 rounded-full bg-[#2A53A0]" />}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900 dark:text-white">Singapore High-Risk Screening</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">MAS Regulatory</span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">MAS-designated high-risk individuals and entities subject to enhanced due diligence under Singapore AML/CFT requirements</p>
+                          <div className="flex gap-4 text-xs text-gray-500 font-medium mt-1">
+                            <span>4 Lists</span>
+                            <span>•</span>
+                            <span>Threshold: 70%</span>
+                            <span>•</span>
+                            <span>Phonetic Match: Enabled</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* UAE Compliance */}
+                    <div
+                      className={cn(
+                        "relative rounded-[8px] border p-4 cursor-pointer transition-all hover:border-[#2A53A0]",
+                        watchlistProfile === "uae"
+                          ? "border-[#2A53A0] bg-blue-50/10 ring-1 ring-[#2A53A0]"
                           : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
                       )}
                       onClick={() => setWatchlistProfile("uae")}
