@@ -1,12 +1,11 @@
 import { useState } from "react";
 import {
-  Search, Add, Edit, TrashCan, Download, Upload, View,
+  Search, Add, Edit, Download, Upload, View,
   ArrowLeft, Filter, ChevronRight, CheckmarkFilled,
 } from "@carbon/icons-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { Switch } from "./ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { CarbonPaginationFooter } from "./carbon-pagination-footer";
 import { useSortableData } from "../hooks/use-sortable-data";
@@ -179,6 +178,27 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   const [librarySearch, setLibrarySearch] = useState("");
   const [libraryRegion, setLibraryRegion] = useState("All Regions");
 
+  // Enable/Disable dialog state
+  const [toggleDialogProfile, setToggleDialogProfile] = useState<WatchlistProfile | null>(null);
+  const [toggleAction, setToggleAction] = useState<"DISABLE" | "ENABLE">("DISABLE");
+  const [toggleDate, setToggleDate] = useState("");
+  const [toggleReason, setToggleReason] = useState("");
+
+  const handleOpenToggleDialog = (profile: WatchlistProfile) => {
+    setToggleDialogProfile(profile);
+    setToggleAction(profile.isActive ? "DISABLE" : "ENABLE");
+    setToggleDate("");
+    setToggleReason("");
+  };
+
+  const handleSubmitToggle = () => {
+    if (!toggleDialogProfile) return;
+    setProfiles(prev => prev.map(p =>
+      p.id === toggleDialogProfile.id ? { ...p, isActive: toggleAction === "ENABLE" } : p
+    ));
+    setToggleDialogProfile(null);
+  };
+
   // Create Wizard state
   const [wizardStep, setWizardStep] = useState(0);
   const [wizardData, setWizardData] = useState({
@@ -211,13 +231,6 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   const totalItemsTab = sortedProfilesTab.length;
   const currentItemsTab = sortedProfilesTab.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const handleToggleActive = (id: string) => {
-    setProfiles(prev => prev.map(p => p.id === id ? { ...p, isActive: !p.isActive } : p));
-  };
-
-  const handleDelete = (id: string) => {
-    setProfiles(prev => prev.filter(p => p.id !== id));
-  };
 
   // ── Lists Library Page ────────────────────────────────────────────────────
   if (pageMode === "lists-library") {
@@ -917,8 +930,11 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
         </div>
       </div>
 
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
+
       {/* Stat Cards */}
-      <div className="flex-none grid grid-cols-3 gap-4 p-0 bg-gray-50 dark:bg-gray-900/50">
+      <div className="flex-none grid grid-cols-3 gap-4 bg-gray-50 dark:bg-gray-900/50">
         {/* Total Watchlists */}
         <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
           <div>
@@ -1010,19 +1026,13 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
           <Table>
             <thead className="sticky top-0 z-10 shadow-sm">
               <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
-                <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[260px]">
-                  <SortableHeader column="name" label="Profile Name" sortConfig={sortConfigTab} onSort={requestSortTab} />
+                <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[300px]">
+                  <SortableHeader column="name" label="Watchlist Name" sortConfig={sortConfigTab} onSort={requestSortTab} />
                 </th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[140px]">
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[160px]">
                   <SortableHeader column="type" label="Type" sortConfig={sortConfigTab} onSort={requestSortTab} />
                 </th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[80px]">Lists</th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[130px]">Primary Name</th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[120px]">Alert Threshold</th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[130px]">
-                  <SortableHeader column="stats" label="Screenings" sortConfig={sortConfigTab} onSort={requestSortTab} className="justify-end" />
-                </th>
-                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[110px]">Alerts</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[140px]">Alert Threshold</th>
                 <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[100px]">Status</th>
                 <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">Actions</th>
               </tr>
@@ -1042,36 +1052,19 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 align-middle text-center">
-                    <span className="text-sm font-bold text-[#2A53A0]">{profile.includedLists.length}</span>
-                  </TableCell>
-                  <TableCell className="px-4 align-middle text-center">
-                    <span className={cn(
-                      "text-sm font-bold px-2 py-0.5 rounded",
-                      profile.matchCriteria.primaryName.threshold >= 90 ? "bg-red-50 text-red-600" : "bg-orange-50 text-orange-600"
-                    )}>
-                      {profile.matchCriteria.primaryName.threshold}%
-                    </span>
-                  </TableCell>
-                  <TableCell className="px-4 align-middle text-center">
                     <span className="text-sm font-semibold text-[#2A53A0] bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded">
                       ≥ {profile.stats.alertThreshold}%
                     </span>
                   </TableCell>
-                  <TableCell className="px-4 align-middle text-right">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{profile.stats.totalScreenings.toLocaleString()}</span>
-                  </TableCell>
-                  <TableCell className="px-4 align-middle text-right">
-                    <span className={cn("text-sm font-bold", profile.stats.alertsGenerated > 0 ? "text-orange-600" : "text-gray-400")}>
-                      {profile.stats.alertsGenerated.toLocaleString()}
+                  <TableCell className="px-4 align-middle text-center">
+                    <span className={cn(
+                      "text-xs font-semibold px-2.5 py-1 rounded-full",
+                      profile.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-500"
+                    )}>
+                      {profile.isActive ? "Active" : "Inactive"}
                     </span>
-                  </TableCell>
-                  <TableCell className="px-4 align-middle">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <Switch checked={profile.isActive} onCheckedChange={() => handleToggleActive(profile.id)} className="data-[state=checked]:bg-[#2A53A0]" />
-                      <span className={cn("text-xs font-medium", profile.isActive ? "text-green-600" : "text-gray-400")}>
-                        {profile.isActive ? "Active" : "Off"}
-                      </span>
-                    </div>
                   </TableCell>
                   <TableCell className="px-4 align-middle">
                     <div className="flex items-center gap-1.5">
@@ -1098,16 +1091,24 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                         className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors" title="Edit">
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(profile.id)}
-                        className="flex items-center justify-center w-8 h-8 rounded-sm bg-red-500/10 hover:bg-red-500/20 text-red-600 transition-colors" title="Delete">
-                        <TrashCan className="w-4 h-4" />
+                      <button
+                        onClick={() => handleOpenToggleDialog(profile)}
+                        className={cn(
+                          "flex items-center justify-center px-2.5 h-8 rounded-sm text-xs font-medium transition-colors",
+                          profile.isActive
+                            ? "bg-red-500/10 hover:bg-red-500/20 text-red-600"
+                            : "bg-green-500/10 hover:bg-green-500/20 text-green-700"
+                        )}
+                        title={profile.isActive ? "Disable" : "Enable"}
+                      >
+                        {profile.isActive ? "Disable" : "Enable"}
                       </button>
                     </div>
                   </TableCell>
                 </TableRow>
               )) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-gray-500">No profiles found matching your search.</TableCell>
+                  <TableCell colSpan={5} className="h-24 text-center text-gray-500">No profiles found matching your search.</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -1117,6 +1118,97 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
           <CarbonPaginationFooter pageSize={pageSize} setPageSize={setPageSize} currentPage={currentPage} setCurrentPage={setCurrentPage} totalItems={totalItemsTab} />
         </div>
       </div>
+
+      </div>{/* end p-4 wrapper */}
+
+      {/* Enable/Disable Dialog */}
+      {toggleDialogProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+            {/* Dialog Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                {toggleAction === "DISABLE" ? "Disable" : "Enable"} custom list
+              </h2>
+              <button onClick={() => setToggleDialogProfile(null)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            {/* Dialog Body */}
+            <div className="px-6 py-5 space-y-5">
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Controlling screening engine status for <strong className="text-gray-900 dark:text-white">{toggleDialogProfile.name}</strong>. All entity records are retained on disable. Both actions require Maker-Checker approval.
+              </p>
+
+              {/* Action Radio */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Action <span className="text-red-500">*</span></label>
+                <div className="flex items-center gap-6 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="toggleAction" value="DISABLE" checked={toggleAction === "DISABLE"}
+                      onChange={() => setToggleAction("DISABLE")} className="accent-[#2A53A0]" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">DISABLE</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="toggleAction" value="ENABLE" checked={toggleAction === "ENABLE"}
+                      onChange={() => setToggleAction("ENABLE")} className="accent-[#2A53A0]" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">ENABLE</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Date + Username row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+                    {toggleAction === "DISABLE" ? "Disable" : "Enable"} Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={toggleDate}
+                    onChange={e => setToggleDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 focus:border-[#2A53A0]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Username (Auto-Populated)</label>
+                  <input
+                    type="text"
+                    value="Charu Chauhan"
+                    readOnly
+                    className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Reason <span className="text-red-500">*</span></label>
+                <textarea
+                  rows={3}
+                  value={toggleReason}
+                  onChange={e => setToggleReason(e.target.value)}
+                  placeholder="Mandatory — retained in audit log..."
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 focus:border-[#2A53A0] resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Dialog Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <Button variant="outline" onClick={() => setToggleDialogProfile(null)} className="h-9 rounded-[8px]">Cancel</Button>
+              <Button
+                onClick={handleSubmitToggle}
+                disabled={!toggleDate || !toggleReason.trim()}
+                className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px] gap-1.5"
+              >
+                Submit for approval →
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
