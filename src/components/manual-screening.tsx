@@ -63,87 +63,83 @@ interface ManualScreeningProps {
   onBreadcrumbNavigate?: (path: string) => void;
 }
 
-// Mock Data for Results
-const MOCK_RESULTS = [
-  {
-    id: "M-2024-001",
-    custId: "CUST-88291",
-    name: "William James Harrington",
-    originalName: "",
-    matchedLists: 3,
-    score: 92,
-    topList: "Singapore High-Risk Screening",
-    category: "Sanctions",
-    type: "Individual",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
-  },
-  {
-    id: "M-2024-002",
-    custId: "CUST-11234",
-    name: "William J. Harrington",
-    originalName: "",
-    matchedLists: 1,
-    score: 85,
-    topList: "MAS Watchlist",
-    category: "PEP",
-    type: "Individual",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
-  },
-  {
-    id: "M-2024-003",
-    custId: "CUST-99210",
-    name: "W.J. Harrington Trading Pte Ltd",
-    originalName: "",
-    matchedLists: 2,
-    score: 74,
-    topList: "OFAC SDN List",
-    category: "Embargo",
-    type: "Organization",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
-  },
-  {
-    id: "M-2024-004",
-    custId: "CUST-45120",
-    name: "Harrington William",
-    originalName: "",
-    matchedLists: 1,
-    score: 68,
-    topList: "UN Security Council",
-    category: "Sanctions",
-    type: "Individual",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
-  },
-  {
-    id: "M-2024-005",
-    custId: "CUST-78901",
-    name: "James Harrington",
-    originalName: "",
-    matchedLists: 2,
-    score: 80,
-    topList: "OFAC SDN List",
-    category: "Embargo",
-    type: "Individual",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
-  },
-  {
-    id: "M-2024-006",
-    custId: "CUST-33211",
-    name: "William Harrington",
-    originalName: "",
-    matchedLists: 1,
-    score: 77,
-    topList: "EU Consolidated List",
-    category: "Sanctions",
-    type: "Individual",
-    matchDate: "06-04-2026",
-    status: "Potential Match"
+// Watchlist profile & purpose label maps
+const WATCHLIST_PROFILE_LABELS: Record<string, string> = {
+  "onboarding": "Onboarding Screening",
+  "monitoring": "Continuous Monitoring",
+  "high-risk": "High-Risk Jurisdiction Screening",
+  "singapore-high-risk": "Singapore High-Risk Screening",
+  "uae": "UAE Compliance Watchlist",
+};
+
+const PURPOSE_LABELS: Record<string, string> = {
+  "onboarding": "Customer Onboarding",
+  "transaction": "Transaction Screening",
+  "review": "Periodic Review",
+  "ad-hoc": "Ad-hoc Screening",
+};
+
+const PROFILE_TOP_LIST: Record<string, string> = {
+  "onboarding": "UN Consolidated List",
+  "monitoring": "OFAC SDN List",
+  "high-risk": "Singapore High-Risk Screening",
+  "singapore-high-risk": "Singapore High-Risk Screening",
+  "uae": "UAE Central Bank Watchlist",
+};
+
+interface ScreeningResult {
+  id: string; custId: string; name: string; originalName: string;
+  matchedLists: number; score: number; topList: string;
+  category: string; type: string; matchDate: string; status: string;
+}
+
+// Generate dynamic screening results based on user input
+function generateScreeningResults(name: string, entityType: string, profile: string): ScreeningResult[] {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return [];
+  const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
+  const rand = () => `CUST-${Math.floor(10000 + Math.random() * 89999)}`;
+  const topList = PROFILE_TOP_LIST[profile] || "UN Consolidated List";
+  const isOrg = entityType === "non-individual";
+  const isVessel = entityType === "vessel";
+  const resultType = isOrg || isVessel ? "Organization" : "Individual";
+  const upper = name.toUpperCase();
+  const first = parts[0].toUpperCase();
+  const last = parts[parts.length - 1].toUpperCase();
+  const results: ScreeningResult[] = [];
+
+  // 1. Exact full name match
+  results.push({ id: `SCR-001-${Date.now()}`, custId: rand(), name: upper, originalName: "", matchedLists: 3, score: 92, topList, category: "Sanctions", type: resultType, matchDate: today, status: "Potential Match" });
+
+  // 2. Middle-initial abbreviation (if 3+ parts)
+  if (parts.length >= 3) {
+    const middle = parts.slice(1, -1).map(p => p[0].toUpperCase() + ".").join(" ");
+    results.push({ id: `SCR-002-${Date.now()}`, custId: rand(), name: `${first} ${middle} ${last}`, originalName: "", matchedLists: 1, score: 85, topList: "MAS Watchlist", category: "PEP", type: resultType, matchDate: today, status: "Potential Match" });
   }
-];
+
+  // 3. First + Last only (skip middle)
+  if (parts.length >= 3) {
+    results.push({ id: `SCR-003-${Date.now()}`, custId: rand(), name: `${first} ${last}`, originalName: "", matchedLists: 2, score: 80, topList: "OFAC SDN List", category: "Embargo", type: resultType, matchDate: today, status: "Potential Match" });
+  }
+
+  // 4. Last, First (reversed comma-separated)
+  if (parts.length >= 2) {
+    results.push({ id: `SCR-004-${Date.now()}`, custId: rand(), name: `${last}, ${first}`, originalName: "", matchedLists: 1, score: 77, topList: "EU Consolidated List", category: "Sanctions", type: resultType, matchDate: today, status: "Potential Match" });
+  }
+
+  // 5. Last First (no comma)
+  if (parts.length >= 2) {
+    results.push({ id: `SCR-005-${Date.now()}`, custId: rand(), name: `${last} ${first}`, originalName: "", matchedLists: 1, score: 68, topList: "UN Security Council", category: "Sanctions", type: resultType, matchDate: today, status: "Potential Match" });
+  }
+
+  // 6. Associated entity / org variation
+  if (parts.length >= 2) {
+    const orgName = isOrg || isVessel ? `${upper} GROUP` : `${last} ${first[0]}. TRADING PTE LTD`;
+    results.push({ id: `SCR-006-${Date.now()}`, custId: rand(), name: orgName, originalName: "", matchedLists: 2, score: 74, topList: "OFAC SDN List", category: "Embargo", type: "Organization", matchDate: today, status: "Potential Match" });
+  }
+
+  return results.slice(0, 6);
+}
 
 // Mock Data for Detailed Matches
 const MOCK_MATCH_DETAILS: Record<string, any[]> = {
@@ -403,12 +399,24 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     type: [] as string[]
   });
 
-  // Per-row action state defaulting to "Under Review"
-  const [rowActions, setRowActions] = useState<Record<string, string>>(
-    () => Object.fromEntries(MOCK_RESULTS.map(r => [r.id, "Under Review"]))
-  );
+  // Submitted snapshot & dynamic results
+  const [submittedData, setSubmittedData] = useState({ ...{
+    primaryName: "", originalName: "", alias: "", gender: "", idType: "", idNumber: "",
+    dob: "", nationality: "", countryBirth: "", residence: "", address: "", jointAccountHolder: "",
+    purpose: "", industry: "", registrationType: "", taxId: "", registeredAddress: "",
+    operatingCountries: "", corporateShareholders: "", directors: "", trustees: "",
+    vesselType: "", callSign: "", flagState: "", imoNumber: ""
+  }, entityType: "", watchlistProfile: "" });
+  const [screeningResults, setScreeningResults] = useState<ScreeningResult[]>([]);
+
+  // Per-row action state
+  const [rowActions, setRowActions] = useState<Record<string, string>>({});
 
   const handleStartScreening = () => {
+    const results = generateScreeningResults(formData.primaryName, entityType, watchlistProfile);
+    setScreeningResults(results);
+    setSubmittedData({ ...formData, entityType, watchlistProfile });
+    setRowActions(Object.fromEntries(results.map(r => [r.id, "Under Review"])));
     setView("results");
   };
 
@@ -479,18 +487,25 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
   };
 
   // Filter Logic
-  const filteredResults = MOCK_RESULTS.filter(result => {
+  const filteredResults = screeningResults.filter(result => {
     if (filters.topList.length > 0 && !filters.topList.includes(result.topList)) return false;
     if (filters.category.length > 0 && !filters.category.includes(result.category)) return false;
     if (filters.type.length > 0 && !filters.type.includes(result.type)) return false;
     return true;
   });
 
-  const uniqueTopLists = Array.from(new Set(MOCK_RESULTS.map(r => r.topList)));
-  const uniqueCategories = Array.from(new Set(MOCK_RESULTS.map(r => r.category)));
-  const uniqueTypes = Array.from(new Set(MOCK_RESULTS.map(r => r.type)));
+  const uniqueTopLists = Array.from(new Set(screeningResults.map(r => r.topList)));
+  const uniqueCategories = Array.from(new Set(screeningResults.map(r => r.category)));
+  const uniqueTypes = Array.from(new Set(screeningResults.map(r => r.type)));
 
   const { items: sortedResults, requestSort, sortConfig } = useSortableData(filteredResults);
+
+  // AI summary derived counts
+  const aiCriticalCount = screeningResults.filter((r: ScreeningResult) => r.score >= 90).length;
+  const aiHighCount = screeningResults.filter((r: ScreeningResult) => r.score >= 80 && r.score < 90).length;
+  const aiMediumCount = screeningResults.filter((r: ScreeningResult) => r.score < 80).length;
+  const aiUniqueLists = Array.from(new Set(screeningResults.map((r: ScreeningResult) => r.topList)));
+  const aiTopList = screeningResults[0]?.topList || "the selected watchlist";
 
   const FilterPopover = ({ title, options, selected, onChange }: { title: string, options: string[], selected: string[], onChange: (val: string[]) => void }) => {
     return (
@@ -540,7 +555,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
 
   // --- DETAILS VIEW ---
   if (view === "details" && selectedMatchId) {
-    const mainResult = MOCK_RESULTS.find(r => r.id === selectedMatchId);
+    const mainResult = screeningResults.find((r: ScreeningResult) => r.id === selectedMatchId);
     const details = MOCK_MATCH_DETAILS[selectedMatchId] || MOCK_MATCH_DETAILS["M-2024-001"]; 
     
     // Extract Customer Details from the first match (assuming constant for the screening)
@@ -1166,7 +1181,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
   }
 
   if (view === "row-summary" && selectedSummaryId) {
-    const result = MOCK_RESULTS.find(r => r.id === selectedSummaryId)!;
+    const result = screeningResults.find((r: ScreeningResult) => r.id === selectedSummaryId)!;
     const matches = MOCK_MATCH_DETAILS[selectedSummaryId] || [];
 
     // Build unified attribute list preserving order of first appearance
@@ -1411,39 +1426,41 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
              <div className="flex flex-wrap gap-6 items-center">
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Primary Name</span>
-                   <div className="text-lg font-bold text-gray-900 dark:text-white">{formData.primaryName}</div>
+                   <div className="text-lg font-bold text-gray-900 dark:text-white">{submittedData.primaryName}</div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">ID Number</span>
-                   <div className="font-mono font-bold text-gray-900 dark:text-white">{formData.idNumber || "—"}</div>
+                   <div className="font-mono font-bold text-gray-900 dark:text-white">{submittedData.idNumber || "—"}</div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date of Birth</span>
-                   <div className="font-medium text-gray-900 dark:text-white">{formData.dob || "—"}</div>
+                   <div className="font-medium text-gray-900 dark:text-white">{submittedData.dob || "—"}</div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nationality</span>
-                   <div className="flex items-center gap-2 font-medium text-gray-900 dark:text-white">
-                      <span className="text-lg">{formData.nationality === 'sg' ? 'Singapore' : formData.nationality || "—"}</span>
-                      {formData.nationality === 'sg' && <img src="https://flagcdn.com/w20/sg.png" alt="Singapore Flag" className="h-4 w-6 object-cover rounded shadow-sm" />}
-                   </div>
+                   <div className="font-medium text-gray-900 dark:text-white">{submittedData.nationality || "—"}</div>
+                </div>
+                <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
+                <div className="space-y-1">
+                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Entity Type</span>
+                   <div className="font-medium text-gray-900 dark:text-white capitalize">{submittedData.entityType === "non-individual" ? "Non-Individual" : submittedData.entityType || "—"}</div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Watchlist Profile</span>
                    <div className="flex items-center gap-2">
                       <Badge className="bg-blue-100 text-[#2A53A0] hover:bg-blue-200 border-0 rounded-full px-3">
-                        {watchlistProfile === 'singapore-high-risk' ? 'Singapore High-Risk Screening' : watchlistProfile}
+                        {WATCHLIST_PROFILE_LABELS[submittedData.watchlistProfile] || submittedData.watchlistProfile}
                       </Badge>
                    </div>
                 </div>
                 <div className="h-8 w-px bg-gray-200 dark:bg-gray-800" />
                 <div className="space-y-1">
                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Purpose</span>
-                   <div className="font-medium text-gray-900 dark:text-white">{formData.purpose === 'onboarding' ? 'Customer Onboarding' : formData.purpose || "—"}</div>
+                   <div className="font-medium text-gray-900 dark:text-white">{PURPOSE_LABELS[submittedData.purpose] || submittedData.purpose || "—"}</div>
                 </div>
              </div>
           </div>
@@ -1467,54 +1484,60 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                     </div>
                   </div>
                   
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
-                    <p>
-                      Screening for <span className="font-bold text-[#2A53A0] bg-[#2A53A0]/5 px-1 rounded">SIN HUAT ALAN (Singapore)</span> returned <span className="font-bold text-red-600 bg-red-50 px-1 rounded">6 potential watchlist matches</span> across active lists. <span className="font-bold text-red-700">1 record is Critical</span> (92% score) — linked to the <span className="font-bold bg-red-50 px-1 rounded">Singapore MAS High-Risk Screening List</span>, which carries mandatory EDD obligations under MAS AML/CFT Notice.
-                    </p>
-                    <p>
-                      <span className="font-bold text-orange-600">3 records are High severity</span> spanning MAS Watchlist, OFAC SDN, and EU Consolidated lists. <span className="font-bold text-[#2A53A0]">2 records are Medium risk</span> on the UN Security Council and EU lists requiring further review.
-                    </p>
-                    <p>
-                      Nationality <span className="font-semibold text-gray-900 dark:text-white">(Singapore)</span> is the <span className="font-bold bg-yellow-50 text-yellow-800 px-1 rounded">strongest common match driver</span> across all results — passport number mismatch (0%) does not exclude the match without additional EDD. <span className="text-green-600 font-medium bg-green-50 px-1 rounded italic">Click any row to view the full AI analysis and watchlist hit details for that customer.</span>
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100 flex items-center gap-1.5 py-1 px-3">
-                      <Zap className="size-3" /> 2 Critical matches
-                    </Badge>
-                    <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-100 flex items-center gap-1.5 py-1 px-3">
-                      <AlertTriangle className="size-3" /> 3 High severity
-                    </Badge>
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-100 flex items-center gap-1.5 py-1 px-3">
-                      <Info className="size-3" /> 1 Medium risk
-                    </Badge>
-                    <Badge variant="outline" className="bg-blue-50 text-[#2A53A0] border-blue-100 flex items-center gap-1.5 py-1 px-3">
-                      <ShieldAlert className="size-3" /> Missing ID – disambiguation needed
-                    </Badge>
-                    <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 flex items-center gap-1.5 py-1 px-3 font-medium">
-                      <FileText className="size-3" /> 5 Lists hit across 6 customers
-                    </Badge>
-                  </div>
+                  {(() => {
+                    const criticalCount = screeningResults.filter(r => r.score >= 90).length;
+                    const highCount = screeningResults.filter(r => r.score >= 80 && r.score < 90).length;
+                    const mediumCount = screeningResults.filter(r => r.score < 80).length;
+                    const topListName = screeningResults[0]?.topList || "the selected watchlist";
+                    const nameDisplay = submittedData.primaryName.toUpperCase();
+                    const nationalityDisplay = submittedData.nationality || "the provided nationality";
+                    const uniqueLists = Array.from(new Set(screeningResults.map(r => r.topList)));
+                    return (
+                      <>
+                        <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed space-y-2">
+                          <p>
+                            Screening for <span className="font-bold text-[#2A53A0] bg-[#2A53A0]/5 px-1 rounded">{nameDisplay}{submittedData.nationality ? ` (${nationalityDisplay})` : ""}</span> returned <span className="font-bold text-red-600 bg-red-50 px-1 rounded">{screeningResults.length} potential watchlist match{screeningResults.length !== 1 ? "es" : ""}</span> across active lists.{criticalCount > 0 && <> <span className="font-bold text-red-700">{criticalCount} record{criticalCount !== 1 ? "s are" : " is"} Critical</span> (≥90% score) — linked to the <span className="font-bold bg-red-50 px-1 rounded">{topListName}</span>, which may carry mandatory EDD obligations.</>}
+                          </p>
+                          {(highCount > 0 || mediumCount > 0) && (
+                            <p>
+                              {highCount > 0 && <><span className="font-bold text-orange-600">{highCount} record{highCount !== 1 ? "s are" : " is"} High severity</span> spanning {uniqueLists.slice(0, 3).join(", ")}. </>}
+                              {mediumCount > 0 && <><span className="font-bold text-[#2A53A0]">{mediumCount} record{mediumCount !== 1 ? "s are" : " is"} Medium risk</span> requiring further review.</>}
+                            </p>
+                          )}
+                          <p>
+                            {submittedData.idNumber ? <>ID <span className="font-semibold text-gray-900 dark:text-white">({submittedData.idNumber})</span> was used as a secondary disambiguation attribute. </> : <>No ID number was provided — name-based matching only. </>}
+                            <span className="text-green-600 font-medium bg-green-50 px-1 rounded italic">Click any row to view the full AI analysis and watchlist hit details.</span>
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          {criticalCount > 0 && <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100 flex items-center gap-1.5 py-1 px-3"><Zap className="size-3" /> {criticalCount} Critical match{criticalCount !== 1 ? "es" : ""}</Badge>}
+                          {highCount > 0 && <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-100 flex items-center gap-1.5 py-1 px-3"><AlertTriangle className="size-3" /> {highCount} High severity</Badge>}
+                          {mediumCount > 0 && <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-100 flex items-center gap-1.5 py-1 px-3"><Info className="size-3" /> {mediumCount} Medium risk</Badge>}
+                          {!submittedData.idNumber && <Badge variant="outline" className="bg-blue-50 text-[#2A53A0] border-blue-100 flex items-center gap-1.5 py-1 px-3"><ShieldAlert className="size-3" /> Missing ID – disambiguation needed</Badge>}
+                          <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200 flex items-center gap-1.5 py-1 px-3 font-medium"><FileText className="size-3" /> {uniqueLists.length} List{uniqueLists.length !== 1 ? "s" : ""} hit across {screeningResults.length} result{screeningResults.length !== 1 ? "s" : ""}</Badge>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* Severity Summary Cards */}
                 <div className="flex flex-col items-center justify-center lg:border-l border-gray-100 dark:border-gray-800 lg:pl-8 space-y-4">
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center p-3 rounded-xl border border-red-100 bg-white dark:bg-gray-800 w-24 shadow-sm">
-                      <span className="text-2xl font-black text-red-600">2</span>
+                      <span className="text-2xl font-black text-red-600">{screeningResults.filter(r => r.score >= 90).length}</span>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Critical</span>
                     </div>
                     <div className="flex flex-col items-center p-3 rounded-xl border border-orange-100 bg-white dark:bg-gray-800 w-24 shadow-sm">
-                      <span className="text-2xl font-black text-orange-500">3</span>
+                      <span className="text-2xl font-black text-orange-500">{screeningResults.filter(r => r.score >= 80 && r.score < 90).length}</span>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">High</span>
                     </div>
                     <div className="flex flex-col items-center p-3 rounded-xl border border-yellow-100 bg-white dark:bg-gray-800 w-24 shadow-sm">
-                      <span className="text-2xl font-black text-yellow-500">1</span>
+                      <span className="text-2xl font-black text-yellow-500">{screeningResults.filter(r => r.score < 80).length}</span>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Medium</span>
                     </div>
                   </div>
-                  <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">6 of 6 results shown</div>
+                  <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{screeningResults.length} of {screeningResults.length} results shown</div>
                 </div>
               </div>
             </CardContent>
@@ -1696,7 +1719,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                 </TableBody>
              </Table>
              <div className="p-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/30 flex justify-between items-center text-xs text-gray-500">
-                <span>Showing {filteredResults.length} of {MOCK_RESULTS.length} results</span>
+                <span>Showing {filteredResults.length} of {screeningResults.length} results</span>
                 <span>Search Time: 0.42 seconds</span>
              </div>
           </div>
