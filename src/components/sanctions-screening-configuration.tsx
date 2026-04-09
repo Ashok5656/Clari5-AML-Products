@@ -169,9 +169,11 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   const [pageMode, setPageMode] = useState<"main" | "lists-library" | "create-wizard" | "view" | "edit">("main");
   const [profiles, setProfiles] = useState<WatchlistProfile[]>(MOCK_PROFILES);
   const [selectedProfile, setSelectedProfile] = useState<WatchlistProfile | null>(null);
+  const [editData, setEditData] = useState<WatchlistProfile | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [activeTab, setActiveTab] = useState<"Active" | "Inactive" | "All Watchlists">("Active");
 
   // Lists Library state
   const [librarySearch, setLibrarySearch] = useState("");
@@ -186,14 +188,19 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     alertThreshold: 80, alertAction: "Flag for Review", notifyEmail: "",
   });
 
-  const filteredProfiles = profiles.filter(p =>
+  const activeCount = profiles.filter(p => p.isActive).length;
+  const inactiveCount = profiles.length - activeCount;
+
+  const tabFilteredProfiles = profiles.filter(p =>
+    activeTab === "All Watchlists" ? true : activeTab === "Active" ? p.isActive : !p.isActive
+  );
+  const tabSearchFiltered = tabFilteredProfiles.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const { items: sortedProfiles, requestSort, sortConfig } = useSortableData(filteredProfiles);
-  const totalItems = sortedProfiles.length;
-  const startItem = (currentPage - 1) * pageSize;
-  const currentItems = sortedProfiles.slice(startItem, startItem + pageSize);
+  const { items: sortedProfilesTab, requestSort: requestSortTab, sortConfig: sortConfigTab } = useSortableData(tabSearchFiltered);
+  const totalItemsTab = sortedProfilesTab.length;
+  const currentItemsTab = sortedProfilesTab.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleToggleActive = (id: string) => {
     setProfiles(prev => prev.map(p => p.id === id ? { ...p, isActive: !p.isActive } : p));
@@ -545,12 +552,14 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   // ── View / Edit Detail Page ───────────────────────────────────────────────
   if ((pageMode === "view" || pageMode === "edit") && selectedProfile) {
     const isEdit = pageMode === "edit";
-    const [editData, setEditData] = useState<WatchlistProfile>(selectedProfile);
+    const currentEditData = editData ?? selectedProfile;
 
     const handleSaveEdit = () => {
+      if (!editData) return;
       setProfiles(prev => prev.map(p => p.id === editData.id ? editData : p));
       setPageMode("main");
       setSelectedProfile(null);
+      setEditData(null);
     };
 
     const criteriaLabels: Record<string, string> = { primaryName: "Primary Name Match", dob: "DOB Match", address: "Address Match", nationality: "Nationality Match" };
@@ -573,7 +582,7 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
               <Button onClick={handleSaveEdit} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">Save Configuration</Button>
             </div>
           ) : (
-            <Button onClick={() => setPageMode("edit")} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">
+            <Button onClick={() => { setEditData({ ...selectedProfile }); setPageMode("edit"); }} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">
               <Edit className="w-4 h-4 mr-2" /> Edit Configuration
             </Button>
           )}
@@ -583,11 +592,11 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Profile Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Name</p>
-                {isEdit ? <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700" value={editData.name} onChange={e => setEditData(d => ({ ...d, name: e.target.value }))} /> : <p className="text-sm font-semibold text-gray-900 dark:text-white">{selectedProfile.name}</p>}</div>
+                {isEdit ? <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700" value={currentEditData.name} onChange={e => setEditData(d => d ? { ...d, name: e.target.value } : d)} /> : <p className="text-sm font-semibold text-gray-900 dark:text-white">{selectedProfile.name}</p>}</div>
               <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Type</p>
                 <Badge variant="secondary" className={cn("text-xs px-2.5 py-0.5 font-medium", TYPE_BADGE[selectedProfile.type])}>{selectedProfile.type}</Badge></div>
               <div className="md:col-span-2"><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Description</p>
-                {isEdit ? <textarea rows={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700 resize-none" value={editData.description} onChange={e => setEditData(d => ({ ...d, description: e.target.value }))} /> : <p className="text-sm text-gray-600 dark:text-gray-400">{selectedProfile.description}</p>}</div>
+                {isEdit ? <textarea rows={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700 resize-none" value={currentEditData.description} onChange={e => setEditData(d => d ? { ...d, description: e.target.value } : d)} /> : <p className="text-sm text-gray-600 dark:text-gray-400">{selectedProfile.description}</p>}</div>
             </div>
           </div>
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
@@ -622,64 +631,122 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   }
 
   // ── Main Table Page ───────────────────────────────────────────────────────
+
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 p-4">
-      {/* Header Actions */}
-      <div className="flex-none pb-4 space-y-3">
-        <div className="bg-blue-50 border border-blue-200 p-3 rounded-md flex items-center justify-between">
-          <h2 className="text-sm font-bold text-[#2A53A0] uppercase tracking-wide">
-            Watchlist Configurations — Manage screening profiles with custom list combinations and match thresholds
-          </h2>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder="Search profiles, types..."
-              className="pl-9 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus-visible:ring-[#2A53A0]"
-              value={searchQuery}
-              onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            />
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 p-0">
+
+      {/* Stat Cards */}
+      <div className="flex-none grid grid-cols-3 gap-4 p-0 bg-gray-50 dark:bg-gray-900/50">
+        {/* Total Watchlists */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Total Watchlists
+              <span className="text-gray-400 cursor-help" title="Total number of watchlist profiles">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{profiles.length}</p>
           </div>
-          <div className="flex items-center gap-3 ml-4">
-            <Button variant="outline" className="gap-2 bg-white dark:bg-gray-900 h-[46px]" onClick={() => setPageMode("lists-library")}>
-              <Filter className="w-4 h-4" /> View Lists Library
-            </Button>
-            <Button variant="outline" className="gap-2 bg-white dark:bg-gray-900 h-[46px]">
-              <Upload className="w-4 h-4" /> Upload List
-            </Button>
-            <Button className="gap-2 bg-[#2A53A0] hover:bg-[#2A53A0]/90 text-white h-[46px]" onClick={() => setPageMode("create-wizard")}>
-              <Add className="w-4 h-4" /> Create Watchlist
-            </Button>
+          <div className="w-10 h-10 rounded-full border border-[#2A53A0]/30 flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+        </div>
+        {/* Active Watchlists */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Active Watchlists
+              <span className="text-gray-400 cursor-help" title="Currently active watchlist profiles">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-[#2A53A0]">{activeCount}</p>
+          </div>
+          <div className="w-10 h-10 rounded-full border border-green-400/40 bg-green-50/60 flex items-center justify-center">
+            <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.15"/><path d="M8 12l3 3 5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        </div>
+        {/* Available Lists */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Available Lists
+              <span className="text-gray-400 cursor-help" title="Total sanctions lists in the library">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-[#2A53A0]">{SANCTIONS_LISTS.length}</p>
+          </div>
+          <div className="w-10 h-10 rounded-full border border-blue-300/40 flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2.5"/></svg>
           </div>
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex-none border-b border-gray-200 dark:border-gray-800">
+        <div className="flex h-[48px] w-full">
+          {(["Active", "Inactive", "All Watchlists"] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+              className={cn(
+                "flex-1 h-full text-sm font-medium border-b-2 transition-colors text-center",
+                activeTab === tab
+                  ? "border-[#2A53A0] text-[#2A53A0]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              )}
+            >
+              {tab === "Active" ? `Active (${activeCount})` : tab === "Inactive" ? `Inactive (${inactiveCount})` : `All Watchlists (${profiles.length})`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Search + Buttons (Tab Content Action Bar) */}
+      <div className="flex-none bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-0 py-4 flex items-center justify-between">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Search profiles, types..."
+            className="pl-9 w-64 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus-visible:ring-[#2A53A0] h-[46px]"
+            value={searchQuery}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="gap-1.5 bg-white dark:bg-gray-900 h-[46px] text-sm" onClick={() => setPageMode("lists-library")}>
+            <Filter className="w-4 h-4" /> View Lists Library
+          </Button>
+          <Button variant="outline" className="gap-1.5 bg-white dark:bg-gray-900 h-[46px] text-sm">
+            <Upload className="w-4 h-4" /> Upload List
+          </Button>
+          <Button className="gap-1.5 bg-[#2A53A0] hover:bg-[#2A53A0]/90 text-white h-[46px] text-sm" onClick={() => setPageMode("create-wizard")}>
+            <Add className="w-4 h-4" /> Create Watchlist
+          </Button>
+        </div>
+      </div>
+
       {/* Table */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm">
+      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border-0 shadow-sm">
         <div className="flex-1 overflow-auto">
           <Table>
             <thead className="sticky top-0 z-10 shadow-sm">
               <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
-                <th className="pl-4 px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[260px]">
-                  <SortableHeader column="name" label="Profile Name" sortConfig={sortConfig} onSort={requestSort} />
+                <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[260px]">
+                  <SortableHeader column="name" label="Profile Name" sortConfig={sortConfigTab} onSort={requestSortTab} />
                 </th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[140px]">
-                  <SortableHeader column="type" label="Type" sortConfig={sortConfig} onSort={requestSort} />
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[140px]">
+                  <SortableHeader column="type" label="Type" sortConfig={sortConfigTab} onSort={requestSortTab} />
                 </th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[80px]">Lists</th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[130px]">Primary Name</th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[120px]">Alert Threshold</th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[130px]">
-                  <SortableHeader column="stats" label="Screenings" sortConfig={sortConfig} onSort={requestSort} className="justify-end" />
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[80px]">Lists</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[130px]">Primary Name</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[120px]">Alert Threshold</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[130px]">
+                  <SortableHeader column="stats" label="Screenings" sortConfig={sortConfigTab} onSort={requestSortTab} className="justify-end" />
                 </th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[110px]">Alerts</th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[100px]">Status</th>
-                <th className="px-4 font-bold text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">Actions</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[110px]">Alerts</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-center w-[100px]">Status</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">Actions</th>
               </tr>
             </thead>
             <TableBody>
-              {currentItems.length > 0 ? currentItems.map(profile => (
+              {currentItemsTab.length > 0 ? currentItemsTab.map(profile => (
                 <TableRow key={profile.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[56px]">
                   <TableCell className="pl-4 px-4 align-middle">
                     <div>
@@ -718,7 +785,7 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                   </TableCell>
                   <TableCell className="px-4 align-middle">
                     <div className="flex items-center justify-center gap-1.5">
-                      <Switch checked={profile.isActive} onCheckedChange={() => handleToggleActive(profile.id)} />
+                      <Switch checked={profile.isActive} onCheckedChange={() => handleToggleActive(profile.id)} className="data-[state=checked]:bg-[#2A53A0]" />
                       <span className={cn("text-xs font-medium", profile.isActive ? "text-green-600" : "text-gray-400")}>
                         {profile.isActive ? "Active" : "Off"}
                       </span>
@@ -726,11 +793,11 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                   </TableCell>
                   <TableCell className="px-4 align-middle">
                     <div className="flex items-center gap-1.5">
-                      <button onClick={() => { setSelectedProfile(profile); setPageMode("view"); }}
-                        className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors" title="View Details">
+                      <button onClick={() => { setSelectedProfile(profile); setEditData(null); setPageMode("view"); }}
+                        className="flex items-center justify-center w-8 h-8 rounded-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 transition-colors" title="View Details">
                         <View className="w-4 h-4" />
                       </button>
-                      <button onClick={() => { setSelectedProfile(profile); setPageMode("edit"); }}
+                      <button onClick={() => { setSelectedProfile(profile); setEditData({ ...profile }); setPageMode("edit"); }}
                         className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors" title="Edit">
                         <Edit className="w-4 h-4" />
                       </button>
@@ -750,7 +817,7 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
           </Table>
         </div>
         <div className="flex-none">
-          <CarbonPaginationFooter pageSize={pageSize} setPageSize={setPageSize} currentPage={currentPage} setCurrentPage={setCurrentPage} totalItems={totalItems} />
+          <CarbonPaginationFooter pageSize={pageSize} setPageSize={setPageSize} currentPage={currentPage} setCurrentPage={setCurrentPage} totalItems={totalItemsTab} />
         </div>
       </div>
     </div>
