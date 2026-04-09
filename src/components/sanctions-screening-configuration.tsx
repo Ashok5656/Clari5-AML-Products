@@ -233,14 +233,16 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setPageMode("main")} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setPageMode("main")} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Sanctions Lists Library</h1>
-              <p className="text-xs text-gray-500 mt-0.5">Browse {SANCTIONS_LISTS.length} global and regional sanctions lists</p>
+            <div className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <button onClick={() => setPageMode("main")} className="hover:text-[#2A53A0] transition-colors">Sanctions Screening Configuration</button>
+              <span className="text-gray-300">/</span>
+              <span className="text-gray-900 dark:text-white font-medium">Lists Library</span>
             </div>
           </div>
         </div>
@@ -327,13 +329,17 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center gap-4 shrink-0 shadow-sm">
-          <button onClick={() => { setWizardStep(0); setPageMode("main"); }} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Create New Watchlist</h1>
-            <p className="text-xs text-gray-500 mt-0.5">Configure a new sanctions watchlist profile</p>
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setWizardStep(0); setPageMode("main"); }} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </button>
+            <div className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <button onClick={() => { setWizardStep(0); setPageMode("main"); }} className="hover:text-[#2A53A0] transition-colors">Sanctions Screening Configuration</button>
+              <span className="text-gray-300">/</span>
+              <span className="text-gray-900 dark:text-white font-medium">Create New Watchlist</span>
+            </div>
           </div>
         </div>
 
@@ -563,14 +569,16 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     const criteriaLabels: Record<string, string> = { primaryName: "Primary Name Match", dob: "DOB Match", address: "Address Match", nationality: "Nationality Match" };
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm">
-          <div className="flex items-center gap-4">
-            <button onClick={() => { setPageMode("main"); setSelectedProfile(null); }} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setPageMode("main"); setSelectedProfile(null); }} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
             </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{selectedProfile.name}</h1>
-              <p className="text-xs text-gray-500 mt-0.5">Sanctions Screening Configuration</p>
+            <div className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <button onClick={() => { setPageMode("main"); setSelectedProfile(null); }} className="hover:text-[#2A53A0] transition-colors">Sanctions Screening Configuration</button>
+              <span className="text-gray-300">/</span>
+              <span className="text-gray-900 dark:text-white font-medium">{selectedProfile.name}</span>
             </div>
           </div>
           <Button
@@ -658,13 +666,17 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center gap-4 shrink-0 shadow-sm">
-          <button onClick={() => { setEditWizardStep(0); setPageMode("main"); setSelectedProfile(null); setEditData(null); }} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Edit Configuration</h1>
-            <p className="text-xs text-gray-500 mt-0.5">Update sanctions watchlist profile — {selectedProfile.name}</p>
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0 shadow-sm">
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setEditWizardStep(0); setPageMode("main"); setSelectedProfile(null); setEditData(null); }} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <ArrowLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </button>
+            <div className="h-4 w-px bg-gray-300 dark:bg-gray-700" />
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <button onClick={() => { setEditWizardStep(0); setPageMode("main"); setSelectedProfile(null); setEditData(null); }} className="hover:text-[#2A53A0] transition-colors">Sanctions Screening Configuration</button>
+              <span className="text-gray-300">/</span>
+              <span className="text-gray-900 dark:text-white font-medium">Edit Configuration</span>
+            </div>
           </div>
         </div>
 
@@ -894,6 +906,16 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900 p-0">
+
+      {/* Page Header */}
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
+        <h1 className="text-lg font-medium text-gray-900 dark:text-white">Sanctions Screening Configuration</h1>
+        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+          <span>Configuration</span>
+          <span className="text-gray-300">/</span>
+          <span className="text-[#2A53A0] font-medium">Sanctions Screening Configuration</span>
+        </div>
+      </div>
 
       {/* Stat Cards */}
       <div className="flex-none grid grid-cols-3 gap-4 p-0 bg-gray-50 dark:bg-gray-900/50">
