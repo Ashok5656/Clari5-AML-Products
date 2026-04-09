@@ -32,7 +32,7 @@ export const CreationSuccessDialog: React.FC<CreationSuccessDialogProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white overflow-hidden relative rounded-[10px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] w-[360px] h-[300px] flex flex-col"
+              className="bg-white overflow-hidden relative rounded-[10px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] w-[360px] h-[262px] flex flex-col"
             >
               <div className="flex-1 flex flex-col items-center pt-[32px] px-8 text-center">
                 {/* Checkmark Icon */}
