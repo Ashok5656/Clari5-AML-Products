@@ -615,51 +615,74 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
 
             {/* Step 3 – Match Score Configuration */}
             {wizardStep === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <p className="text-sm text-gray-500">Configure match thresholds and attribute weights for each mapped field.</p>
                 {wizardData.fieldMappings.length === 0 ? (
                   <div className="text-center py-12 text-sm text-gray-400 bg-white dark:bg-gray-900 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
                     No fields mapped. Go back to the Field Mapping step to add fields.
                   </div>
                 ) : (
-                  wizardData.fieldMappings.map(mapping => (
-                    <div key={mapping.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-bold text-gray-800 dark:text-white">{mapping.targetField} Match</h3>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-400">Source:</span>
-                          <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">{mapping.sourceField}</span>
-                          {mapping.required && <span className="text-[10px] font-semibold text-[#2A53A0] bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">Required</span>}
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-gray-500 uppercase">Threshold (%)</label>
-                          <div className="flex items-center gap-2">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    {/* Table Header */}
+                    <div className="grid grid-cols-[1.4fr_1fr_80px_1.6fr_1.4fr] bg-[#F0F0F0] dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-5 py-2.5 gap-4">
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Target Field</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Source Field</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide text-center">Required</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Threshold (%)</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Weight</span>
+                    </div>
+                    {/* Table Rows */}
+                    <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                      {wizardData.fieldMappings.map(mapping => (
+                        <div key={mapping.id} className="grid grid-cols-[1.4fr_1fr_80px_1.6fr_1.4fr] items-center px-5 py-3.5 gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                          {/* Target Field */}
+                          <span className="text-sm font-semibold text-gray-800 dark:text-white">{mapping.targetField}</span>
+                          {/* Source Field */}
+                          <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded text-gray-600 dark:text-gray-300 truncate w-fit">{mapping.sourceField}</span>
+                          {/* Required */}
+                          <div className="flex justify-center">
+                            <span className={cn("text-xs font-semibold px-2.5 py-0.5 rounded-full", mapping.required ? "bg-blue-50 text-[#2A53A0]" : "bg-gray-100 text-gray-400")}>
+                              {mapping.required ? "Yes" : "No"}
+                            </span>
+                          </div>
+                          {/* Threshold */}
+                          <div className="flex items-center gap-2.5">
                             <input
                               type="range" min={50} max={100}
                               value={mapping.threshold}
                               onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, threshold: Number(e.target.value) } : m) }))}
-                              className="flex-1 accent-[#2A53A0]"
+                              className="flex-1 accent-[#2A53A0] h-1.5"
                             />
-                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{mapping.threshold}%</span>
+                            <input
+                              type="number" min={50} max={100}
+                              value={mapping.threshold}
+                              onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, threshold: Number(e.target.value) } : m) }))}
+                              className="w-14 h-8 px-2 text-sm font-bold text-center text-[#2A53A0] border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
+                            />
                           </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-gray-500 uppercase">Weight</label>
-                          <div className="flex items-center gap-2">
+                          {/* Weight */}
+                          <div className="flex items-center gap-2.5">
                             <input
                               type="range" min={1} max={100}
                               value={mapping.weight}
                               onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, weight: Number(e.target.value) } : m) }))}
-                              className="flex-1 accent-[#2A53A0]"
+                              className="flex-1 accent-[#2A53A0] h-1.5"
                             />
-                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{mapping.weight}</span>
+                            <input
+                              type="number" min={1} max={100}
+                              value={mapping.weight}
+                              onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, weight: Number(e.target.value) } : m) }))}
+                              className="w-14 h-8 px-2 text-sm font-bold text-center text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
+                            />
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))
+                    {/* Footer note */}
+                    <div className="px-5 py-3 bg-[#EEF2FB] dark:bg-blue-900/10 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs text-[#2A53A0]">Threshold: minimum similarity score (50–100%). Weight: relative importance of this field in the overall match score.</p>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
@@ -1405,51 +1428,74 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
 
             {/* Step 3 – Match Score Configuration */}
             {editWizardStep === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <p className="text-sm text-gray-500">Configure match thresholds and attribute weights for each mapped field.</p>
                 {editWizardData.fieldMappings.length === 0 ? (
                   <div className="text-center py-12 text-sm text-gray-400 bg-white dark:bg-gray-900 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
                     No fields mapped. Go back to the Field Mapping step to add fields.
                   </div>
                 ) : (
-                  editWizardData.fieldMappings.map(mapping => (
-                    <div key={mapping.id} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-bold text-gray-800 dark:text-white">{mapping.targetField} Match</h3>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-400">Source:</span>
-                          <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">{mapping.sourceField}</span>
-                          {mapping.required && <span className="text-[10px] font-semibold text-[#2A53A0] bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">Required</span>}
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-gray-500 uppercase">Threshold (%)</label>
-                          <div className="flex items-center gap-2">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    {/* Table Header */}
+                    <div className="grid grid-cols-[1.4fr_1fr_80px_1.6fr_1.4fr] bg-[#F0F0F0] dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-5 py-2.5 gap-4">
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Target Field</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Source Field</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide text-center">Required</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Threshold (%)</span>
+                      <span className="text-xs font-bold text-[#2A53A0] uppercase tracking-wide">Weight</span>
+                    </div>
+                    {/* Table Rows */}
+                    <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                      {editWizardData.fieldMappings.map(mapping => (
+                        <div key={mapping.id} className="grid grid-cols-[1.4fr_1fr_80px_1.6fr_1.4fr] items-center px-5 py-3.5 gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                          {/* Target Field */}
+                          <span className="text-sm font-semibold text-gray-800 dark:text-white">{mapping.targetField}</span>
+                          {/* Source Field */}
+                          <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded text-gray-600 dark:text-gray-300 truncate w-fit">{mapping.sourceField}</span>
+                          {/* Required */}
+                          <div className="flex justify-center">
+                            <span className={cn("text-xs font-semibold px-2.5 py-0.5 rounded-full", mapping.required ? "bg-blue-50 text-[#2A53A0]" : "bg-gray-100 text-gray-400")}>
+                              {mapping.required ? "Yes" : "No"}
+                            </span>
+                          </div>
+                          {/* Threshold */}
+                          <div className="flex items-center gap-2.5">
                             <input
                               type="range" min={50} max={100}
                               value={mapping.threshold}
                               onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, threshold: Number(e.target.value) } : m) }))}
-                              className="flex-1 accent-[#2A53A0]"
+                              className="flex-1 accent-[#2A53A0] h-1.5"
                             />
-                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{mapping.threshold}%</span>
+                            <input
+                              type="number" min={50} max={100}
+                              value={mapping.threshold}
+                              onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, threshold: Number(e.target.value) } : m) }))}
+                              className="w-14 h-8 px-2 text-sm font-bold text-center text-[#2A53A0] border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
+                            />
                           </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-gray-500 uppercase">Weight</label>
-                          <div className="flex items-center gap-2">
+                          {/* Weight */}
+                          <div className="flex items-center gap-2.5">
                             <input
                               type="range" min={1} max={100}
                               value={mapping.weight}
                               onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, weight: Number(e.target.value) } : m) }))}
-                              className="flex-1 accent-[#2A53A0]"
+                              className="flex-1 accent-[#2A53A0] h-1.5"
                             />
-                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{mapping.weight}</span>
+                            <input
+                              type="number" min={1} max={100}
+                              value={mapping.weight}
+                              onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, weight: Number(e.target.value) } : m) }))}
+                              className="w-14 h-8 px-2 text-sm font-bold text-center text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
+                            />
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))
+                    {/* Footer note */}
+                    <div className="px-5 py-3 bg-[#EEF2FB] dark:bg-blue-900/10 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-xs text-[#2A53A0]">Threshold: minimum similarity score (50–100%). Weight: relative importance of this field in the overall match score.</p>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
