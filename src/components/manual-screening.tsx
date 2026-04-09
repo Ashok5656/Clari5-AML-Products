@@ -1160,8 +1160,9 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         <Table>
                           <TableHeader>
                             <TableRow className="h-8 hover:bg-transparent border-b-gray-200">
-                              <TableHead className="h-8 text-xs font-bold uppercase w-1/4 pl-6">Attribute</TableHead>
-                              <TableHead className="h-8 text-xs font-bold uppercase w-1/2">Watchlist Value</TableHead>
+                              <TableHead className="h-8 text-xs font-bold uppercase w-1/5 pl-6">Attribute</TableHead>
+                              <TableHead className="h-8 text-xs font-bold uppercase w-[30%] text-[#2A53A0]">Screened Subject</TableHead>
+                              <TableHead className="h-8 text-xs font-bold uppercase w-[35%]">Watchlist Value</TableHead>
                               <TableHead className="h-8 text-xs font-bold uppercase text-center">Score</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -1169,6 +1170,9 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                             {match.details.map((detail: any, i: number) => (
                               <TableRow key={i} className="hover:bg-white dark:hover:bg-gray-800 border-b-gray-100 h-10">
                                 <TableCell className="text-xs font-medium text-gray-500 pl-6">{detail.attribute}</TableCell>
+                                <TableCell className="text-sm font-semibold text-[#2A53A0] break-all">
+                                  {getCustomerFieldValue(detail.attribute, submittedData)}
+                                </TableCell>
                                 <TableCell className="text-sm font-semibold text-gray-900 dark:text-white break-all">
                                   {detail.watchlist}
                                 </TableCell>
