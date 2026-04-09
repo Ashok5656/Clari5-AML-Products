@@ -179,9 +179,18 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
   const [librarySearch, setLibrarySearch] = useState("");
   const [libraryRegion, setLibraryRegion] = useState("All Regions");
 
-  // Wizard state
+  // Create Wizard state
   const [wizardStep, setWizardStep] = useState(0);
   const [wizardData, setWizardData] = useState({
+    name: "", description: "", purpose: "Customer Onboarding",
+    selectedLists: [] as string[],
+    matchCriteria: { primaryName: { threshold: 80, weight: 50 }, dob: { threshold: 80, weight: 20 }, address: { threshold: 70, weight: 15 }, nationality: { threshold: 85, weight: 15 } },
+    alertThreshold: 80, alertAction: "Flag for Review", notifyEmail: "",
+  });
+
+  // Edit Wizard state
+  const [editWizardStep, setEditWizardStep] = useState(0);
+  const [editWizardData, setEditWizardData] = useState({
     name: "", description: "", purpose: "Customer Onboarding",
     selectedLists: [] as string[],
     matchCriteria: { primaryName: { threshold: 80, weight: 50 }, dob: { threshold: 80, weight: 20 }, address: { threshold: 70, weight: 15 }, nationality: { threshold: 85, weight: 15 } },
@@ -549,21 +558,9 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
     );
   }
 
-  // ── View / Edit Detail Page ───────────────────────────────────────────────
-  if ((pageMode === "view" || pageMode === "edit") && selectedProfile) {
-    const isEdit = pageMode === "edit";
-    const currentEditData = editData ?? selectedProfile;
-
-    const handleSaveEdit = () => {
-      if (!editData) return;
-      setProfiles(prev => prev.map(p => p.id === editData.id ? editData : p));
-      setPageMode("main");
-      setSelectedProfile(null);
-      setEditData(null);
-    };
-
+  // ── View Detail Page ─────────────────────────────────────────────────────
+  if (pageMode === "view" && selectedProfile) {
     const criteriaLabels: Record<string, string> = { primaryName: "Primary Name Match", dob: "DOB Match", address: "Address Match", nationality: "Nationality Match" };
-
     return (
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
         <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between shrink-0 shadow-sm">
@@ -572,31 +569,39 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
               <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{isEdit ? "Edit Configuration" : selectedProfile.name}</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{selectedProfile.name}</h1>
               <p className="text-xs text-gray-500 mt-0.5">Sanctions Screening Configuration</p>
             </div>
           </div>
-          {isEdit ? (
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => { setPageMode("main"); setSelectedProfile(null); }} className="h-9 rounded-[8px]">Cancel</Button>
-              <Button onClick={handleSaveEdit} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">Save Configuration</Button>
-            </div>
-          ) : (
-            <Button onClick={() => { setEditData({ ...selectedProfile }); setPageMode("edit"); }} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">
-              <Edit className="w-4 h-4 mr-2" /> Edit Configuration
-            </Button>
-          )}
+          <Button
+            onClick={() => {
+              setEditWizardStep(0);
+              setEditWizardData({
+                name: selectedProfile.name,
+                description: selectedProfile.description,
+                purpose: selectedProfile.type,
+                selectedLists: [...selectedProfile.includedLists],
+                matchCriteria: { ...selectedProfile.matchCriteria },
+                alertThreshold: selectedProfile.stats.alertThreshold,
+                alertAction: "Flag for Review",
+                notifyEmail: "",
+              });
+              setEditData({ ...selectedProfile });
+              setPageMode("edit");
+            }}
+            className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]"
+          >
+            <Edit className="w-4 h-4 mr-2" /> Edit Configuration
+          </Button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-5">
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Profile Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Name</p>
-                {isEdit ? <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700" value={currentEditData.name} onChange={e => setEditData(d => d ? { ...d, name: e.target.value } : d)} /> : <p className="text-sm font-semibold text-gray-900 dark:text-white">{selectedProfile.name}</p>}</div>
+              <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Name</p><p className="text-sm font-semibold text-gray-900 dark:text-white">{selectedProfile.name}</p></div>
               <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Type</p>
                 <Badge variant="secondary" className={cn("text-xs px-2.5 py-0.5 font-medium", TYPE_BADGE[selectedProfile.type])}>{selectedProfile.type}</Badge></div>
-              <div className="md:col-span-2"><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Description</p>
-                {isEdit ? <textarea rows={2} className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 bg-white dark:bg-gray-800 dark:border-gray-700 resize-none" value={currentEditData.description} onChange={e => setEditData(d => d ? { ...d, description: e.target.value } : d)} /> : <p className="text-sm text-gray-600 dark:text-gray-400">{selectedProfile.description}</p>}</div>
+              <div className="md:col-span-2"><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Description</p><p className="text-sm text-gray-600 dark:text-gray-400">{selectedProfile.description}</p></div>
             </div>
           </div>
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
@@ -624,6 +629,261 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
               <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Total Screenings</p><p className="text-2xl font-bold text-gray-900 dark:text-white">{selectedProfile.stats.totalScreenings.toLocaleString()}</p></div>
               <div><p className="text-xs text-gray-400 uppercase font-semibold mb-1">Alerts Generated</p><p className="text-2xl font-bold text-gray-900 dark:text-white">{selectedProfile.stats.alertsGenerated.toLocaleString()}</p></div>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Edit Configuration Wizard ─────────────────────────────────────────────
+  if (pageMode === "edit" && selectedProfile) {
+    const canNext = editWizardStep === 0 ? editWizardData.name.trim() !== "" : true;
+
+    const handleSaveEdit = () => {
+      const updated: WatchlistProfile = {
+        ...selectedProfile,
+        name: editWizardData.name,
+        description: editWizardData.description,
+        includedLists: editWizardData.selectedLists,
+        matchCriteria: editWizardData.matchCriteria,
+        stats: { ...selectedProfile.stats, alertThreshold: editWizardData.alertThreshold },
+        lastUpdated: new Date().toLocaleDateString("en-GB"),
+      };
+      setProfiles(prev => prev.map(p => p.id === updated.id ? updated : p));
+      setPageMode("main");
+      setSelectedProfile(null);
+      setEditData(null);
+    };
+
+    return (
+      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50 overflow-hidden">
+        {/* Header */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center gap-4 shrink-0 shadow-sm">
+          <button onClick={() => { setEditWizardStep(0); setPageMode("main"); setSelectedProfile(null); setEditData(null); }} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Edit Configuration</h1>
+            <p className="text-xs text-gray-500 mt-0.5">Update sanctions watchlist profile — {selectedProfile.name}</p>
+          </div>
+        </div>
+
+        {/* Step Indicator */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-0 shrink-0">
+          <div className="flex">
+            {WIZARD_STEPS.map((step, idx) => (
+              <button key={step} onClick={() => idx < editWizardStep ? setEditWizardStep(idx) : undefined}
+                className={cn(
+                  "px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap",
+                  idx === editWizardStep
+                    ? "border-[#2A53A0] text-[#2A53A0]"
+                    : idx < editWizardStep
+                    ? "border-transparent text-gray-500 hover:text-gray-700 cursor-pointer"
+                    : "border-transparent text-gray-400 cursor-default"
+                )}
+              >
+                {step}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Step Content */}
+        <div className="flex-1 overflow-y-auto px-6 py-8">
+          <div className="max-w-2xl">
+
+            {/* Step 0 – Basic Information */}
+            {editWizardStep === 0 && (
+              <div className="space-y-6">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    Watchlist Name <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    value={editWizardData.name}
+                    onChange={e => setEditWizardData(d => ({ ...d, name: e.target.value }))}
+                    placeholder="e.g., Customer Onboarding for Lending"
+                    className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus-visible:ring-[#2A53A0] h-11"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">Description</label>
+                  <textarea
+                    rows={4}
+                    value={editWizardData.description}
+                    onChange={e => setEditWizardData(d => ({ ...d, description: e.target.value }))}
+                    placeholder="Describe the purpose and usage of this watchlist configuration"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 focus:border-[#2A53A0] resize-none"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">Purpose</label>
+                  <select
+                    value={editWizardData.purpose}
+                    onChange={e => setEditWizardData(d => ({ ...d, purpose: e.target.value }))}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 focus:border-[#2A53A0]"
+                  >
+                    {PURPOSE_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Step 1 – Risk Selection */}
+            {editWizardStep === 1 && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">Select the sanctions lists to include in this watchlist profile.</p>
+                <div className="relative mb-2">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input placeholder="Search available lists..." className="pl-9 bg-white dark:bg-gray-900" />
+                </div>
+                {REGIONS.filter(r => r !== "All Regions").map(region => {
+                  const regionLists = SANCTIONS_LISTS.filter(l => l.region === region);
+                  return (
+                    <div key={region}>
+                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{region}</h3>
+                      <div className="space-y-2">
+                        {regionLists.map(list => (
+                          <label key={list.id} className="flex items-start gap-3 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-[#2A53A0]/40 transition-colors">
+                            <input
+                              type="checkbox"
+                              className="mt-0.5 accent-[#2A53A0]"
+                              checked={editWizardData.selectedLists.includes(list.name)}
+                              onChange={e => {
+                                setEditWizardData(d => ({
+                                  ...d,
+                                  selectedLists: e.target.checked
+                                    ? [...d.selectedLists, list.name]
+                                    : d.selectedLists.filter(n => n !== list.name),
+                                }));
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{list.name}</span>
+                                <span className="text-[10px] text-gray-400">{list.entries.toLocaleString()} entries</span>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-0.5 truncate">{list.description}</p>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Step 2 – Match Score Configuration */}
+            {editWizardStep === 2 && (
+              <div className="space-y-6">
+                <p className="text-sm text-gray-500">Configure match thresholds and attribute weights for scoring.</p>
+                {(["primaryName", "dob", "address", "nationality"] as const).map(field => {
+                  const labels: Record<string, string> = { primaryName: "Primary Name Match", dob: "Date of Birth Match", address: "Address Match", nationality: "Nationality Match" };
+                  return (
+                    <div key={field} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                      <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-4">{labels[field]}</h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-gray-500 uppercase">Threshold (%)</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range" min={50} max={100}
+                              value={editWizardData.matchCriteria[field].threshold}
+                              onChange={e => setEditWizardData(d => ({ ...d, matchCriteria: { ...d.matchCriteria, [field]: { ...d.matchCriteria[field], threshold: Number(e.target.value) } } }))}
+                              className="flex-1 accent-[#2A53A0]"
+                            />
+                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{editWizardData.matchCriteria[field].threshold}%</span>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-gray-500 uppercase">Weight</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="range" min={1} max={100}
+                              value={editWizardData.matchCriteria[field].weight}
+                              onChange={e => setEditWizardData(d => ({ ...d, matchCriteria: { ...d.matchCriteria, [field]: { ...d.matchCriteria[field], weight: Number(e.target.value) } } }))}
+                              className="flex-1 accent-[#2A53A0]"
+                            />
+                            <span className="text-sm font-bold text-[#2A53A0] w-12 text-right">{editWizardData.matchCriteria[field].weight}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Step 3 – Result Configuration */}
+            {editWizardStep === 3 && (
+              <div className="space-y-6">
+                <p className="text-sm text-gray-500">Configure how screening results are handled and who is notified.</p>
+                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">Alert Threshold (%)</label>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-500">≥</span>
+                      <input
+                        type="number" min={50} max={100}
+                        value={editWizardData.alertThreshold}
+                        onChange={e => setEditWizardData(d => ({ ...d, alertThreshold: Number(e.target.value) }))}
+                        className="w-24 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20"
+                      />
+                      <span className="text-sm text-gray-400">%</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">Alert Action</label>
+                    <select
+                      value={editWizardData.alertAction}
+                      onChange={e => setEditWizardData(d => ({ ...d, alertAction: e.target.value }))}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20"
+                    >
+                      {["Flag for Review", "Auto-Escalate to Case", "Notify Compliance Officer", "Block Transaction", "Generate STR"].map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-200">Notification Email (optional)</label>
+                    <Input
+                      type="email"
+                      value={editWizardData.notifyEmail}
+                      onChange={e => setEditWizardData(d => ({ ...d, notifyEmail: e.target.value }))}
+                      placeholder="compliance@yourbank.com"
+                      className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus-visible:ring-[#2A53A0]"
+                    />
+                  </div>
+                </div>
+                {/* Summary */}
+                <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 rounded-xl p-5 space-y-2">
+                  <h4 className="text-sm font-bold text-[#2A53A0]">Configuration Summary</h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-semibold">Name:</span> {editWizardData.name || "—"}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-semibold">Purpose:</span> {editWizardData.purpose}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-semibold">Lists Selected:</span> {editWizardData.selectedLists.length}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400"><span className="font-semibold">Alert Threshold:</span> ≥ {editWizardData.alertThreshold}%</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Wizard Footer */}
+        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between shrink-0">
+          <Button variant="outline" onClick={() => { setEditWizardStep(0); setPageMode("main"); setSelectedProfile(null); setEditData(null); }} className="h-9 rounded-[8px]">Cancel</Button>
+          <div className="flex items-center gap-3">
+            {editWizardStep > 0 && (
+              <Button variant="outline" onClick={() => setEditWizardStep(s => s - 1)} className="h-9 rounded-[8px]">Back</Button>
+            )}
+            {editWizardStep < WIZARD_STEPS.length - 1 ? (
+              <Button onClick={() => setEditWizardStep(s => s + 1)} disabled={!canNext}
+                className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px] flex items-center gap-1.5">
+                Next <ChevronRight className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button onClick={handleSaveEdit} className="h-9 bg-[#2A53A0] hover:bg-[#1e3a70] text-white rounded-[8px]">
+                Save Configuration
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -797,7 +1057,22 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                         className="flex items-center justify-center w-8 h-8 rounded-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 transition-colors" title="View Details">
                         <View className="w-4 h-4" />
                       </button>
-                      <button onClick={() => { setSelectedProfile(profile); setEditData({ ...profile }); setPageMode("edit"); }}
+                      <button onClick={() => {
+                          setSelectedProfile(profile);
+                          setEditData({ ...profile });
+                          setEditWizardStep(0);
+                          setEditWizardData({
+                            name: profile.name,
+                            description: profile.description,
+                            purpose: profile.type,
+                            selectedLists: [...profile.includedLists],
+                            matchCriteria: { ...profile.matchCriteria },
+                            alertThreshold: profile.stats.alertThreshold,
+                            alertAction: "Flag for Review",
+                            notifyEmail: "",
+                          });
+                          setPageMode("edit");
+                        }}
                         className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors" title="Edit">
                         <Edit className="w-4 h-4" />
                       </button>
