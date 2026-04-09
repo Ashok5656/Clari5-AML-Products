@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Dropdown } from "carbon-components-react";
 import {
   Search, Add, Edit, Download, Upload, View,
   ArrowLeft, Filter, ChevronRight, CheckmarkFilled,
@@ -551,21 +552,29 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                   {/* Mapping Rows */}
                   <div className="divide-y divide-gray-100 dark:divide-gray-800">
                     {wizardData.fieldMappings.map((mapping) => (
-                      <div key={mapping.id} className="grid grid-cols-[1fr_1fr_100px_48px] gap-0 items-center px-4 py-2.5">
-                        <select
-                          value={mapping.sourceField}
-                          onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, sourceField: e.target.value } : m) }))}
-                          className="mr-3 h-9 px-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
-                        >
-                          {FIELD_MAPPING_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <select
-                          value={mapping.targetField}
-                          onChange={e => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, targetField: e.target.value } : m) }))}
-                          className="mr-3 h-9 px-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
-                        >
-                          {FIELD_MAPPING_TARGETS.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
+                      <div key={mapping.id} className="grid grid-cols-[1fr_1fr_100px_48px] gap-0 items-center px-4 py-2">
+                        <div className="mr-3">
+                          <Dropdown
+                            id={`create-source-${mapping.id}`}
+                            titleText=""
+                            label=""
+                            items={FIELD_MAPPING_SOURCES}
+                            selectedItem={mapping.sourceField}
+                            onChange={({ selectedItem }: any) => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, sourceField: selectedItem } : m) }))}
+                            size="sm"
+                          />
+                        </div>
+                        <div className="mr-3">
+                          <Dropdown
+                            id={`create-target-${mapping.id}`}
+                            titleText=""
+                            label=""
+                            items={FIELD_MAPPING_TARGETS}
+                            selectedItem={mapping.targetField}
+                            onChange={({ selectedItem }: any) => setWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, targetField: selectedItem } : m) }))}
+                            size="sm"
+                          />
+                        </div>
                         <div className="flex justify-center">
                           <input
                             type="checkbox"
@@ -1336,21 +1345,29 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
                   </div>
                   <div className="divide-y divide-gray-100 dark:divide-gray-800">
                     {editWizardData.fieldMappings.map((mapping) => (
-                      <div key={mapping.id} className="grid grid-cols-[1fr_1fr_100px_48px] gap-0 items-center px-4 py-2.5">
-                        <select
-                          value={mapping.sourceField}
-                          onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, sourceField: e.target.value } : m) }))}
-                          className="mr-3 h-9 px-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
-                        >
-                          {FIELD_MAPPING_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                        <select
-                          value={mapping.targetField}
-                          onChange={e => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, targetField: e.target.value } : m) }))}
-                          className="mr-3 h-9 px-2.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
-                        >
-                          {FIELD_MAPPING_TARGETS.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
+                      <div key={mapping.id} className="grid grid-cols-[1fr_1fr_100px_48px] gap-0 items-center px-4 py-2">
+                        <div className="mr-3">
+                          <Dropdown
+                            id={`edit-source-${mapping.id}`}
+                            titleText=""
+                            label=""
+                            items={FIELD_MAPPING_SOURCES}
+                            selectedItem={mapping.sourceField}
+                            onChange={({ selectedItem }: any) => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, sourceField: selectedItem } : m) }))}
+                            size="sm"
+                          />
+                        </div>
+                        <div className="mr-3">
+                          <Dropdown
+                            id={`edit-target-${mapping.id}`}
+                            titleText=""
+                            label=""
+                            items={FIELD_MAPPING_TARGETS}
+                            selectedItem={mapping.targetField}
+                            onChange={({ selectedItem }: any) => setEditWizardData(d => ({ ...d, fieldMappings: d.fieldMappings.map(m => m.id === mapping.id ? { ...m, targetField: selectedItem } : m) }))}
+                            size="sm"
+                          />
+                        </div>
                         <div className="flex justify-center">
                           <input
                             type="checkbox"
