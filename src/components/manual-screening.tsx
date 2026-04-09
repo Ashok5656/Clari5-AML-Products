@@ -141,6 +141,20 @@ function generateScreeningResults(name: string, entityType: string, profile: str
   return results.slice(0, 6);
 }
 
+// Maps attribute label → submitted form field value
+function getCustomerFieldValue(attribute: string, data: Record<string, string>): string {
+  const attr = attribute.toLowerCase();
+  if (attr.includes("name")) return data.primaryName || "—";
+  if (attr === "date of birth" || attr.includes("dob") || (attr.includes("birth") && attr.includes("date"))) return data.dob || "—";
+  if (attr.includes("place of birth") || (attr.includes("birth") && !attr.includes("date") && !attr.includes("country"))) return data.countryBirth || data.nationality || "—";
+  if (attr.includes("nationality")) return data.nationality || "—";
+  if (attr.includes("country")) return data.nationality || "—";
+  if (attr.includes("passport") || attr.includes("id number") || attr.includes("id no")) return data.idNumber || "—";
+  if (attr.includes("gender")) return data.gender || "—";
+  if (attr.includes("address")) return data.address || "—";
+  return "—";
+}
+
 // Mock Data for Detailed Matches
 const MOCK_MATCH_DETAILS: Record<string, any[]> = {
   "M-2024-001": [
@@ -561,7 +575,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
     // Extract Customer Details from the first match (assuming constant for the screening)
     const customerDetails = details[0]?.details.map((d: any) => ({
       attribute: d.attribute,
-      value: d.customer
+      value: getCustomerFieldValue(d.attribute, submittedData)
     })) || [];
 
     return (
@@ -640,12 +654,12 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
           {detailsTab === "view-summary" ? (
             (() => {
               const summaryAttributes = [
-                { attribute: "Name",         weight: 40, customerValue: "William James Harrington", unscr: { value: "William Jame Harrington", score: 98 }, ofac: { value: "Wm. James Harrington",    score: 88 } },
-                { attribute: "Passport No.", weight:  7, customerValue: "K2947681B",                unscr: { value: "K2947681B",               score: 89 }, ofac: { value: "K2947600B",               score: 85 } },
-                { attribute: "Date of Birth",weight: 25, customerValue: "1971-09-04",               unscr: { value: "1971-09-04",              score: 100}, ofac: { value: "1971-09-04",              score: 100} },
-                { attribute: "Nationality",  weight: 12, customerValue: "Singapore",                unscr: { value: "SGP",                     score: 33 }, ofac: { value: "Singapore",               score: 100} },
-                { attribute: "Place of Birth",weight:11, customerValue: "Singapore",                unscr: { value: "Singapore",               score: 100}, ofac: { value: "Singapore",               score: 100} },
-                { attribute: "Gender",       weight:  5, customerValue: "Male",                     unscr: { value: "Male",                    score: 25 }, ofac: { value: "Male",                    score: 100} },
+                { attribute: "Name",         weight: 40, customerValue: mainResult?.name || submittedData.primaryName, unscr: { value: "WILLIAM JAMES HARRINGTON", score: 98 }, ofac: { value: "WM. JAMES HARRINGTON", score: 88 } },
+                { attribute: "Passport No.", weight:  7, customerValue: submittedData.idNumber || "—",                 unscr: { value: "K2947681B",               score: submittedData.idNumber ? 0 : 89 }, ofac: { value: "K2947600B", score: submittedData.idNumber ? 0 : 85 } },
+                { attribute: "Date of Birth",weight: 25, customerValue: submittedData.dob || "—",                      unscr: { value: "1971-09-04",              score: 78 }, ofac: { value: "1971-09-04", score: 78 } },
+                { attribute: "Nationality",  weight: 12, customerValue: submittedData.nationality || "—",              unscr: { value: "SGP",                     score: submittedData.nationality ? 33 : 0 }, ofac: { value: "Singapore", score: submittedData.nationality ? 100 : 0 } },
+                { attribute: "Place of Birth",weight:11, customerValue: submittedData.countryBirth || submittedData.nationality || "—", unscr: { value: "Singapore", score: 100 }, ofac: { value: "Singapore", score: 100 } },
+                { attribute: "Gender",       weight:  5, customerValue: submittedData.gender || "—",                  unscr: { value: "Male",                    score: submittedData.gender ? 100 : 0 }, ofac: { value: "Male", score: submittedData.gender ? 100 : 0 } },
               ];
               return (
                 <div className="p-4 space-y-4">
@@ -657,19 +671,19 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <div className="space-y-0">
                         <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
                           <span className="text-sm text-gray-500">Customer ID</span>
-                          <span className="text-sm font-semibold text-[#2A53A0] font-mono">CUST-2025-08355</span>
+                          <span className="text-sm font-semibold text-[#2A53A0] font-mono">{mainResult?.custId || "—"}</span>
                         </div>
                         <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
                           <span className="text-sm text-gray-500">Customer Type</span>
-                          <span className="text-sm font-semibold text-[#2A53A0]">Individual</span>
+                          <span className="text-sm font-semibold text-[#2A53A0]">{mainResult?.type || (submittedData.entityType === "non-individual" ? "Non-Individual" : submittedData.entityType || "Individual")}</span>
                         </div>
                         <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
                           <span className="text-sm text-gray-500">Overall CRC Score</span>
-                          <span className="text-sm font-bold text-[#2A53A0]">85</span>
+                          <span className="text-sm font-bold text-[#2A53A0]">{mainResult?.score ?? "—"}</span>
                         </div>
                         <div className="flex justify-between items-center py-2.5">
                           <span className="text-sm text-gray-500">CRC Category</span>
-                          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-0 font-semibold">Medium</Badge>
+                          <Badge className={cn("border-0 font-semibold", (mainResult?.score ?? 0) >= 90 ? "bg-red-100 text-red-700 hover:bg-red-100" : (mainResult?.score ?? 0) >= 80 ? "bg-orange-100 text-orange-700 hover:bg-orange-100" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100")}>{(mainResult?.score ?? 0) >= 90 ? "Critical" : (mainResult?.score ?? 0) >= 80 ? "High" : "Medium"}</Badge>
                         </div>
                       </div>
                     </div>
@@ -680,11 +694,11 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <div className="space-y-0">
                         <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
                           <span className="text-sm text-gray-500">Total List Matches</span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">2</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">{details.length}</span>
                         </div>
                         <div className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
                           <span className="text-sm text-gray-500">Highest Match Score</span>
-                          <span className="text-sm font-bold text-[#2A53A0]">92.00%</span>
+                          <span className="text-sm font-bold text-[#2A53A0]">{mainResult?.score != null ? `${mainResult.score}.00%` : "—"}</span>
                         </div>
                         <div className="flex justify-between items-center py-2.5">
                           <span className="text-sm text-gray-500">Used for Calculation</span>
@@ -748,12 +762,12 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                             </th>
                           </tr>
                           <tr className="border-b border-gray-200 dark:border-gray-700 bg-blue-50/40 dark:bg-blue-900/10">
-                            <td className="py-2.5 px-5 text-sm font-bold text-[#2A53A0]">92.0%</td>
+                            <td className="py-2.5 px-5 text-sm font-bold text-[#2A53A0]">{mainResult?.score != null ? `${mainResult.score}.0%` : "—"}</td>
                             <td className="py-2.5 px-4" />
                             <td className="py-2.5 px-4" />
                             <td className="py-2.5 px-4 text-center border-l border-gray-200 dark:border-gray-700 w-56">
                               <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">UN Security Council Consolidated List (UNSCR 1267)</div>
-                              <div className="text-sm font-bold text-[#2A53A0] mt-0.5">92.00%</div>
+                              <div className="text-sm font-bold text-[#2A53A0] mt-0.5">{mainResult?.score != null ? `${mainResult.score}.00%` : "—"}</div>
                             </td>
                             <td className="py-2.5 px-4 text-center border-l border-gray-200 dark:border-gray-700 w-44">
                               <div className="text-xs font-semibold text-gray-700 dark:text-gray-300">OFAC SDN</div>
@@ -897,7 +911,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                       <TableBody>
                         <TableRow className="h-12">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Name</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">SIN HUAT ALAN</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">{(mainResult?.name || submittedData.primaryName || "—").toUpperCase()}</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -909,7 +923,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         </TableRow>
                         <TableRow className="h-12">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Nationality</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">Singapore</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">{submittedData.nationality || "—"}</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -921,7 +935,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         </TableRow>
                         <TableRow className="h-12">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Passport Number</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">7234580J</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">{submittedData.idNumber || "—"}</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -933,7 +947,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
                         </TableRow>
                         <TableRow className="h-12 border-b-0">
                           <TableCell className="text-sm font-bold text-gray-900 dark:text-white">Date of Birth</TableCell>
-                          <TableCell className="text-sm text-gray-500 font-mono">1972-09-20</TableCell>
+                          <TableCell className="text-sm text-gray-500 font-mono">{submittedData.dob || "—"}</TableCell>
                           <TableCell>
                             <div className="flex items-center justify-end gap-3">
                               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -1192,7 +1206,7 @@ export function ManualScreening({ breadcrumbs, onBreadcrumbNavigate }: ManualScr
       match.details.forEach((d: any) => {
         if (!allAttributes.includes(d.attribute)) {
           allAttributes.push(d.attribute);
-          customerValues[d.attribute] = d.customer;
+          customerValues[d.attribute] = getCustomerFieldValue(d.attribute, submittedData);
           weightMap[d.attribute] = d.weight;
         }
       });
