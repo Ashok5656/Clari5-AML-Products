@@ -1,22 +1,29 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
-  Search, Add, Edit, Download, View, DocumentExport,
-  SettingsAdjust, ChevronUp, ChevronDown,
+  Search, Add, Edit, Download, View, Close, DocumentExport,
 } from "@carbon/icons-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { CarbonPaginationFooter } from "./carbon-pagination-footer";
+import { useSortableData } from "../hooks/use-sortable-data";
+import { SortableHeader } from "./ui/sortable-header";
 import { cn } from "./ui/utils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 // ── Types ──────────────────────────────────────────────────────────────────
+
+type ListStatus = "Active" | "Disabled" | "Pending";
+type ActionOnHit = "Alert & block" | "Generate alert" | "Flag for review";
 
 interface CustomList {
   id: string;
   name: string;
-  status: "Active" | "Disabled" | "Pending";
+  status: ListStatus;
   records: number;
   active: number;
-  actionOnHit: "Alert & block" | "Generate alert" | "Flag for review";
+  actionOnHit: ActionOnHit;
   ttl: string;
   dateCreated: string;
   lastModified: string;
@@ -26,446 +33,471 @@ interface CustomList {
 // ── Mock Data ──────────────────────────────────────────────────────────────
 
 const MOCK_LISTS: CustomList[] = [
-  {
-    id: "CL-001", name: "Internal fraud — flagged", status: "Active",
-    records: 3841, active: 3712, actionOnHit: "Alert & block",
-    ttl: "12 months", dateCreated: "12 Jan 2026", lastModified: "06 Apr 2026", listExpiry: "12 Jan 2027",
-  },
-  {
-    id: "CL-002", name: "Rejected KYC applicants", status: "Active",
-    records: 12204, active: 11890, actionOnHit: "Alert & block",
-    ttl: "12 months", dateCreated: "15 Jan 2026", lastModified: "05 Apr 2026", listExpiry: "15 Jan 2027",
-  },
-  {
-    id: "CL-003", name: "PEP — internal identified", status: "Active",
-    records: 892, active: 871, actionOnHit: "Generate alert",
-    ttl: "24 months", dateCreated: "20 Jan 2026", lastModified: "04 Apr 2026", listExpiry: null,
-  },
-  {
-    id: "CL-004", name: "Device blocklist", status: "Active",
-    records: 2341, active: 2299, actionOnHit: "Alert & block",
-    ttl: "6 months", dateCreated: "22 Jan 2026", lastModified: "03 Apr 2026", listExpiry: "22 Jul 2026",
-  },
-  {
-    id: "CL-005", name: "IP — TOR / VPN exit nodes", status: "Active",
-    records: 18420, active: 18420, actionOnHit: "Alert & block",
-    ttl: "3 months", dateCreated: "25 Jan 2026", lastModified: "02 Apr 2026", listExpiry: "25 Apr 2026",
-  },
-  {
-    id: "CL-006", name: "Adverse media flagged", status: "Active",
-    records: 504, active: 481, actionOnHit: "Generate alert",
-    ttl: "12 months", dateCreated: "01 Feb 2026", lastModified: "01 Apr 2026", listExpiry: "01 Feb 2027",
-  },
-  {
-    id: "CL-007", name: "SIM-farm mobile numbers", status: "Active",
-    records: 7812, active: 7799, actionOnHit: "Alert & block",
-    ttl: "6 months", dateCreated: "05 Feb 2026", lastModified: "31 Mar 2026", listExpiry: "05 Aug 2026",
-  },
-  {
-    id: "CL-008", name: "Investigations — under review", status: "Active",
-    records: 239, active: 205, actionOnHit: "Generate alert",
-    ttl: "No expiry", dateCreated: "10 Feb 2026", lastModified: "29 Mar 2026", listExpiry: null,
-  },
-  {
-    id: "CL-009", name: "Temp sanctions override", status: "Disabled",
-    records: 12, active: 0, actionOnHit: "Alert & block",
-    ttl: "12 months", dateCreated: "01 Mar 2026", lastModified: "29 Mar 2026", listExpiry: "01 Mar 2027",
-  },
-  {
-    id: "CL-010", name: "High-value customer watchlist", status: "Active",
-    records: 318, active: 302, actionOnHit: "Flag for review",
-    ttl: "24 months", dateCreated: "05 Mar 2026", lastModified: "25 Mar 2026", listExpiry: null,
-  },
-  {
-    id: "CL-011", name: "Shell company registry", status: "Active",
-    records: 1450, active: 1387, actionOnHit: "Alert & block",
-    ttl: "12 months", dateCreated: "10 Mar 2026", lastModified: "20 Mar 2026", listExpiry: "10 Mar 2027",
-  },
-  {
-    id: "CL-012", name: "Crypto mixer addresses", status: "Pending",
-    records: 9870, active: 0, actionOnHit: "Alert & block",
-    ttl: "6 months", dateCreated: "15 Mar 2026", lastModified: "15 Mar 2026", listExpiry: "15 Sep 2026",
-  },
+  { id: "CL-001", name: "Internal fraud — flagged",       status: "Active",   records: 3841,  active: 3712,  actionOnHit: "Alert & block",   ttl: "12 months", dateCreated: "12 Jan 2026", lastModified: "06 Apr 2026", listExpiry: "12 Jan 2027" },
+  { id: "CL-002", name: "Rejected KYC applicants",        status: "Active",   records: 12204, active: 11890, actionOnHit: "Alert & block",   ttl: "12 months", dateCreated: "15 Jan 2026", lastModified: "05 Apr 2026", listExpiry: "15 Jan 2027" },
+  { id: "CL-003", name: "PEP — internal identified",      status: "Active",   records: 892,   active: 871,   actionOnHit: "Generate alert",  ttl: "24 months", dateCreated: "20 Jan 2026", lastModified: "04 Apr 2026", listExpiry: null },
+  { id: "CL-004", name: "Device blocklist",               status: "Active",   records: 2341,  active: 2299,  actionOnHit: "Alert & block",   ttl: "6 months",  dateCreated: "22 Jan 2026", lastModified: "03 Apr 2026", listExpiry: "22 Jul 2026" },
+  { id: "CL-005", name: "IP — TOR / VPN exit nodes",      status: "Active",   records: 18420, active: 18420, actionOnHit: "Alert & block",   ttl: "3 months",  dateCreated: "25 Jan 2026", lastModified: "02 Apr 2026", listExpiry: "25 Apr 2026" },
+  { id: "CL-006", name: "Adverse media flagged",          status: "Active",   records: 504,   active: 481,   actionOnHit: "Generate alert",  ttl: "12 months", dateCreated: "01 Feb 2026", lastModified: "01 Apr 2026", listExpiry: "01 Feb 2027" },
+  { id: "CL-007", name: "SIM-farm mobile numbers",        status: "Active",   records: 7812,  active: 7799,  actionOnHit: "Alert & block",   ttl: "6 months",  dateCreated: "05 Feb 2026", lastModified: "31 Mar 2026", listExpiry: "05 Aug 2026" },
+  { id: "CL-008", name: "Investigations — under review",  status: "Active",   records: 239,   active: 205,   actionOnHit: "Generate alert",  ttl: "No expiry", dateCreated: "10 Feb 2026", lastModified: "29 Mar 2026", listExpiry: null },
+  { id: "CL-009", name: "Temp sanctions override",        status: "Disabled", records: 12,    active: 0,     actionOnHit: "Alert & block",   ttl: "12 months", dateCreated: "01 Mar 2026", lastModified: "29 Mar 2026", listExpiry: "01 Mar 2027" },
+  { id: "CL-010", name: "High-value customer watchlist",  status: "Active",   records: 318,   active: 302,   actionOnHit: "Flag for review", ttl: "24 months", dateCreated: "05 Mar 2026", lastModified: "25 Mar 2026", listExpiry: null },
+  { id: "CL-011", name: "Shell company registry",         status: "Active",   records: 1450,  active: 1387,  actionOnHit: "Alert & block",   ttl: "12 months", dateCreated: "10 Mar 2026", lastModified: "20 Mar 2026", listExpiry: "10 Mar 2027" },
+  { id: "CL-012", name: "Crypto mixer addresses",         status: "Pending",  records: 9870,  active: 0,     actionOnHit: "Alert & block",   ttl: "6 months",  dateCreated: "15 Mar 2026", lastModified: "15 Mar 2026", listExpiry: "15 Sep 2026" },
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Badge helpers ──────────────────────────────────────────────────────────
 
-type SortKey = keyof CustomList;
-type SortDir = "asc" | "desc" | null;
-
-function SortIcon({ col, sortKey, sortDir }: { col: SortKey; sortKey: SortKey | null; sortDir: SortDir }) {
-  const active = sortKey === col;
-  return (
-    <span className="inline-flex flex-col ml-1 -space-y-0.5">
-      <ChevronUp className={cn("w-2.5 h-2.5", active && sortDir === "asc" ? "text-[#2A53A0]" : "text-gray-300")} />
-      <ChevronDown className={cn("w-2.5 h-2.5", active && sortDir === "desc" ? "text-[#2A53A0]" : "text-gray-300")} />
-    </span>
-  );
-}
-
-function ActionOnHitBadge({ action }: { action: CustomList["actionOnHit"] }) {
-  const cls =
-    action === "Alert & block" ? "bg-red-50 text-red-600 border border-red-200" :
-    action === "Generate alert" ? "bg-amber-50 text-amber-600 border border-amber-200" :
-    "bg-blue-50 text-blue-600 border border-blue-200";
-  return (
-    <span className={cn("text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap", cls)}>
-      {action}
-    </span>
-  );
-}
-
-function StatusBadge({ status }: { status: CustomList["status"] }) {
-  const cls =
-    status === "Active" ? "bg-green-100 text-green-700" :
-    status === "Pending" ? "bg-yellow-100 text-yellow-700" :
-    "bg-gray-100 text-gray-500";
-  return (
-    <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full", cls)}>
-      {status}
-    </span>
-  );
-}
-
-const PAGE_SIZE_OPTIONS = ["10 / page", "20 / page", "50 / page"];
+const ACTION_BADGE: Record<ActionOnHit, string> = {
+  "Alert & block":   "bg-red-50 text-red-600 border border-red-200",
+  "Generate alert":  "bg-amber-50 text-amber-600 border border-amber-200",
+  "Flag for review": "bg-blue-50 text-blue-600 border border-blue-200",
+};
 
 // ── Component ──────────────────────────────────────────────────────────────
 
 export function SanctionListManagement() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All statuses");
+  const [lists, setLists] = useState<CustomList[]>(MOCK_LISTS);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState<SortKey | null>(null);
-  const [sortDir, setSortDir] = useState<SortDir>(null);
+  const [activeTab, setActiveTab] = useState<"Active" | "Inactive" | "All Lists">("Active");
 
-  // Stats
-  const totalLists = MOCK_LISTS.length;
-  const activeLists = MOCK_LISTS.filter((l) => l.status === "Active").length;
-  const totalEntities = MOCK_LISTS.reduce((s, l) => s + l.records, 0);
-  const pendingApproval = MOCK_LISTS.filter((l) => l.status === "Pending").length;
+  // Enable/Disable dialog state
+  const [toggleDialogList, setToggleDialogList] = useState<CustomList | null>(null);
+  const [toggleAction, setToggleAction] = useState<"DISABLE" | "ENABLE">("DISABLE");
+  const [toggleDate, setToggleDate] = useState("");
+  const [toggleReason, setToggleReason] = useState("");
 
-  // Filter
-  const filtered = useMemo(() => {
-    let rows = MOCK_LISTS;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      rows = rows.filter((r) => r.name.toLowerCase().includes(q) || r.status.toLowerCase().includes(q));
-    }
-    if (statusFilter !== "All statuses") {
-      rows = rows.filter((r) => r.status === statusFilter);
-    }
-    return rows;
-  }, [search, statusFilter]);
+  const handleOpenToggleDialog = (list: CustomList) => {
+    setToggleDialogList(list);
+    setToggleAction(list.status === "Active" ? "DISABLE" : "ENABLE");
+    setToggleDate("");
+    setToggleReason("");
+  };
 
-  // Sort
-  const sorted = useMemo(() => {
-    if (!sortKey || !sortDir) return filtered;
-    return [...filtered].sort((a, b) => {
-      const av = a[sortKey] ?? "";
-      const bv = b[sortKey] ?? "";
-      const cmp = String(av).localeCompare(String(bv), undefined, { numeric: true });
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-  }, [filtered, sortKey, sortDir]);
+  const handleSubmitToggle = () => {
+    if (!toggleDialogList) return;
+    setLists(prev => prev.map(l =>
+      l.id === toggleDialogList.id
+        ? { ...l, status: toggleAction === "ENABLE" ? "Active" : "Disabled" }
+        : l
+    ));
+    setToggleDialogList(null);
+  };
 
-  // Paginate
-  const totalPages = Math.ceil(sorted.length / pageSize);
-  const paginated = sorted.slice((page - 1) * pageSize, page * pageSize);
+  // Derived counts
+  const activeCount   = lists.filter(l => l.status === "Active").length;
+  const inactiveCount = lists.filter(l => l.status === "Disabled" || l.status === "Pending").length;
+  const totalEntities = lists.reduce((s, l) => s + l.records, 0);
+  const pendingCount  = lists.filter(l => l.status === "Pending").length;
 
-  function toggleSort(col: SortKey) {
-    if (sortKey !== col) { setSortKey(col); setSortDir("asc"); }
-    else if (sortDir === "asc") setSortDir("desc");
-    else if (sortDir === "desc") { setSortKey(null); setSortDir(null); }
-    setPage(1);
-  }
+  // Tab filter
+  const tabFiltered = lists.filter(l =>
+    activeTab === "All Lists" ? true :
+    activeTab === "Active"   ? l.status === "Active" :
+    l.status === "Disabled" || l.status === "Pending"
+  );
 
-  function handleSearch(v: string) { setSearch(v); setPage(1); }
-  function handleStatus(v: string) { setStatusFilter(v); setPage(1); }
-  function handlePageSize(v: string) {
-    setPageSize(parseInt(v));
-    setPage(1);
-  }
+  // Search filter
+  const tabSearchFiltered = tabFiltered.filter(l =>
+    l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    l.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    l.actionOnHit.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const COLS: { key: SortKey; label: string; sortable: boolean; align?: string }[] = [
-    { key: "name", label: "List Name", sortable: true },
-    { key: "status", label: "Status", sortable: true },
-    { key: "records", label: "Records", sortable: true, align: "right" },
-    { key: "active", label: "Active", sortable: true, align: "right" },
-    { key: "actionOnHit", label: "Action on Hit", sortable: false },
-    { key: "ttl", label: "TTL", sortable: true },
-    { key: "dateCreated", label: "Date Created", sortable: true },
-    { key: "lastModified", label: "Last Modified", sortable: true },
-    { key: "listExpiry", label: "List Expiry", sortable: true },
-    { key: "id", label: "Actions", sortable: false, align: "center" },
-  ];
+  // Sortable
+  const { items: sortedLists, requestSort, sortConfig } = useSortableData(tabSearchFiltered);
+  const totalItems = sortedLists.length;
+  const currentItems = sortedLists.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900/50">
+    <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
 
-      {/* ── Stats Bar ───────────────────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-5">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+      {/* ── Stat Cards ────────────────────────────────────────────────────── */}
+      <div className="flex-none grid grid-cols-4 gap-4">
+
+        {/* Total Lists */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
           <div>
-            <div className="text-xs font-medium text-gray-500 mb-1">Total lists</div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">{totalLists}</div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Total Lists
+              <span className="text-gray-400 cursor-help" title="Total number of custom/sanction lists">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{lists.length}</p>
           </div>
-          <div>
-            <div className="text-xs font-medium text-gray-500 mb-1">Active lists</div>
-            <div className="text-3xl font-bold text-[#2A53A0]">{activeLists}</div>
+          <div className="w-10 h-10 rounded-full border border-[#2A53A0]/30 flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6" strokeWidth="2.5"/><line x1="3" y1="12" x2="3.01" y2="12" strokeWidth="2.5"/><line x1="3" y1="18" x2="3.01" y2="18" strokeWidth="2.5"/>
+            </svg>
           </div>
+        </div>
+
+        {/* Active Lists */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
           <div>
-            <div className="text-xs font-medium text-gray-500 mb-1">Total entities</div>
-            <div className="text-3xl font-bold text-[#2A53A0]">{totalEntities.toLocaleString()}</div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Active Lists
+              <span className="text-gray-400 cursor-help" title="Currently active custom lists">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-[#2A53A0]">{activeCount}</p>
           </div>
+          <div className="w-10 h-10 rounded-full border border-green-400/40 bg-green-50/60 flex items-center justify-center">
+            <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.15"/>
+              <path d="M8 12l3 3 5-5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* Total Entities */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
           <div>
-            <div className="text-xs font-medium text-gray-500 mb-1">Pending approval</div>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">{pendingApproval}</div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Total Entities
+              <span className="text-gray-400 cursor-help" title="Total records across all lists">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-[#2A53A0]">{totalEntities.toLocaleString()}</p>
+          </div>
+          <div className="w-10 h-10 rounded-full border border-[#2A53A0]/30 flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round"/>
+              <path d="M21 21v-2a4 4 0 0 0-3-3.87" strokeLinecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        {/* Pending Approval */}
+        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              Pending Approval
+              <span className="text-gray-400 cursor-help" title="Lists awaiting approval">ⓘ</span>
+            </div>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingCount}</p>
+          </div>
+          <div className="w-10 h-10 rounded-full border border-amber-400/40 bg-amber-50/60 flex items-center justify-center">
+            <svg className="w-5 h-5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12" strokeLinecap="round"/>
+              <line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2.5" strokeLinecap="round"/>
+            </svg>
           </div>
         </div>
       </div>
 
-      {/* ── Toolbar ─────────────────────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center gap-3 flex-wrap">
-        {/* Search */}
-        <div className="relative flex-1 min-w-[220px] max-w-2xl">
+      {/* ── Tabs ──────────────────────────────────────────────────────────── */}
+      <div className="flex-none border-b border-gray-200 dark:border-gray-800">
+        <div className="flex h-[48px] w-full">
+          {(["Active", "Inactive", "All Lists"] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+              className={cn(
+                "flex-1 h-full text-sm font-medium border-b-2 transition-colors text-center",
+                activeTab === tab
+                  ? "border-[#2A53A0] text-[#2A53A0]"
+                  : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              )}
+            >
+              {tab === "Active" ? `Active (${activeCount})` :
+               tab === "Inactive" ? `Inactive (${inactiveCount})` :
+               `All Lists (${lists.length})`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Search + Action Buttons ────────────────────────────────────────── */}
+      <div className="flex-none bg-white dark:bg-gray-900 flex items-center justify-between">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search by list name or status..."
-            className="w-full h-9 pl-9 pr-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#2A53A0]"
+          <Input
+            placeholder="Search lists by name, status..."
+            className="pl-9 w-64 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 focus-visible:ring-[#2A53A0] h-[46px]"
+            value={searchQuery}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
           />
         </div>
-
-        {/* Status filter */}
-        <select
-          value={statusFilter}
-          onChange={(e) => handleStatus(e.target.value)}
-          className="h-9 px-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2A53A0] cursor-pointer"
-        >
-          {["All statuses", "Active", "Disabled", "Pending"].map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-
-        {/* Page size */}
-        <select
-          value={`${pageSize} / page`}
-          onChange={(e) => handlePageSize(e.target.value)}
-          className="h-9 px-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2A53A0] cursor-pointer"
-        >
-          {PAGE_SIZE_OPTIONS.map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-
-        <div className="flex-1" />
-
-        {/* Export CSV */}
-        <button className="h-9 px-4 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-          <DocumentExport className="w-4 h-4" /> CSV
-        </button>
-
-        {/* Export PDF */}
-        <button className="h-9 px-4 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-          <DocumentExport className="w-4 h-4" /> PDF
-        </button>
-
-        {/* Create list */}
-        <button className="h-9 px-4 flex items-center gap-1.5 text-sm font-semibold text-white bg-[#2A53A0] hover:bg-[#1e3a70] rounded-md transition-colors">
-          <Add className="w-4 h-4" /> Create List
-        </button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="gap-1.5 bg-white dark:bg-gray-900 h-[46px] text-sm">
+            <DocumentExport className="w-4 h-4" /> Export CSV
+          </Button>
+          <Button variant="outline" className="gap-1.5 bg-white dark:bg-gray-900 h-[46px] text-sm">
+            <DocumentExport className="w-4 h-4" /> Export PDF
+          </Button>
+          <Button className="gap-1.5 bg-[#2A53A0] hover:bg-[#2A53A0]/90 text-white h-[46px] text-sm">
+            <Add className="w-4 h-4" /> Create List
+          </Button>
+        </div>
       </div>
 
-      {/* ── Table ───────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full border-collapse text-sm min-w-[1100px]">
-          <thead>
-            <tr className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-              {COLS.map((col) => (
-                <th
-                  key={col.key}
-                  onClick={col.sortable ? () => toggleSort(col.key) : undefined}
-                  className={cn(
-                    "py-3 px-4 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap select-none",
-                    col.sortable && "cursor-pointer hover:text-[#2A53A0] hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors",
-                    col.align === "right" && "text-right",
-                    col.align === "center" && "text-center",
-                  )}
-                >
-                  <span className="inline-flex items-center gap-0.5">
-                    {col.label}
-                    {col.sortable && <SortIcon col={col.key} sortKey={sortKey} sortDir={sortDir} />}
-                  </span>
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
+      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border-0 shadow-sm">
+        <div className="flex-1 overflow-auto">
+          <Table>
+            <thead className="sticky top-0 z-10 shadow-sm">
+              <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
+                <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[240px]">
+                  <SortableHeader column="name" label="List Name" sortConfig={sortConfig} onSort={requestSort} />
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {paginated.length === 0 ? (
-              <tr>
-                <td colSpan={COLS.length} className="py-16 text-center text-sm text-gray-400">
-                  No lists match your search criteria.
-                </td>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[100px]">
+                  <SortableHeader column="status" label="Status" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[110px]">
+                  <SortableHeader column="records" label="Records" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-right w-[100px]">
+                  <SortableHeader column="active" label="Active" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[150px]">Action on Hit</th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[110px]">
+                  <SortableHeader column="ttl" label="TTL" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">
+                  <SortableHeader column="dateCreated" label="Date Created" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">
+                  <SortableHeader column="lastModified" label="Last Modified" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[130px]">
+                  <SortableHeader column="listExpiry" label="List Expiry" sortConfig={sortConfig} onSort={requestSort} />
+                </th>
+                <th className="px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[100px]">Actions</th>
               </tr>
-            ) : (
-              paginated.map((row) => {
-                const expiryDate = row.listExpiry
-                  ? new Date(row.listExpiry.replace(/(\d+) (\w+) (\d+)/, "$2 $1 $3"))
+            </thead>
+            <TableBody>
+              {currentItems.length > 0 ? currentItems.map(list => {
+                const expiryDate = list.listExpiry
+                  ? new Date(list.listExpiry.replace(/(\d+) (\w+) (\d+)/, "$2 $1, $3"))
                   : null;
                 const isExpiringSoon = expiryDate
                   ? (expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24) <= 60
                   : false;
 
                 return (
-                  <tr
-                    key={row.id}
-                    className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                  >
+                  <TableRow key={list.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[56px]">
                     {/* List Name */}
-                    <td className="py-3 px-4">
-                      <span className="font-semibold text-[#2A53A0] hover:underline cursor-pointer">
-                        {row.name}
+                    <TableCell className="pl-4 px-4 align-middle">
+                      <span className="text-sm font-semibold text-[#2A53A0] dark:text-[#6b93e6] cursor-pointer hover:underline">
+                        {list.name}
                       </span>
-                    </td>
+                    </TableCell>
 
                     {/* Status */}
-                    <td className="py-3 px-4">
-                      <StatusBadge status={row.status} />
-                    </td>
+                    <TableCell className="px-4 align-middle">
+                      <span className={cn(
+                        "text-xs font-semibold px-2.5 py-1 rounded-full",
+                        list.status === "Active"   ? "bg-green-100 text-green-700" :
+                        list.status === "Pending"  ? "bg-yellow-100 text-yellow-700" :
+                        "bg-gray-100 text-gray-500"
+                      )}>
+                        {list.status}
+                      </span>
+                    </TableCell>
 
                     {/* Records */}
-                    <td className="py-3 px-4 text-right font-medium text-gray-700 dark:text-gray-300 tabular-nums">
-                      {row.records.toLocaleString()}
-                    </td>
+                    <TableCell className="px-4 align-middle text-right">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 tabular-nums">
+                        {list.records.toLocaleString()}
+                      </span>
+                    </TableCell>
 
                     {/* Active */}
-                    <td className="py-3 px-4 text-right tabular-nums">
+                    <TableCell className="px-4 align-middle text-right">
                       <span className={cn(
-                        "font-semibold",
-                        row.active > 0 ? "text-[#2A53A0]" : "text-gray-400"
+                        "text-sm font-semibold tabular-nums",
+                        list.active > 0 ? "text-[#2A53A0]" : "text-gray-400"
                       )}>
-                        {row.active.toLocaleString()}
+                        {list.active.toLocaleString()}
                       </span>
-                    </td>
+                    </TableCell>
 
                     {/* Action on Hit */}
-                    <td className="py-3 px-4">
-                      <ActionOnHitBadge action={row.actionOnHit} />
-                    </td>
+                    <TableCell className="px-4 align-middle">
+                      <span className={cn(
+                        "text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap",
+                        ACTION_BADGE[list.actionOnHit]
+                      )}>
+                        {list.actionOnHit}
+                      </span>
+                    </TableCell>
 
                     {/* TTL */}
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                      {row.ttl}
-                    </td>
+                    <TableCell className="px-4 align-middle">
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{list.ttl}</span>
+                    </TableCell>
 
                     {/* Date Created */}
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400 whitespace-nowrap tabular-nums">
-                      {row.dateCreated}
-                    </td>
+                    <TableCell className="px-4 align-middle">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 tabular-nums">{list.dateCreated}</span>
+                    </TableCell>
 
                     {/* Last Modified */}
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400 whitespace-nowrap tabular-nums">
-                      {row.lastModified}
-                    </td>
+                    <TableCell className="px-4 align-middle">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 tabular-nums">{list.lastModified}</span>
+                    </TableCell>
 
                     {/* List Expiry */}
-                    <td className="py-3 px-4 whitespace-nowrap tabular-nums">
-                      {row.listExpiry ? (
+                    <TableCell className="px-4 align-middle">
+                      {list.listExpiry ? (
                         <span className={cn(
-                          "font-medium",
-                          isExpiringSoon ? "text-red-500 font-semibold" : "text-gray-600 dark:text-gray-400"
+                          "text-sm tabular-nums font-medium",
+                          isExpiringSoon ? "text-red-500 font-semibold" : "text-gray-700 dark:text-gray-300"
                         )}>
-                          {row.listExpiry}
+                          {list.listExpiry}
                         </span>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
-                    </td>
+                    </TableCell>
 
                     {/* Actions */}
-                    <td className="py-3 px-4">
-                      <div className="flex items-center justify-center gap-1.5">
-                        {/* View */}
+                    <TableCell className="px-4 align-middle">
+                      <div className="flex items-center justify-start gap-2">
                         <button
-                          title="View"
-                          className="w-7 h-7 flex items-center justify-center rounded bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                          className="flex items-center justify-center w-8 h-8 rounded-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 transition-colors"
+                          title="View Details"
                         >
-                          <View className="w-3.5 h-3.5" />
+                          <View className="w-4 h-4" />
                         </button>
-                        {/* Edit */}
                         <button
+                          className="flex items-center justify-center w-8 h-8 rounded-sm bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors"
                           title="Edit"
-                          className="w-7 h-7 flex items-center justify-center rounded bg-[#2A53A0]/10 hover:bg-[#2A53A0]/20 text-[#2A53A0] transition-colors"
                         >
-                          <Edit className="w-3.5 h-3.5" />
+                          <Edit className="w-4 h-4" />
                         </button>
-                        {/* More / Toggle */}
                         <button
-                          title={row.status === "Active" ? "Disable" : "Enable"}
+                          onClick={() => handleOpenToggleDialog(list)}
                           className={cn(
-                            "w-7 h-7 flex items-center justify-center rounded transition-colors",
-                            row.status === "Active"
-                              ? "bg-red-50 hover:bg-red-100 text-red-500"
-                              : "bg-green-50 hover:bg-green-100 text-green-600"
+                            "flex items-center justify-center w-8 h-8 rounded-sm text-xs font-medium transition-colors",
+                            list.status === "Active"
+                              ? "bg-red-500/10 hover:bg-red-500/20 text-red-600"
+                              : "bg-green-500/10 hover:bg-green-500/20 text-green-700"
                           )}
+                          title={list.status === "Active" ? "Disable" : "Enable"}
                         >
-                          {/* Using grid-like icon to match screenshot */}
-                          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-current">
-                            <rect x="1" y="1" width="6" height="6" rx="1" />
-                            <rect x="9" y="1" width="6" height="6" rx="1" />
-                            <rect x="1" y="9" width="6" height="6" rx="1" />
-                            <rect x="9" y="9" width="6" height="6" rx="1" />
-                          </svg>
+                          {list.status === "Active" ? "Off" : "On"}
                         </button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ── Pagination Footer ────────────────────────────────────────────── */}
-      <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between">
-        <span className="text-sm text-gray-500">
-          Showing {sorted.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, sorted.length)} of {sorted.length} lists
-        </span>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
-          >
-            ‹
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={cn(
-                "w-8 h-8 flex items-center justify-center rounded border text-sm font-medium transition-colors",
-                p === page
-                  ? "bg-[#2A53A0] text-white border-[#2A53A0]"
-                  : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              }) : (
+                <TableRow>
+                  <TableCell colSpan={10} className="h-24 text-center text-gray-500">
+                    No lists found matching your search.
+                  </TableCell>
+                </TableRow>
               )}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages || totalPages === 0}
-            className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
-          >
-            ›
-          </button>
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex-none">
+          <CarbonPaginationFooter
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalItems={totalItems}
+          />
         </div>
       </div>
+
+      {/* ── Enable/Disable Dialog ──────────────────────────────────────────── */}
+      <AnimatePresence>
+        {toggleDialogList && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setToggleDialogList(null)}
+              className="fixed inset-0 bg-black/50 z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[512px] bg-white rounded-[8px] overflow-hidden z-[101] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] border border-black/10"
+            >
+              {/* Dialog Header */}
+              <div className="bg-[#2a53a0] h-[64px] flex items-center justify-between px-[30px] shrink-0">
+                <h2 className="text-white text-[20px] font-normal">
+                  {toggleAction === "DISABLE" ? "Disable" : "Enable"} custom list
+                </h2>
+                <button
+                  onClick={() => setToggleDialogList(null)}
+                  className="text-white/70 hover:text-white transition-colors"
+                >
+                  <Close className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Dialog Body */}
+              <div className="p-[24px] space-y-[16px]">
+                <p className="text-[14px] text-[#525252]">
+                  You are about to <strong>{toggleAction === "DISABLE" ? "disable" : "enable"}</strong> the list{" "}
+                  <span className="font-semibold text-[#161616]">"{toggleDialogList.name}"</span>.
+                  {toggleAction === "DISABLE" && " This will stop it from being used in screenings."}
+                </p>
+
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">
+                    Effective Date <span className="text-[#fb2c36]">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={toggleDate}
+                    onChange={e => setToggleDate(e.target.value)}
+                    className="w-full h-[46px] px-[12px] bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
+                  />
+                </div>
+
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">Reason / Notes</label>
+                  <textarea
+                    rows={3}
+                    value={toggleReason}
+                    onChange={e => setToggleReason(e.target.value)}
+                    placeholder="Enter reason for this change..."
+                    className="w-full p-[12px] bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#717182] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Dialog Footer */}
+              <div className="h-[64px] border-t border-[#e5e7eb] flex items-center justify-end gap-3 px-[24px] bg-[#f4f4f4]">
+                <Button
+                  variant="outline"
+                  onClick={() => setToggleDialogList(null)}
+                  className="h-[40px] px-6 rounded-[8px] border-gray-300"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmitToggle}
+                  disabled={!toggleDate}
+                  className={cn(
+                    "h-[40px] px-6 rounded-[8px] text-white",
+                    toggleAction === "DISABLE"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-[#2A53A0] hover:bg-[#1e3a70]"
+                  )}
+                >
+                  {toggleAction === "DISABLE" ? "Disable List" : "Enable List"}
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
