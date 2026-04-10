@@ -35,6 +35,7 @@ import { SanctionsScreeningConfiguration } from "./components/sanctions-screenin
 import { CustomerRiskRatingConfiguration } from "./components/customer-risk-rating-configuration";
 import { Customer360View, Customer360Handle } from "./components/customer-360-view";
 import { SanctionListManagement } from "./components/sanction-list-management";
+import { ScreeningKeywordsConfiguration } from "./components/screening-keywords-configuration";
 import { SanctionMisReports } from "./components/sanction-mis-reports";
 import { DedupScreening } from "./components/dedup-screening";
 import { GenericPage } from "./components/GenericPage";
@@ -276,6 +277,7 @@ export default function App() {
   const [activeItem, _setActiveItem] = useState("dashboard"); // Set to Dashboard Overview by default
   const [refreshKey, setRefreshKey] = useState(0);
   const [extraBreadcrumbs, setExtraBreadcrumbs] = useState<any[]>([]);
+  const [sanctionListSubPage, setSanctionListSubPage] = useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(true); // Default to true to show dashboard submenu
@@ -300,6 +302,7 @@ export default function App() {
     }
 
     setExtraBreadcrumbs([]);
+    if (item !== "sanctions-sanction-custom-list-management") setSanctionListSubPage(false);
     if (item === activeItem) {
       setRefreshKey(prev => prev + 1);
     } else {
@@ -649,7 +652,7 @@ export default function App() {
               />
             </div>
 
-            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "config-sanctions-screening-configuration" && activeItem !== "sanctions-sanction-custom-list-management" && (
+            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "config-sanctions-screening-configuration" && !(activeItem === "sanctions-sanction-custom-list-management" && sanctionListSubPage) && (
               <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm px-4 py-2 flex items-center justify-between relative">
                 <div className="flex items-center gap-3">
                    {extraBreadcrumbs.length > 0 && activeItem.includes("customer-360-view") ? (
@@ -698,9 +701,9 @@ export default function App() {
               </div>
             )}
 
-            <main ref={mainContentRef} className={activeItem === "config-customer-risk-rating-configuration" ? "flex-1 overflow-hidden flex flex-col p-4 gap-4" : activeItem.startsWith("reg_gen-") || activeItem === "ai-graphical-network-analysis" || activeItem === "config-scenario-authoring-tool" || activeItem === "kyc-customer-360-view" || activeItem === "ai-customer-360-view" || activeItem === "simulation-alerts-simulation" || activeItem.startsWith("sanctions-manual-screening") || activeItem === "sanctions-sanction-screening-workflow" || activeItem === "sanctions-sanction-mis-reports" || activeItem === "config-human-trafficking-alerts-configuration" || activeItem === "config-tbml-proliferation-financing-alerts-configuration" || activeItem === "config-wildlife-trafficking-alerts-configuration" || activeItem === "config-mule-alerts-configuration" || activeItem === "config-cyber-enabled-fraud-configuration" || activeItem === "config-high-risk-countries" || activeItem === "config-out-of-the-box-tm-rules-configuration" || activeItem === "config-sanctions-screening-configuration" || activeItem === "config-customer-risk-rating-configuration" || activeItem === "sanctions-sanction-custom-list-management" ? "flex-1 overflow-hidden flex flex-col" : "flex-1 hover-scroll"}>
-              {!activeItem.startsWith("reg_gen-") && activeItem !== "ai-graphical-network-analysis" && activeItem !== "simulation-alerts-simulation" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "sanctions-sanction-screening-workflow" && activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-human-trafficking-alerts-configuration" && activeItem !== "config-tbml-proliferation-financing-alerts-configuration" && activeItem !== "config-wildlife-trafficking-alerts-configuration" && activeItem !== "config-mule-alerts-configuration" && activeItem !== "config-cyber-enabled-fraud-configuration" && activeItem !== "config-high-risk-countries" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && activeItem !== "config-sanctions-screening-configuration" && activeItem !== "config-customer-risk-rating-configuration" && activeItem !== "sanctions-sanction-custom-list-management" && !activeItem.toLowerCase().includes("event") && <ScrollToTopButton scrollRef={mainContentRef} />}
-              <div className={activeItem.startsWith("reg_gen-") || activeItem === "ai-graphical-network-analysis" || activeItem === "config-scenario-authoring-tool" || activeItem === "simulation-alerts-simulation" || activeItem === "kyc-customer-360-view" || activeItem === "ai-customer-360-view" || activeItem.startsWith("sanctions-manual-screening") || activeItem === "sanctions-sanction-screening-workflow" || activeItem === "sanctions-sanction-mis-reports" || activeItem === "config-human-trafficking-alerts-configuration" || activeItem === "config-tbml-proliferation-financing-alerts-configuration" || activeItem === "config-wildlife-trafficking-alerts-configuration" || activeItem === "config-mule-alerts-configuration" || activeItem === "config-cyber-enabled-fraud-configuration" || activeItem === "config-high-risk-countries" || activeItem === "config-out-of-the-box-tm-rules-configuration" || activeItem === "config-sanctions-screening-configuration" || activeItem === "config-customer-risk-rating-configuration" || activeItem === "sanctions-sanction-custom-list-management" ? "flex-1 h-full" : "p-4"}>
+            <main ref={mainContentRef} className={activeItem === "config-customer-risk-rating-configuration" ? "flex-1 overflow-hidden flex flex-col p-4 gap-4" : activeItem.startsWith("reg_gen-") || activeItem === "ai-graphical-network-analysis" || activeItem === "config-scenario-authoring-tool" || activeItem === "kyc-customer-360-view" || activeItem === "ai-customer-360-view" || activeItem === "simulation-alerts-simulation" || activeItem.startsWith("sanctions-manual-screening") || activeItem === "sanctions-sanction-screening-workflow" || activeItem === "sanctions-sanction-mis-reports" || activeItem === "config-human-trafficking-alerts-configuration" || activeItem === "config-tbml-proliferation-financing-alerts-configuration" || activeItem === "config-wildlife-trafficking-alerts-configuration" || activeItem === "config-mule-alerts-configuration" || activeItem === "config-cyber-enabled-fraud-configuration" || activeItem === "config-high-risk-countries" || activeItem === "config-out-of-the-box-tm-rules-configuration" || activeItem === "config-sanctions-screening-configuration" || activeItem === "config-customer-risk-rating-configuration" || activeItem === "sanctions-sanction-custom-list-management" || activeItem === "config-screening-keywords-configuration" ? "flex-1 overflow-hidden flex flex-col" : "flex-1 hover-scroll"}>
+              {!activeItem.startsWith("reg_gen-") && activeItem !== "ai-graphical-network-analysis" && activeItem !== "simulation-alerts-simulation" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "sanctions-sanction-screening-workflow" && activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-human-trafficking-alerts-configuration" && activeItem !== "config-tbml-proliferation-financing-alerts-configuration" && activeItem !== "config-wildlife-trafficking-alerts-configuration" && activeItem !== "config-mule-alerts-configuration" && activeItem !== "config-cyber-enabled-fraud-configuration" && activeItem !== "config-high-risk-countries" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && activeItem !== "config-sanctions-screening-configuration" && activeItem !== "config-customer-risk-rating-configuration" && activeItem !== "sanctions-sanction-custom-list-management" && activeItem !== "config-screening-keywords-configuration" && !activeItem.toLowerCase().includes("event") && <ScrollToTopButton scrollRef={mainContentRef} />}
+              <div className={activeItem.startsWith("reg_gen-") || activeItem === "ai-graphical-network-analysis" || activeItem === "config-scenario-authoring-tool" || activeItem === "simulation-alerts-simulation" || activeItem === "kyc-customer-360-view" || activeItem === "ai-customer-360-view" || activeItem.startsWith("sanctions-manual-screening") || activeItem === "sanctions-sanction-screening-workflow" || activeItem === "sanctions-sanction-mis-reports" || activeItem === "config-human-trafficking-alerts-configuration" || activeItem === "config-tbml-proliferation-financing-alerts-configuration" || activeItem === "config-wildlife-trafficking-alerts-configuration" || activeItem === "config-mule-alerts-configuration" || activeItem === "config-cyber-enabled-fraud-configuration" || activeItem === "config-high-risk-countries" || activeItem === "config-out-of-the-box-tm-rules-configuration" || activeItem === "config-sanctions-screening-configuration" || activeItem === "config-customer-risk-rating-configuration" || activeItem === "sanctions-sanction-custom-list-management" || activeItem === "config-screening-keywords-configuration" ? "flex-1 h-full" : "p-4"}>
                 {activeItem === "ai-graphical-network-analysis" ? (
                   <GraphicalNetworkAnalysis 
                     breadcrumbs={currentContent.breadcrumbs}
@@ -779,7 +782,9 @@ export default function App() {
                     onBreadcrumbNavigate={(path) => setActiveItem(path)}
                   />
                 ) : activeItem === "sanctions-sanction-custom-list-management" ? (
-                  <SanctionListManagement />
+                  <SanctionListManagement onSubPageChange={setSanctionListSubPage} />
+                ) : activeItem === "config-screening-keywords-configuration" ? (
+                  <ScreeningKeywordsConfiguration />
                 ) : activeItem === "sanctions-sanction-mis-reports" ? (
                   <SanctionMisReports 
                     breadcrumbs={currentContent.breadcrumbs}
