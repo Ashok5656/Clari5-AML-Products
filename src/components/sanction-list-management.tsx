@@ -239,10 +239,10 @@ export function SanctionListManagement() {
 
       {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border-0 shadow-sm">
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-auto min-h-0">
           <Table>
             <thead className="sticky top-0 z-10 shadow-sm">
-              <tr className="bg-[#F0F0F0] text-[#161616] h-[40px]">
+              <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
                 <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[240px]">
                   <SortableHeader column="name" label="List Name" sortConfig={sortConfig} onSort={requestSort} />
                 </th>
@@ -281,7 +281,7 @@ export function SanctionListManagement() {
                   : false;
 
                 return (
-                  <TableRow key={list.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[44px]">
+                  <TableRow key={list.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[46px]">
                     {/* List Name */}
                     <TableCell className="pl-4 px-4 align-middle">
                       <span className="text-sm font-semibold text-[#2A53A0] dark:text-[#6b93e6] cursor-pointer hover:underline">
