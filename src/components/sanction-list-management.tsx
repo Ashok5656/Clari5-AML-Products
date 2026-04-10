@@ -238,9 +238,9 @@ export function SanctionListManagement() {
       </div>
 
       {/* ── Table ─────────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border-0 shadow-sm">
+      <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 rounded-[8px] border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex-1 overflow-auto min-h-0">
-          <Table>
+          <table className="w-full caption-bottom text-sm">
             <thead className="sticky top-0 z-10 shadow-sm">
               <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
                 <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[240px]">
@@ -396,7 +396,7 @@ export function SanctionListManagement() {
                 </TableRow>
               )}
             </TableBody>
-          </Table>
+          </table>
         </div>
 
         {/* Pagination */}
