@@ -114,7 +114,7 @@ export function SanctionListManagement() {
   const currentItems = sortedLists.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden p-0 gap-4">
+    <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
 
       {/* ── Stat Cards ────────────────────────────────────────────────────── */}
       <div className="flex-none grid grid-cols-4 gap-4">
@@ -242,7 +242,7 @@ export function SanctionListManagement() {
         <div className="flex-1 overflow-hidden">
           <Table>
             <thead className="sticky top-0 z-10 shadow-sm">
-              <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
+              <tr className="bg-[#F0F0F0] text-[#161616] h-[40px]">
                 <th className="pl-4 px-4 font-medium text-[15px] text-[#2A53A0] bg-[#F0F0F0] align-middle whitespace-nowrap text-left w-[240px]">
                   <SortableHeader column="name" label="List Name" sortConfig={sortConfig} onSort={requestSort} />
                 </th>
@@ -281,7 +281,7 @@ export function SanctionListManagement() {
                   : false;
 
                 return (
-                  <TableRow key={list.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[56px]">
+                  <TableRow key={list.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-100 dark:border-gray-800 h-[44px]">
                     {/* List Name */}
                     <TableCell className="pl-4 px-4 align-middle">
                       <span className="text-sm font-semibold text-[#2A53A0] dark:text-[#6b93e6] cursor-pointer hover:underline">
