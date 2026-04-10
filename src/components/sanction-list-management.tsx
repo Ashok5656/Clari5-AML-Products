@@ -114,7 +114,7 @@ export function SanctionListManagement() {
   const currentItems = sortedLists.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
+    <div className="flex flex-col h-full overflow-hidden p-4 gap-4">
 
       {/* ── Stat Cards ────────────────────────────────────────────────────── */}
       <div className="flex-none grid grid-cols-4 gap-4">
