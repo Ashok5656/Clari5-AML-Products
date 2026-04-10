@@ -62,7 +62,7 @@ export function SanctionListManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [activeTab, setActiveTab] = useState<"Active" | "Inactive" | "All Lists">("Active");
+  const [activeTab, setActiveTab] = useState<"Active" | "Inactive" | "All Lists" | "Pending for Approval">("Active");
 
   // Enable/Disable dialog state
   const [toggleDialogList, setToggleDialogList] = useState<CustomList | null>(null);
@@ -89,15 +89,16 @@ export function SanctionListManagement() {
 
   // Derived counts
   const activeCount   = lists.filter(l => l.status === "Active").length;
-  const inactiveCount = lists.filter(l => l.status === "Disabled" || l.status === "Pending").length;
+  const disabledCount = lists.filter(l => l.status === "Disabled").length;
   const totalEntities = lists.reduce((s, l) => s + l.records, 0);
   const pendingCount  = lists.filter(l => l.status === "Pending").length;
 
   // Tab filter
   const tabFiltered = lists.filter(l =>
-    activeTab === "All Lists" ? true :
-    activeTab === "Active"   ? l.status === "Active" :
-    l.status === "Disabled" || l.status === "Pending"
+    activeTab === "All Lists"            ? true :
+    activeTab === "Active"               ? l.status === "Active" :
+    activeTab === "Pending for Approval" ? l.status === "Pending" :
+    l.status === "Disabled"
   );
 
   // Search filter
@@ -113,7 +114,7 @@ export function SanctionListManagement() {
   const currentItems = sortedLists.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
+    <div className="flex flex-col flex-1 overflow-hidden p-0 gap-4">
 
       {/* ── Stat Cards ────────────────────────────────────────────────────── */}
       <div className="flex-none grid grid-cols-4 gap-4">
@@ -192,7 +193,7 @@ export function SanctionListManagement() {
       {/* ── Tabs ──────────────────────────────────────────────────────────── */}
       <div className="flex-none border-b border-gray-200 dark:border-gray-800">
         <div className="flex h-[48px] w-full">
-          {(["Active", "Inactive", "All Lists"] as const).map(tab => (
+          {(["Active", "Inactive", "All Lists", "Pending for Approval"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
@@ -203,8 +204,9 @@ export function SanctionListManagement() {
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               )}
             >
-              {tab === "Active" ? `Active (${activeCount})` :
-               tab === "Inactive" ? `Inactive (${inactiveCount})` :
+              {tab === "Active"               ? `Active (${activeCount})` :
+               tab === "Inactive"             ? `Inactive (${disabledCount})` :
+               tab === "Pending for Approval" ? `Pending for Approval (${pendingCount})` :
                `All Lists (${lists.length})`}
             </button>
           ))}
@@ -237,7 +239,7 @@ export function SanctionListManagement() {
 
       {/* ── Table ─────────────────────────────────────────────────────────── */}
       <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-900 border-0 shadow-sm">
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-hidden">
           <Table>
             <thead className="sticky top-0 z-10 shadow-sm">
               <tr className="bg-[#F0F0F0] text-[#161616] h-[48px]">
