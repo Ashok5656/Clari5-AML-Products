@@ -40,6 +40,7 @@ interface CustomList {
   checkerName?: string;
   checkerDate?: string;
   expiringWithin30?: number;
+  pendingAction?: "ENABLE" | "DISABLE" | "CREATE";
 }
 
 interface EntityRecord {
@@ -252,11 +253,118 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
   const [bulkFile, setBulkFile]         = useState<File | null>(null);
 
   // ── entity records (view page) ─────────────────────────────────────────
+  const [entities, setEntities]                   = useState<EntityRecord[]>(MOCK_ENTITIES);
   const [entitySearch, setEntitySearch]           = useState("");
   const [entityCurrentPage, setEntityCurrentPage] = useState(1);
   const [entityPageSize, setEntityPageSize]       = useState(10);
   const [entityStatusFilter, setEntityStatusFilter] = useState("All statuses");
   const [entityRiskFilter, setEntityRiskFilter]   = useState("All risk categories");
+
+  // ── add entity form (view page) ────────────────────────────────────────
+  const [showAddEntity, setShowAddEntity]   = useState(false);
+  const [aef, setAef] = useState({
+    fullName: "", aliases: "", dateOfBirth: "", gender: "", nationality: "",
+    passportNo: "", nationalIdNo: "", taxId: "", companyRegNo: "",
+    ipAddress: "", deviceId: "", macAddress: "", mobileNumber: "", emailAddress: "",
+    nativeScriptName: "", scriptType: "",
+    riskCategory: "High" as RiskCategory,
+    actionOnHit: "Alert & block" as ActionOnHit,
+    expiryDate: "", reasonForAddition: "", sourceReference: "",
+    triggerAlert: true,
+  });
+
+  const resetAef = () => setAef({
+    fullName: "", aliases: "", dateOfBirth: "", gender: "", nationality: "",
+    passportNo: "", nationalIdNo: "", taxId: "", companyRegNo: "",
+    ipAddress: "", deviceId: "", macAddress: "", mobileNumber: "", emailAddress: "",
+    nativeScriptName: "", scriptType: "",
+    riskCategory: "High",
+    actionOnHit: "Alert & block",
+    expiryDate: "", reasonForAddition: "", sourceReference: "",
+    triggerAlert: true,
+  });
+
+  const handleSubmitEntity = () => {
+    const newEntity: EntityRecord = {
+      id: `E-${String(Date.now()).slice(-4)}`,
+      fullName: aef.fullName || aef.ipAddress || aef.mobileNumber || aef.deviceId || "—",
+      entityId: `ID-${String(Date.now()).slice(-7)}`,
+      riskCategory: aef.riskCategory,
+      actionOnHit: aef.actionOnHit,
+      status: "Active",
+      dateAdded: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+      expiryDate: aef.expiryDate || null,
+    };
+    setEntities((prev: EntityRecord[]) => [newEntity, ...prev]);
+    setShowAddEntity(false);
+    resetAef();
+  };
+
+  const isEntityFormValid = () =>
+    !!(aef.fullName.trim() || aef.ipAddress.trim() || aef.mobileNumber.trim() || aef.deviceId.trim());
+
+  // ── edit entity form (view page) ───────────────────────────────────────
+  const [showEditEntity, setShowEditEntity]   = useState(false);
+  const [editingEntityId, setEditingEntityId] = useState<string | null>(null);
+  const [eef, setEef] = useState({
+    fullName: "", aliases: "", dateOfBirth: "", gender: "", nationality: "",
+    passportNo: "", nationalIdNo: "", taxId: "", companyRegNo: "",
+    ipAddress: "", deviceId: "", macAddress: "", mobileNumber: "", emailAddress: "",
+    nativeScriptName: "", scriptType: "",
+    riskCategory: "High" as RiskCategory,
+    actionOnHit: "Alert & block" as ActionOnHit,
+    expiryDate: "", reasonForAddition: "", sourceReference: "",
+    triggerAlert: true,
+  });
+
+  const openEditEntity = (entity: EntityRecord) => {
+    setEditingEntityId(entity.id);
+    setEef({
+      fullName: entity.fullName, aliases: "", dateOfBirth: "", gender: "", nationality: "",
+      passportNo: "", nationalIdNo: "", taxId: "", companyRegNo: "",
+      ipAddress: "", deviceId: "", macAddress: "", mobileNumber: "", emailAddress: "",
+      nativeScriptName: "", scriptType: "",
+      riskCategory: entity.riskCategory,
+      actionOnHit: entity.actionOnHit,
+      expiryDate: entity.expiryDate || "",
+      reasonForAddition: "", sourceReference: "",
+      triggerAlert: true,
+    });
+    setShowAddEntity(false);
+    setShowBulkUpload(false);
+    setShowEditEntity(true);
+  };
+
+  const isEditFormValid = () =>
+    !!(eef.fullName.trim() || eef.ipAddress.trim() || eef.mobileNumber.trim() || eef.deviceId.trim());
+
+  // ── bulk upload panel (view page) ──────────────────────────────────────
+  const [showBulkUpload, setShowBulkUpload]       = useState(false);
+  const [viewBulkReason, setViewBulkReason]       = useState("");
+  const [viewBulkFile, setViewBulkFile]           = useState<File | null>(null);
+
+  const resetBulkUpload = () => { setViewBulkReason(""); setViewBulkFile(null); };
+
+  const handleBulkSubmit = () => {
+    setShowBulkUpload(false);
+    resetBulkUpload();
+  };
+
+  const handleUpdateEntity = () => {
+    setEntities((prev: EntityRecord[]) => prev.map(e =>
+      e.id === editingEntityId
+        ? {
+            ...e,
+            fullName:     eef.fullName || eef.ipAddress || eef.mobileNumber || eef.deviceId || e.fullName,
+            riskCategory: eef.riskCategory,
+            actionOnHit:  eef.actionOnHit,
+            expiryDate:   eef.expiryDate || null,
+          }
+        : e
+    ));
+    setShowEditEntity(false);
+    setEditingEntityId(null);
+  };
 
   // ── navigation helpers ─────────────────────────────────────────────────
   const goToMain = () => { setPageMode("main"); setSelectedList(null); onSubPageChange?.(false); };
@@ -273,6 +381,12 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     setEntityCurrentPage(1);
     setEntityStatusFilter("All statuses");
     setEntityRiskFilter("All risk categories");
+    setShowAddEntity(false);
+    setShowEditEntity(false);
+    setShowBulkUpload(false);
+    setEditingEntityId(null);
+    resetAef();
+    resetBulkUpload();
     setPageMode("view");
     onSubPageChange?.(true);
   };
@@ -305,7 +419,7 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     if (!toggleDialogList) return;
     setLists((prev: CustomList[]) => prev.map(l =>
       l.id === toggleDialogList.id
-        ? { ...l, status: toggleAction === "ENABLE" ? "Active" : "Disabled" }
+        ? { ...l, status: "Pending" as ListStatus, pendingAction: toggleAction }
         : l
     ));
     setToggleDialogList(null);
@@ -338,7 +452,7 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
   const currentItems = sortedLists.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   // ── entity records derived data ─────────────────────────────────────────
-  const filteredEntities = MOCK_ENTITIES.filter(e => {
+  const filteredEntities = entities.filter((e: EntityRecord) => {
     const matchSearch = e.fullName.toLowerCase().includes(entitySearch.toLowerCase()) ||
                         e.entityId.toLowerCase().includes(entitySearch.toLowerCase());
     const matchStatus = entityStatusFilter === "All statuses" || e.status === entityStatusFilter;
@@ -578,7 +692,8 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     const handleApprove = () => {
       setIsVerifying(true);
       setTimeout(() => {
-        setLists((prev: CustomList[]) => prev.map(l => l.id === list.id ? { ...l, status: "Active" as ListStatus } : l));
+        const resolvedStatus: ListStatus = list.pendingAction === "DISABLE" ? "Disabled" : "Active";
+        setLists((prev: CustomList[]) => prev.map(l => l.id === list.id ? { ...l, status: resolvedStatus, pendingAction: undefined } : l));
         setIsVerifying(false);
         setShowApproveSuccess(true);
       }, 2000);
@@ -587,7 +702,8 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     const handleReject = () => {
       setIsVerifying(true);
       setTimeout(() => {
-        setLists((prev: CustomList[]) => prev.map(l => l.id === list.id ? { ...l, status: "Draft" as ListStatus } : l));
+        const revertStatus: ListStatus = list.pendingAction === "DISABLE" ? "Active" : list.pendingAction === "ENABLE" ? "Disabled" : "Draft";
+        setLists((prev: CustomList[]) => prev.map(l => l.id === list.id ? { ...l, status: revertStatus, pendingAction: undefined } : l));
         setIsVerifying(false);
         setShowRejectDialog(true);
       }, 2000);
@@ -599,21 +715,37 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
         <CreationSuccessDialog
           eventName=""
           isOpen={showApproveSuccess}
-          title="Approved"
-          message="The list has been approved and moved to the Active list."
+          title={list.pendingAction === "DISABLE" ? "Disabled" : list.pendingAction === "ENABLE" ? "Enabled" : "Approved"}
+          message={
+            list.pendingAction === "DISABLE"
+              ? "The list has been disabled and moved to the Inactive list."
+              : list.pendingAction === "ENABLE"
+              ? "The list has been enabled and moved to the Active list."
+              : "The list has been approved and moved to the Active list."
+          }
           onContinue={() => {
             setShowApproveSuccess(false);
-            setActiveTab("Active");
+            setActiveTab(list.pendingAction === "DISABLE" ? "Inactive" : "Active");
             goToMain();
           }}
         />
         <RejectionDialog
           isOpen={showRejectDialog}
           title="Rejected"
-          message="The list has been rejected and moved back to the Drafted List."
+          message={
+            list.pendingAction === "DISABLE"
+              ? "The disable request was rejected. The list remains Active."
+              : list.pendingAction === "ENABLE"
+              ? "The enable request was rejected. The list remains Inactive."
+              : "The list has been rejected and moved back to the Drafted List."
+          }
           onContinue={() => {
             setShowRejectDialog(false);
-            setActiveTab("Drafted List");
+            setActiveTab(
+              list.pendingAction === "DISABLE" ? "Active" :
+              list.pendingAction === "ENABLE"  ? "Inactive" :
+              "Drafted List"
+            );
             goToMain();
           }}
         />
@@ -731,6 +863,7 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
           name: createForm.listName,
           purpose: createForm.purpose,
           status: "Pending",
+          pendingAction: "CREATE",
           records: 0,
           active: 0,
           actionOnHit: (createForm.actionOnHit as ActionOnHit) || "Generate alert",
@@ -948,10 +1081,16 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
             >
               <Edit className="w-4 h-4" /> Edit List
             </Button>
-            <Button className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white">
+            <Button
+              className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white"
+              onClick={() => { resetBulkUpload(); setShowBulkUpload(true); setShowAddEntity(false); setShowEditEntity(false); setEditingEntityId(null); }}
+            >
               <Upload className="w-4 h-4" /> Bulk Upload
             </Button>
-            <Button className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white">
+            <Button
+              className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white"
+              onClick={() => { resetAef(); setShowAddEntity(true); setShowEditEntity(false); setShowBulkUpload(false); setEditingEntityId(null); }}
+            >
               <Add className="w-4 h-4" /> Add Entity
             </Button>
           </div>
@@ -1001,6 +1140,632 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
               ))}
             </div>
           </div>
+
+          {/* ── Add Entity Form ──────────────────────────────────────────── */}
+          <AnimatePresence>
+            {showAddEntity && (
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-[8px] border border-[#2a53a0] shadow-sm overflow-hidden"
+              >
+                {/* Form header */}
+                <div className="bg-[#2a53a0] h-[52px] flex items-center justify-between px-5 shrink-0">
+                  <h2 className="text-white text-[16px] font-medium">Add entity</h2>
+                  <button
+                    onClick={() => setShowAddEntity(false)}
+                    className="text-white/80 hover:text-white transition-colors text-[13px] flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 18 18">
+                      <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    Close
+                  </button>
+                </div>
+
+                {/* Validation banner */}
+                <div className="bg-[#fff8f0] border-b border-[#f59e0b]/30 px-5 py-2.5">
+                  <p className="text-[12px] text-[#92400e]">At least one must be populated: Full Name, IP Address, Mobile Number, or Device ID.</p>
+                </div>
+
+                {/* Form body */}
+                <div className="p-5 space-y-5">
+
+                  {/* IDENTITY */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Identity</p>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Full Name</label>
+                        <input type="text" value={aef.fullName} onChange={e => setAef(p => ({ ...p, fullName: e.target.value }))}
+                          placeholder="Full legal name"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Aliases / Alternate Names</label>
+                        <input type="text" value={aef.aliases} onChange={e => setAef(p => ({ ...p, aliases: e.target.value }))}
+                          placeholder="Pipe-separated: John|Johnny|J. Smith"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Date of Birth</label>
+                        <input type="date" value={aef.dateOfBirth} onChange={e => setAef(p => ({ ...p, dateOfBirth: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Gender</label>
+                        <div className="relative">
+                          <select value={aef.gender} onChange={e => setAef(p => ({ ...p, gender: e.target.value }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option value="">Select</option>
+                            <option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Nationality (ISO)</label>
+                        <input type="text" value={aef.nationality} onChange={e => setAef(p => ({ ...p, nationality: e.target.value }))}
+                          placeholder="e.g. IN, NG, AE"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* IDENTIFIERS */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Identifiers</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Passport No.</label>
+                        <input type="text" value={aef.passportNo} onChange={e => setAef(p => ({ ...p, passportNo: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">National ID No.</label>
+                        <input type="text" value={aef.nationalIdNo} onChange={e => setAef(p => ({ ...p, nationalIdNo: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Tax ID (TIN / PAN)</label>
+                        <input type="text" value={aef.taxId} onChange={e => setAef(p => ({ ...p, taxId: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Company Registration No.</label>
+                      <input type="text" value={aef.companyRegNo} onChange={e => setAef(p => ({ ...p, companyRegNo: e.target.value }))}
+                        placeholder="For legal entity entries"
+                        className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                    </div>
+                  </div>
+
+                  {/* DIGITAL IDENTIFIERS */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Digital Identifiers</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">IP Address</label>
+                        <input type="text" value={aef.ipAddress} onChange={e => setAef(p => ({ ...p, ipAddress: e.target.value }))}
+                          placeholder="IPv4/v6 or CIDR range"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Device ID / IMEI</label>
+                        <input type="text" value={aef.deviceId} onChange={e => setAef(p => ({ ...p, deviceId: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">MAC Address</label>
+                        <input type="text" value={aef.macAddress} onChange={e => setAef(p => ({ ...p, macAddress: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Mobile Number</label>
+                        <input type="text" value={aef.mobileNumber} onChange={e => setAef(p => ({ ...p, mobileNumber: e.target.value }))}
+                          placeholder="+234XXXXXXXXXXX (E.164 format)"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Email Address</label>
+                        <input type="text" value={aef.emailAddress} onChange={e => setAef(p => ({ ...p, emailAddress: e.target.value }))}
+                          placeholder="user@domain.com"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* LOCALISATION */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Localisation (Multilingual)</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Name in Native Script</label>
+                        <input type="text" value={aef.nativeScriptName} onChange={e => setAef(p => ({ ...p, nativeScriptName: e.target.value }))}
+                          placeholder="e.g. Arabic: محمد · Cyrillic · Chinese"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Script Type</label>
+                        <div className="relative">
+                          <select value={aef.scriptType} onChange={e => setAef(p => ({ ...p, scriptType: e.target.value }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option value="">Select</option>
+                            <option>Arabic</option><option>Cyrillic</option><option>Chinese (Simplified)</option>
+                            <option>Chinese (Traditional)</option><option>Devanagari</option><option>Latin</option><option>Hebrew</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RISK & GOVERNANCE */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Risk &amp; Governance</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Risk Category <span className="text-[#fb2c36]">*</span></label>
+                        <div className="relative">
+                          <select value={aef.riskCategory} onChange={e => setAef(p => ({ ...p, riskCategory: e.target.value as RiskCategory }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option>High</option><option>Medium</option><option>Low</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Action on Hit <span className="text-[#fb2c36]">*</span></label>
+                        <div className="relative">
+                          <select value={aef.actionOnHit} onChange={e => setAef(p => ({ ...p, actionOnHit: e.target.value as ActionOnHit }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option>Alert & block</option><option>Generate alert</option><option>Flag for review</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Expiry Date (TTL)</label>
+                        <input type="date" value={aef.expiryDate} onChange={e => setAef(p => ({ ...p, expiryDate: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Reason for Addition <span className="text-[#fb2c36]">*</span></label>
+                        <textarea rows={3} value={aef.reasonForAddition} onChange={e => setAef(p => ({ ...p, reasonForAddition: e.target.value }))}
+                          placeholder="Mandatory — max 500 characters, retained in audit log..."
+                          className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Source Reference</label>
+                        <input type="text" value={aef.sourceReference} onChange={e => setAef(p => ({ ...p, sourceReference: e.target.value }))}
+                          placeholder="Case ID / SAR no. / Investigation ref."
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <button
+                        type="button"
+                        onClick={() => setAef(p => ({ ...p, triggerAlert: !p.triggerAlert }))}
+                        className={cn(
+                          "relative inline-flex w-[40px] h-[22px] rounded-full transition-colors shrink-0 focus:outline-none",
+                          aef.triggerAlert ? "bg-[#2a53a0]" : "bg-gray-300"
+                        )}
+                      >
+                        <span className={cn(
+                          "absolute top-[3px] w-[16px] h-[16px] bg-white rounded-full shadow transition-transform",
+                          aef.triggerAlert ? "translate-x-[19px]" : "translate-x-[3px]"
+                        )} />
+                      </button>
+                      <span className="text-[13px] text-[#374151]">Trigger real-time alert on match</span>
+                    </label>
+                  </div>
+
+                </div>
+
+                {/* Form footer */}
+                <div className="h-[60px] border-t border-[#e5e7eb] flex items-center justify-between px-5 bg-[#f9fafb]">
+                  <button
+                    onClick={() => setShowAddEntity(false)}
+                    className="h-[36px] px-5 rounded-[6px] border border-[#d1d5dc] text-[13px] font-medium text-[#374151] hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitEntity}
+                    disabled={!isEntityFormValid()}
+                    className={cn(
+                      "h-[36px] px-6 rounded-[6px] text-[13px] font-medium transition-colors flex items-center gap-1.5",
+                      isEntityFormValid()
+                        ? "bg-[#2a53a0] text-white hover:bg-[#1e3a70]"
+                        : "bg-[#d1d5dc] text-white cursor-not-allowed"
+                    )}
+                  >
+                    Submit for approval →
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Edit Entity Form ──────────────────────────────────────────── */}
+          <AnimatePresence>
+            {showEditEntity && (
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-[8px] border border-[#2a53a0] shadow-sm overflow-hidden"
+              >
+                {/* Form header */}
+                <div className="bg-[#2a53a0] h-[52px] flex items-center justify-between px-5 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-white text-[16px] font-medium">Edit entity</h2>
+                    {editingEntityId && (
+                      <span className="text-white/60 text-[12px]">· {editingEntityId}</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => { setShowEditEntity(false); setEditingEntityId(null); }}
+                    className="text-white/80 hover:text-white transition-colors text-[13px] flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 18 18">
+                      <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    Close
+                  </button>
+                </div>
+
+                {/* Validation banner */}
+                <div className="bg-[#fff8f0] border-b border-[#f59e0b]/30 px-5 py-2.5">
+                  <p className="text-[12px] text-[#92400e]">At least one must be populated: Full Name, IP Address, Mobile Number, or Device ID.</p>
+                </div>
+
+                {/* Form body */}
+                <div className="p-5 space-y-5">
+
+                  {/* IDENTITY */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Identity</p>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Full Name</label>
+                        <input type="text" value={eef.fullName} onChange={e => setEef(p => ({ ...p, fullName: e.target.value }))}
+                          placeholder="Full legal name"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Aliases / Alternate Names</label>
+                        <input type="text" value={eef.aliases} onChange={e => setEef(p => ({ ...p, aliases: e.target.value }))}
+                          placeholder="Pipe-separated: John|Johnny|J. Smith"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Date of Birth</label>
+                        <input type="date" value={eef.dateOfBirth} onChange={e => setEef(p => ({ ...p, dateOfBirth: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Gender</label>
+                        <div className="relative">
+                          <select value={eef.gender} onChange={e => setEef(p => ({ ...p, gender: e.target.value }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option value="">Select</option>
+                            <option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Nationality (ISO)</label>
+                        <input type="text" value={eef.nationality} onChange={e => setEef(p => ({ ...p, nationality: e.target.value }))}
+                          placeholder="e.g. IN, NG, AE"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* IDENTIFIERS */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Identifiers</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Passport No.</label>
+                        <input type="text" value={eef.passportNo} onChange={e => setEef(p => ({ ...p, passportNo: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">National ID No.</label>
+                        <input type="text" value={eef.nationalIdNo} onChange={e => setEef(p => ({ ...p, nationalIdNo: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Tax ID (TIN / PAN)</label>
+                        <input type="text" value={eef.taxId} onChange={e => setEef(p => ({ ...p, taxId: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Company Registration No.</label>
+                      <input type="text" value={eef.companyRegNo} onChange={e => setEef(p => ({ ...p, companyRegNo: e.target.value }))}
+                        placeholder="For legal entity entries"
+                        className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                    </div>
+                  </div>
+
+                  {/* DIGITAL IDENTIFIERS */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Digital Identifiers</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">IP Address</label>
+                        <input type="text" value={eef.ipAddress} onChange={e => setEef(p => ({ ...p, ipAddress: e.target.value }))}
+                          placeholder="IPv4/v6 or CIDR range"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Device ID / IMEI</label>
+                        <input type="text" value={eef.deviceId} onChange={e => setEef(p => ({ ...p, deviceId: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">MAC Address</label>
+                        <input type="text" value={eef.macAddress} onChange={e => setEef(p => ({ ...p, macAddress: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Mobile Number</label>
+                        <input type="text" value={eef.mobileNumber} onChange={e => setEef(p => ({ ...p, mobileNumber: e.target.value }))}
+                          placeholder="+234XXXXXXXXXXX (E.164 format)"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Email Address</label>
+                        <input type="text" value={eef.emailAddress} onChange={e => setEef(p => ({ ...p, emailAddress: e.target.value }))}
+                          placeholder="user@domain.com"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* LOCALISATION */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Localisation (Multilingual)</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Name in Native Script</label>
+                        <input type="text" value={eef.nativeScriptName} onChange={e => setEef(p => ({ ...p, nativeScriptName: e.target.value }))}
+                          placeholder="e.g. Arabic: محمد · Cyrillic · Chinese"
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Script Type</label>
+                        <div className="relative">
+                          <select value={eef.scriptType} onChange={e => setEef(p => ({ ...p, scriptType: e.target.value }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option value="">Select</option>
+                            <option>Arabic</option><option>Cyrillic</option><option>Chinese (Simplified)</option>
+                            <option>Chinese (Traditional)</option><option>Devanagari</option><option>Latin</option><option>Hebrew</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* RISK & GOVERNANCE */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Risk &amp; Governance</p>
+                    <div className="grid grid-cols-3 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Risk Category <span className="text-[#fb2c36]">*</span></label>
+                        <div className="relative">
+                          <select value={eef.riskCategory} onChange={e => setEef(p => ({ ...p, riskCategory: e.target.value as RiskCategory }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option>High</option><option>Medium</option><option>Low</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Action on Hit <span className="text-[#fb2c36]">*</span></label>
+                        <div className="relative">
+                          <select value={eef.actionOnHit} onChange={e => setEef(p => ({ ...p, actionOnHit: e.target.value as ActionOnHit }))}
+                            className="w-full h-[38px] pl-3 pr-8 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] appearance-none focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                            <option>Alert & block</option><option>Generate alert</option><option>Flag for review</option>
+                          </select>
+                          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Expiry Date (TTL)</label>
+                        <input type="date" value={eef.expiryDate} onChange={e => setEef(p => ({ ...p, expiryDate: e.target.value }))}
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Reason for Edit <span className="text-[#fb2c36]">*</span></label>
+                        <textarea rows={3} value={eef.reasonForAddition} onChange={e => setEef(p => ({ ...p, reasonForAddition: e.target.value }))}
+                          placeholder="Mandatory — max 500 characters, retained in audit log..."
+                          className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">Source Reference</label>
+                        <input type="text" value={eef.sourceReference} onChange={e => setEef(p => ({ ...p, sourceReference: e.target.value }))}
+                          placeholder="Case ID / SAR no. / Investigation ref."
+                          className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]" />
+                      </div>
+                    </div>
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <button
+                        type="button"
+                        onClick={() => setEef(p => ({ ...p, triggerAlert: !p.triggerAlert }))}
+                        className={cn(
+                          "relative inline-flex w-[40px] h-[22px] rounded-full transition-colors shrink-0 focus:outline-none",
+                          eef.triggerAlert ? "bg-[#2a53a0]" : "bg-gray-300"
+                        )}
+                      >
+                        <span className={cn(
+                          "absolute top-[3px] w-[16px] h-[16px] bg-white rounded-full shadow transition-transform",
+                          eef.triggerAlert ? "translate-x-[19px]" : "translate-x-[3px]"
+                        )} />
+                      </button>
+                      <span className="text-[13px] text-[#374151]">Trigger real-time alert on match</span>
+                    </label>
+                  </div>
+
+                </div>
+
+                {/* Form footer */}
+                <div className="h-[60px] border-t border-[#e5e7eb] flex items-center justify-between px-5 bg-[#f9fafb]">
+                  <button
+                    onClick={() => { setShowEditEntity(false); setEditingEntityId(null); }}
+                    className="h-[36px] px-5 rounded-[6px] border border-[#d1d5dc] text-[13px] font-medium text-[#374151] hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateEntity}
+                    disabled={!isEditFormValid()}
+                    className={cn(
+                      "h-[36px] px-6 rounded-[6px] text-[13px] font-medium transition-colors flex items-center gap-1.5",
+                      isEditFormValid()
+                        ? "bg-[#2a53a0] text-white hover:bg-[#1e3a70]"
+                        : "bg-[#d1d5dc] text-white cursor-not-allowed"
+                    )}
+                  >
+                    Save changes →
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Bulk Upload Panel ─────────────────────────────────────────── */}
+          <AnimatePresence>
+            {showBulkUpload && (
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-[8px] border border-[#2a53a0] shadow-sm overflow-hidden"
+              >
+                {/* Header */}
+                <div className="bg-[#2a53a0] h-[52px] flex items-center justify-between px-5 shrink-0">
+                  <h2 className="text-white text-[16px] font-medium">
+                    Bulk upload entities — <span className="font-normal">{list.name}</span>
+                  </h2>
+                  <button
+                    onClick={() => { setShowBulkUpload(false); resetBulkUpload(); }}
+                    className="text-white/80 hover:text-white transition-colors text-[13px] flex items-center gap-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 18 18">
+                      <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    Close
+                  </button>
+                </div>
+
+                {/* Form body */}
+                <div className="p-5 space-y-4">
+
+                  {/* Reason + File row */}
+                  <div className="grid grid-cols-2 gap-5">
+                    {/* Reason for Addition */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">
+                        Reason for Addition <span className="text-[#fb2c36]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={500}
+                        value={viewBulkReason}
+                        onChange={e => setViewBulkReason(e.target.value)}
+                        placeholder="Max 500 characters"
+                        className="w-full h-[38px] px-3 bg-white border border-[#d1d5dc] rounded-[6px] text-[13px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
+                      />
+                    </div>
+
+                    {/* Upload File */}
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wide">
+                        Upload File <span className="text-[#fb2c36]">*</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="h-[38px] px-3 flex items-center gap-1.5 border border-[#d1d5dc] rounded-[6px] bg-white text-[13px] text-[#374151] cursor-pointer hover:bg-gray-50 transition-colors shrink-0">
+                          <input
+                            type="file"
+                            accept=".csv,.xlsx"
+                            className="sr-only"
+                            onChange={e => setViewBulkFile(e.target.files?.[0] ?? null)}
+                          />
+                          Choose file
+                        </label>
+                        <span className="text-[13px] text-[#9ca3af] truncate">
+                          {viewBulkFile ? viewBulkFile.name : "No file chosen"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Info box */}
+                  <div className="bg-[#f8fafc] border border-[#e5e7eb] rounded-[6px] p-4 space-y-2.5">
+                    <p className="text-[12px] text-[#6b7280]">
+                      Max 50,000 records · Max 25 MB · Formats: CSV (UTF-8), XLSX
+                    </p>
+                    <p className="text-[12px] text-[#6b7280]">
+                      Required:{" "}
+                      <code className="bg-[#e5e7eb] text-[#374151] text-[11px] px-1.5 py-0.5 rounded font-mono">full_name</code>
+                      {" · "}
+                      <code className="bg-[#e5e7eb] text-[#374151] text-[11px] px-1.5 py-0.5 rounded font-mono">action_on_hit</code>
+                      {" · "}
+                      <code className="bg-[#e5e7eb] text-[#374151] text-[11px] px-1.5 py-0.5 rounded font-mono">reason_for_addition</code>
+                    </p>
+                    <button className="h-[32px] px-3 flex items-center gap-1.5 border border-[#d1d5dc] rounded-[6px] bg-white text-[12px] text-[#374151] hover:bg-gray-50 transition-colors">
+                      <Download className="w-3.5 h-3.5" /> Download template (XLSX)
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Footer */}
+                <div className="h-[60px] border-t border-[#e5e7eb] flex items-center justify-between px-5 bg-[#f9fafb]">
+                  <button
+                    onClick={() => { setShowBulkUpload(false); resetBulkUpload(); }}
+                    className="h-[36px] px-5 rounded-[6px] border border-[#d1d5dc] text-[13px] font-medium text-[#374151] hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkSubmit}
+                    disabled={!viewBulkReason.trim() || !viewBulkFile}
+                    className={cn(
+                      "h-[36px] px-6 rounded-[6px] text-[13px] font-medium transition-colors flex items-center gap-1.5",
+                      viewBulkReason.trim() && viewBulkFile
+                        ? "bg-[#2a53a0] text-white hover:bg-[#1e3a70]"
+                        : "bg-[#d1d5dc] text-white cursor-not-allowed"
+                    )}
+                  >
+                    Validate &amp; submit →
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Entity Records */}
           <div className="flex flex-col bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden">
@@ -1069,7 +1834,7 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
                   </tr>
                 </thead>
                 <tbody>
-                  {entityPageItems.length > 0 ? entityPageItems.map(entity => (
+                  {entityPageItems.length > 0 ? entityPageItems.map((entity: EntityRecord) => (
                     <tr key={entity.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors h-[46px]">
                       <td className="pl-4 px-4 align-middle">
                         <p className="text-[13px] font-semibold text-[#161616]">{entity.fullName}</p>
@@ -1099,7 +1864,11 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
                       </td>
                       <td className="px-4 align-middle">
                         <div className="flex items-center gap-1.5">
-                          <button className="flex items-center justify-center w-7 h-7 rounded-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 transition-colors" title="Edit entity">
+                          <button
+                            onClick={() => openEditEntity(entity)}
+                            className="flex items-center justify-center w-7 h-7 rounded-sm bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 transition-colors"
+                            title="Edit entity"
+                          >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
                           <button className="flex items-center justify-center w-7 h-7 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="History">

@@ -21,7 +21,8 @@ import { RejectionDialog } from "./rejection-dialog";
 
 type RiskLevel  = "High" | "Medium" | "Low";
 type MatchType  = "Exact phrase" | "Partial match" | "Regex pattern";
-type Category   = "Sanctions" | "Terrorism" | "PEP" | "Financial Crime";
+type BuiltInCategory = "Sanctions" | "Terrorism" | "PEP" | "Financial Crime";
+type Category   = string;
 type KwStatus   = "Active" | "Inactive" | "Draft" | "Pending";
 type PageMode   = "main" | "create" | "audit-trail" | "verify";
 type FilterTab  = "Active" | "Inactive" | "Drafted Keyword" | "Pending for Verification";
@@ -35,6 +36,7 @@ interface Keyword {
   status: KwStatus;
   dateAdded: string;
   addedBy: string;
+  pendingAction?: "ENABLE" | "DISABLE" | "CREATE";
 }
 
 // ── Mock Data ──────────────────────────────────────────────────────────────
@@ -58,7 +60,7 @@ const MOCK_KEYWORDS: Keyword[] = [
   { id: "K-016", phrase: "front company",       category: "Sanctions",       risk: "High",   matchType: "Exact phrase",  status: "Pending", dateAdded: "11 Feb 2026", addedBy: "Compliance Officer" },
 ];
 
-const CATEGORIES: Category[]   = ["Sanctions", "Terrorism", "PEP", "Financial Crime"];
+const BASE_CATEGORIES: string[] = ["Sanctions", "Terrorism", "PEP", "Financial Crime"];
 const MATCH_TYPES: MatchType[]  = ["Exact phrase", "Partial match", "Regex pattern"];
 const RISK_LEVELS: RiskLevel[]  = ["High", "Medium", "Low"];
 
@@ -70,12 +72,24 @@ const RISK_BADGE: Record<RiskLevel, string> = {
   Low:    "bg-green-100 text-green-700",
 };
 
-const CATEGORY_BADGE: Record<Category, string> = {
+const BUILTIN_CATEGORY_BADGE: Record<BuiltInCategory, string> = {
   Sanctions:         "bg-orange-100 text-orange-700 border-orange-200",
   Terrorism:         "bg-red-100 text-red-700 border-red-200",
   PEP:               "bg-purple-100 text-purple-700 border-purple-200",
   "Financial Crime": "bg-blue-100 text-blue-700 border-blue-200",
 };
+const CUSTOM_CATEGORY_BADGES = [
+  "bg-teal-100 text-teal-700 border-teal-200",
+  "bg-cyan-100 text-cyan-700 border-cyan-200",
+  "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "bg-pink-100 text-pink-700 border-pink-200",
+  "bg-lime-100 text-lime-700 border-lime-200",
+];
+function getCategoryBadge(category: string, customCategories: { name: string }[]): string {
+  if (category in BUILTIN_CATEGORY_BADGE) return BUILTIN_CATEGORY_BADGE[category as BuiltInCategory];
+  const idx = customCategories.findIndex(c => c.name === category);
+  return CUSTOM_CATEGORY_BADGES[idx % CUSTOM_CATEGORY_BADGES.length] ?? "bg-gray-100 text-gray-600 border-gray-200";
+}
 
 const MATCH_BADGE: Record<MatchType, string> = {
   "Exact phrase":  "bg-green-100 text-green-700 border-green-200",
@@ -116,12 +130,36 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
 
   // category controls dialog
   const [categoryControlsOpen, setCategoryControlsOpen] = useState(false);
-  const [categoryEnabled, setCategoryEnabled] = useState<Record<Category, boolean>>({
-    Sanctions:        true,
-    Terrorism:        true,
-    PEP:              true,
+  const [categoryEnabled, setCategoryEnabled] = useState<Record<string, boolean>>({
+    Sanctions:         true,
+    Terrorism:         true,
+    PEP:               true,
     "Financial Crime": true,
   });
+
+  // custom categories
+  const [customCategories, setCustomCategories] = useState<{ name: string; description: string }[]>([]);
+
+  // add category dialog
+  const [addCategoryOpen, setAddCategoryOpen]           = useState(false);
+  const [newCategoryName, setNewCategoryName]           = useState("");
+  const [newCategoryDesc, setNewCategoryDesc]           = useState("");
+
+  // enable/disable dialog
+  const [toggleDialogKw, setToggleDialogKw]   = useState<Keyword | null>(null);
+  const [toggleAction, setToggleAction]       = useState<"DISABLE" | "ENABLE">("DISABLE");
+  const [toggleDate, setToggleDate]           = useState("");
+  const [toggleReason, setToggleReason]       = useState("");
+
+  const handleAddCategory = () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    setCustomCategories(prev => [...prev, { name, description: newCategoryDesc.trim() }]);
+    setCategoryEnabled(prev => ({ ...prev, [name]: true }));
+    setNewCategoryName("");
+    setNewCategoryDesc("");
+    setAddCategoryOpen(false);
+  };
 
   // ── navigation helpers ─────────────────────────────────────────────────
   const goToMain = () => { setPageMode("main"); setSelectedKeyword(null); onSubPageChange?.(false); };
@@ -168,10 +206,23 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
   })();
 
   // ── action handlers ────────────────────────────────────────────────────
-  const handleToggle = (id: string) => {
+  const handleOpenToggleDialog = (kw: Keyword) => {
+    setToggleDialogKw(kw);
+    setToggleAction(kw.status === "Active" ? "DISABLE" : "ENABLE");
+    setToggleDate("");
+    setToggleReason("");
+  };
+
+  const handleSubmitToggle = () => {
+    if (!toggleDialogKw) return;
     setKeywords((prev: Keyword[]) => prev.map(k =>
-      k.id === id ? { ...k, status: k.status === "Active" ? "Inactive" : "Active" } : k
+      k.id === toggleDialogKw.id
+        ? { ...k, status: "Pending" as KwStatus, pendingAction: toggleAction }
+        : k
     ));
+    setToggleDialogKw(null);
+    setToggleDate("");
+    setToggleReason("");
   };
 
   const handleRemove = (id: string) => {
@@ -188,6 +239,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
         risk: newRisk,
         matchType: newMatchType,
         status: "Pending",
+        pendingAction: "CREATE",
         dateAdded: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
         addedBy: "Current User",
       };
@@ -353,7 +405,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
                   id="kw-category"
                   titleText=""
                   label=""
-                  items={CATEGORIES}
+                  items={[...BASE_CATEGORIES, ...customCategories.map(c => c.name)]}
                   selectedItem={newCategory}
                   onChange={({ selectedItem }: any) => setNewCategory(selectedItem as Category)}
                 />
@@ -449,7 +501,8 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
     const handleApprove = () => {
       setIsVerifying(true);
       setTimeout(() => {
-        setKeywords((prev: Keyword[]) => prev.map(k => k.id === kw.id ? { ...k, status: "Active" as KwStatus } : k));
+        const resolvedStatus: KwStatus = kw.pendingAction === "DISABLE" ? "Inactive" : "Active";
+        setKeywords((prev: Keyword[]) => prev.map(k => k.id === kw.id ? { ...k, status: resolvedStatus, pendingAction: undefined } : k));
         setIsVerifying(false);
         setShowApproveSuccess(true);
       }, 2000);
@@ -458,7 +511,8 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
     const handleReject = () => {
       setIsVerifying(true);
       setTimeout(() => {
-        setKeywords((prev: Keyword[]) => prev.map(k => k.id === kw.id ? { ...k, status: "Draft" as KwStatus } : k));
+        const revertStatus: KwStatus = kw.pendingAction === "DISABLE" ? "Active" : kw.pendingAction === "ENABLE" ? "Inactive" : "Draft";
+        setKeywords((prev: Keyword[]) => prev.map(k => k.id === kw.id ? { ...k, status: revertStatus, pendingAction: undefined } : k));
         setIsVerifying(false);
         setShowRejectDialog(true);
       }, 2000);
@@ -470,15 +524,39 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
         <CreationSuccessDialog
           eventName=""
           isOpen={showApproveSuccess}
-          title="Approved"
-          message="The keyword has been approved and moved to the Active list."
-          onContinue={() => { setShowApproveSuccess(false); setActiveTab("Active"); goToMain(); }}
+          title={kw.pendingAction === "DISABLE" ? "Disabled" : kw.pendingAction === "ENABLE" ? "Enabled" : "Approved"}
+          message={
+            kw.pendingAction === "DISABLE"
+              ? "The keyword has been disabled and moved to the Inactive list."
+              : kw.pendingAction === "ENABLE"
+              ? "The keyword has been enabled and moved to the Active list."
+              : "The keyword has been approved and moved to the Active list."
+          }
+          onContinue={() => {
+            setShowApproveSuccess(false);
+            setActiveTab(kw.pendingAction === "DISABLE" ? "Inactive" : "Active");
+            goToMain();
+          }}
         />
         <RejectionDialog
           isOpen={showRejectDialog}
           title="Rejected"
-          message="The keyword has been rejected and moved back to the Drafted Keyword list."
-          onContinue={() => { setShowRejectDialog(false); setActiveTab("Drafted Keyword"); goToMain(); }}
+          message={
+            kw.pendingAction === "DISABLE"
+              ? "The disable request was rejected. The keyword remains Active."
+              : kw.pendingAction === "ENABLE"
+              ? "The enable request was rejected. The keyword remains Inactive."
+              : "The keyword has been rejected and moved back to the Drafted Keyword list."
+          }
+          onContinue={() => {
+            setShowRejectDialog(false);
+            setActiveTab(
+              kw.pendingAction === "DISABLE" ? "Active" :
+              kw.pendingAction === "ENABLE"  ? "Inactive" :
+              "Drafted Keyword"
+            );
+            goToMain();
+          }}
         />
 
         {/* Top Nav */}
@@ -661,6 +739,13 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
             >
               <Settings className="w-4 h-4" /> Category Controls
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setNewCategoryName(""); setNewCategoryDesc(""); setAddCategoryOpen(true); }}
+              className="gap-1.5 bg-white dark:bg-gray-900 h-[46px] text-sm"
+            >
+              <Add className="w-4 h-4" /> Add Category
+            </Button>
             {/* Add Keyword — hidden on Pending for Verification */}
             {activeTab !== "Pending for Verification" && (
               <Button
@@ -711,7 +796,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
 
                     {/* Category badge */}
                     <TableCell className="px-4 align-middle">
-                      <Badge variant="secondary" className={cn("text-xs px-2 py-0.5 font-medium whitespace-nowrap", CATEGORY_BADGE[kw.category])}>
+                      <Badge variant="secondary" className={cn("text-xs px-2 py-0.5 font-medium whitespace-nowrap", getCategoryBadge(kw.category, customCategories))}>
                         {kw.category}
                       </Badge>
                     </TableCell>
@@ -754,7 +839,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
                         {/* On/Off toggle — Active / Inactive tabs only */}
                         {(activeTab === "Active" || activeTab === "Inactive") && (
                           <button
-                            onClick={() => handleToggle(kw.id)}
+                            onClick={() => handleOpenToggleDialog(kw)}
                             className={cn(
                               "flex items-center justify-center w-8 h-8 rounded-sm text-xs font-medium transition-colors",
                               kw.status === "Active"
@@ -847,11 +932,16 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
               </div>
 
               {/* Category list */}
-              <div className="divide-y divide-gray-100">
-                {(["Sanctions", "Terrorism", "PEP (Politically Exposed Persons)", "Financial Crime"] as const).map((label) => {
-                  const key = label === "PEP (Politically Exposed Persons)" ? "PEP" : label as Category;
+              <div className="divide-y divide-gray-100 max-h-[360px] overflow-y-auto">
+                {([
+                  { key: "Sanctions",         label: "Sanctions" },
+                  { key: "Terrorism",         label: "Terrorism" },
+                  { key: "PEP",               label: "PEP (Politically Exposed Persons)" },
+                  { key: "Financial Crime",   label: "Financial Crime" },
+                  ...customCategories.map(c => ({ key: c.name, label: c.name })),
+                ]).map(({ key, label }) => {
                   const count = keywords.filter(k => k.category === key).length;
-                  const enabled = categoryEnabled[key];
+                  const enabled = categoryEnabled[key] ?? true;
                   return (
                     <div key={key} className="flex items-center justify-between px-[30px] py-[18px]">
                       <div>
@@ -889,6 +979,220 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
                   className="flex-1 h-full text-[14px] font-medium bg-[#2a53a0] text-white hover:bg-[#1f3e7a] transition-colors"
                 >
                   Save
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Add Category Dialog ──────────────────────────────────────── */}
+      <AnimatePresence>
+        {addCategoryOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setAddCategoryOpen(false)}
+              className="fixed inset-0 bg-black/50 z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              transition={{ duration: 0.18 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[420px] bg-white rounded-[8px] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] z-[101] overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-[#2a53a0] h-[64px] flex items-center justify-between px-[30px]">
+                <div>
+                  <h2 className="text-white text-[18px] font-normal leading-tight">Add Category</h2>
+                  <p className="text-white/70 text-[12px] mt-0.5">Create a new keyword screening category</p>
+                </div>
+                <button
+                  onClick={() => setAddCategoryOpen(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Form */}
+              <div className="p-[20px] space-y-[16px]">
+                {/* Category Name */}
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">
+                    Category Name <span className="text-[#fb2c36]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newCategoryName}
+                    onChange={e => setNewCategoryName(e.target.value)}
+                    placeholder="e.g. Cybercrime, Narcotics..."
+                    className="w-full h-[46px] px-3 bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
+                  />
+                </div>
+                {/* Category Description */}
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">
+                    Category Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={newCategoryDesc}
+                    onChange={e => setNewCategoryDesc(e.target.value)}
+                    placeholder="Brief description of this category..."
+                    className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="h-[64px] border-t border-[#e5e7eb] flex bg-[#f4f4f4]">
+                <button
+                  onClick={() => setAddCategoryOpen(false)}
+                  className="flex-1 h-full text-[14px] font-medium text-[#2a53a0] hover:bg-[#eaeaea] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddCategory}
+                  disabled={!newCategoryName.trim()}
+                  className={cn(
+                    "flex-1 h-full text-[14px] font-medium transition-colors",
+                    newCategoryName.trim()
+                      ? "bg-[#2a53a0] text-white hover:bg-[#1f3e7a]"
+                      : "bg-[#d1d5dc] text-white cursor-not-allowed"
+                  )}
+                >
+                  Add Category
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Enable / Disable Dialog ──────────────────────────────────── */}
+      <AnimatePresence>
+        {toggleDialogKw && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setToggleDialogKw(null)}
+              className="fixed inset-0 bg-black/50 z-[100]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[512px] bg-white rounded-[8px] overflow-hidden z-[101] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] border border-black/10"
+            >
+              {/* Header */}
+              <div className="bg-[#2a53a0] h-[64px] flex items-center justify-between px-[30px] shrink-0">
+                <h2 className="text-white text-[20px] font-normal">
+                  {toggleAction === "DISABLE" ? "Disable" : "Enable"} keyword
+                </h2>
+                <button
+                  onClick={() => setToggleDialogKw(null)}
+                  className="size-[28px] rounded-[4px] flex items-center justify-center hover:bg-white/10 transition-colors"
+                >
+                  <svg className="size-[18px]" fill="none" viewBox="0 0 18 18">
+                    <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-[20px] space-y-[16px]">
+                <p className="text-[13px] text-[#4b5563] leading-relaxed">
+                  Controlling screening engine status for{" "}
+                  <strong className="text-[#161616]">{toggleDialogKw.phrase}</strong>.{" "}
+                  Both actions require Maker-Checker approval.
+                </p>
+
+                {/* Action Radio */}
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">
+                    Action <span className="text-[#fb2c36]">*</span>
+                  </label>
+                  <div className="flex items-center gap-6 mt-1">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="kwToggleAction" value="DISABLE" checked={toggleAction === "DISABLE"}
+                        onChange={() => setToggleAction("DISABLE")} className="accent-[#2a53a0]" />
+                      <span className="text-[14px] font-medium text-[#161616]">Disable</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="kwToggleAction" value="ENABLE" checked={toggleAction === "ENABLE"}
+                        onChange={() => setToggleAction("ENABLE")} className="accent-[#2a53a0]" />
+                      <span className="text-[14px] font-medium text-[#161616]">Enable</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Date + Username */}
+                <div className="grid grid-cols-2 gap-[16px]">
+                  <div className="space-y-[6px]">
+                    <label className="text-[13px] font-semibold text-[#161616]">
+                      {toggleAction === "DISABLE" ? "Disable Date" : "Enable Date"} <span className="text-[#fb2c36]">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={toggleDate}
+                      onChange={e => setToggleDate(e.target.value)}
+                      className="w-full h-[46px] px-[12px] bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
+                    />
+                  </div>
+                  <div className="space-y-[6px]">
+                    <label className="text-[13px] font-semibold text-[#161616]">Username (Auto-Populated)</label>
+                    <input
+                      type="text"
+                      value="Charu Chauhan"
+                      readOnly
+                      className="w-full h-[46px] px-[12px] bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+
+                {/* Reason */}
+                <div className="space-y-[6px]">
+                  <label className="text-[13px] font-semibold text-[#161616]">
+                    Reason <span className="text-[#fb2c36]">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={toggleReason}
+                    onChange={e => setToggleReason(e.target.value)}
+                    placeholder="Mandatory — retained in audit log..."
+                    className="w-full p-[12px] bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#717182] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="h-[64px] border-t border-[#e5e7eb] flex bg-[#f4f4f4]">
+                <button
+                  onClick={() => setToggleDialogKw(null)}
+                  className="flex-1 h-full text-[14px] font-medium text-[#2a53a0] hover:bg-[#eaeaea] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitToggle}
+                  disabled={!toggleDate || !toggleReason.trim()}
+                  className={cn(
+                    "flex-1 h-full text-[14px] font-medium transition-colors",
+                    toggleDate && toggleReason.trim()
+                      ? "bg-[#2a53a0] text-white hover:bg-[#1f3e7a]"
+                      : "bg-[#d1d5dc] text-white cursor-not-allowed"
+                  )}
+                >
+                  Submit
                 </button>
               </div>
             </motion.div>
