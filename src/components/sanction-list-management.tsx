@@ -332,11 +332,26 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     });
     setShowAddEntity(false);
     setShowBulkUpload(false);
+    setShowViewEntity(false);
+    setViewingEntity(null);
     setShowEditEntity(true);
   };
 
   const isEditFormValid = () =>
     !!(eef.fullName.trim() || eef.ipAddress.trim() || eef.mobileNumber.trim() || eef.deviceId.trim());
+
+  // ── view entity panel (view page) ─────────────────────────────────────
+  const [showViewEntity, setShowViewEntity]       = useState(false);
+  const [viewingEntity, setViewingEntity]         = useState<EntityRecord | null>(null);
+
+  const openViewEntity = (entity: EntityRecord) => {
+    setViewingEntity(entity);
+    setShowAddEntity(false);
+    setShowEditEntity(false);
+    setShowBulkUpload(false);
+    setEditingEntityId(null);
+    setShowViewEntity(true);
+  };
 
   // ── bulk upload panel (view page) ──────────────────────────────────────
   const [showBulkUpload, setShowBulkUpload]       = useState(false);
@@ -384,7 +399,9 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
     setShowAddEntity(false);
     setShowEditEntity(false);
     setShowBulkUpload(false);
+    setShowViewEntity(false);
     setEditingEntityId(null);
+    setViewingEntity(null);
     resetAef();
     resetBulkUpload();
     setPageMode("view");
@@ -1083,13 +1100,13 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
             </Button>
             <Button
               className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white"
-              onClick={() => { resetBulkUpload(); setShowBulkUpload(true); setShowAddEntity(false); setShowEditEntity(false); setEditingEntityId(null); }}
+              onClick={() => { resetBulkUpload(); setShowBulkUpload(true); setShowAddEntity(false); setShowEditEntity(false); setShowViewEntity(false); setViewingEntity(null); setEditingEntityId(null); }}
             >
               <Upload className="w-4 h-4" /> Bulk Upload
             </Button>
             <Button
               className="h-[36px] px-4 text-[13px] gap-1.5 bg-[#2a53a0] hover:bg-[#1e3a70] text-white"
-              onClick={() => { resetAef(); setShowAddEntity(true); setShowEditEntity(false); setShowBulkUpload(false); setEditingEntityId(null); }}
+              onClick={() => { resetAef(); setShowAddEntity(true); setShowEditEntity(false); setShowBulkUpload(false); setShowViewEntity(false); setViewingEntity(null); setEditingEntityId(null); }}
             >
               <Add className="w-4 h-4" /> Add Entity
             </Button>
@@ -1767,6 +1784,105 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
             )}
           </AnimatePresence>
 
+          {/* ── View Entity Panel ─────────────────────────────────────────── */}
+          <AnimatePresence>
+            {showViewEntity && viewingEntity && (
+              <motion.div
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.18 }}
+                className="bg-white rounded-[8px] border border-[#2a53a0] shadow-sm overflow-hidden"
+              >
+                {/* Header */}
+                <div className="bg-[#2a53a0] h-[52px] flex items-center justify-between px-5 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-white text-[16px] font-medium">View entity</h2>
+                    <span className="text-white/60 text-[12px]">· {viewingEntity.id}</span>
+                  </div>
+                  <button
+                    onClick={() => { setShowViewEntity(false); setViewingEntity(null); }}
+                    className="text-white/80 hover:text-white transition-colors flex items-center gap-1 text-[13px]"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 18 18">
+                      <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    Close
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 space-y-5">
+
+                  {/* IDENTITY */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Identity</p>
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-4">
+                      {[
+                        { label: "Full Name",    value: viewingEntity.fullName },
+                        { label: "Entity ID",    value: viewingEntity.entityId },
+                        { label: "Date Added",   value: viewingEntity.dateAdded },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="space-y-0.5">
+                          <p className="text-[11px] text-[#9ca3af] uppercase tracking-wide font-medium">{label}</p>
+                          <p className="text-[14px] font-medium text-[#161616]">{value || "—"}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* RISK & GOVERNANCE */}
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#2a53a0] uppercase tracking-widest mb-3 border-b border-[#e5e7eb] pb-1.5">Risk &amp; Governance</p>
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-4">
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] text-[#9ca3af] uppercase tracking-wide font-medium">Risk Category</p>
+                        <span className={cn("inline-block text-xs font-medium px-2.5 py-0.5 rounded-full", RISK_BADGE[viewingEntity.riskCategory])}>
+                          {viewingEntity.riskCategory}
+                        </span>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] text-[#9ca3af] uppercase tracking-wide font-medium">Action on Hit</p>
+                        <span className={cn("inline-block text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap", ACTION_BADGE[viewingEntity.actionOnHit])}>
+                          {viewingEntity.actionOnHit}
+                        </span>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] text-[#9ca3af] uppercase tracking-wide font-medium">Status</p>
+                        <span className={cn("inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full", ENTITY_STATUS_BADGE[viewingEntity.status])}>
+                          {viewingEntity.status}
+                        </span>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] text-[#9ca3af] uppercase tracking-wide font-medium">Expiry Date (TTL)</p>
+                        <p className="text-[14px] font-medium text-[#161616]">
+                          {viewingEntity.expiryDate || <span className="text-[#9ca3af]">No expiry</span>}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Footer */}
+                <div className="h-[56px] border-t border-[#e5e7eb] flex items-center justify-between px-5 bg-[#f9fafb]">
+                  <button
+                    onClick={() => { setShowViewEntity(false); setViewingEntity(null); }}
+                    className="h-[36px] px-5 rounded-[6px] border border-[#d1d5dc] text-[13px] font-medium text-[#374151] hover:bg-gray-100 transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => openEditEntity(viewingEntity)}
+                    className="h-[36px] px-5 rounded-[6px] bg-[#2a53a0] text-white text-[13px] font-medium hover:bg-[#1e3a70] transition-colors flex items-center gap-1.5"
+                  >
+                    <Edit className="w-3.5 h-3.5" /> Edit entity
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Entity Records */}
           <div className="flex flex-col bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden">
             {/* section header */}
@@ -1871,7 +1987,11 @@ export function SanctionListManagement({ onSubPageChange }: { onSubPageChange?: 
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
-                          <button className="flex items-center justify-center w-7 h-7 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors" title="History">
+                          <button
+                            onClick={() => openViewEntity(entity)}
+                            className="flex items-center justify-center w-7 h-7 rounded-sm bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                            title="View entity"
+                          >
                             <View className="w-3.5 h-3.5" />
                           </button>
                           <button
