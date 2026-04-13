@@ -308,12 +308,16 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
               placeholder="Search lists by name, description..."
               className="pl-9 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus-visible:ring-[#2A53A0]" />
           </div>
-          <select
-            value={libraryRegion} onChange={e => setLibraryRegion(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2A53A0]/20 min-w-[150px]"
-          >
-            {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+          <div className="kw-dropdown-wrap min-w-[180px]">
+            <Dropdown
+              id="library-region"
+              titleText=""
+              label=""
+              items={REGIONS}
+              selectedItem={libraryRegion}
+              onChange={({ selectedItem }: any) => setLibraryRegion(selectedItem ?? "All Regions")}
+            />
+          </div>
         </div>
 
         {/* Scrollable List */}
@@ -1775,54 +1779,8 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
-
-      {/* Stat Cards */}
-      <div className="flex-none grid grid-cols-3 gap-4 bg-gray-50 dark:bg-gray-900/50">
-        {/* Total Watchlists */}
-        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-              Total Watchlists
-              <span className="text-gray-400 cursor-help" title="Total number of watchlist profiles">ⓘ</span>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{profiles.length}</p>
-          </div>
-          <div className="w-10 h-10 rounded-full border border-[#2A53A0]/30 flex items-center justify-center">
-            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-        </div>
-        {/* Active Watchlists */}
-        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-              Active Watchlists
-              <span className="text-gray-400 cursor-help" title="Currently active watchlist profiles">ⓘ</span>
-            </div>
-            <p className="text-2xl font-bold text-[#2A53A0]">{activeCount}</p>
-          </div>
-          <div className="w-10 h-10 rounded-full border border-green-400/40 bg-green-50/60 flex items-center justify-center">
-            <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" opacity="0.15"/><path d="M8 12l3 3 5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-        </div>
-        {/* Available Lists */}
-        <div className="flex items-center justify-between px-6 py-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-[8px]">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
-              Available Lists
-              <span className="text-gray-400 cursor-help" title="Total sanctions lists in the library">ⓘ</span>
-            </div>
-            <p className="text-2xl font-bold text-[#2A53A0]">{SANCTIONS_LISTS.length}</p>
-          </div>
-          <div className="w-10 h-10 rounded-full border border-blue-300/40 flex items-center justify-center">
-            <svg className="w-5 h-5 text-[#2A53A0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" strokeWidth="2.5"/></svg>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex-none border-b border-gray-200 dark:border-gray-800">
+      {/* Tabs — outside main content */}
+      <div className="flex-none border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4">
         <div className="flex h-[48px] w-full">
           {(["Active", "Inactive", "All Watchlists"] as const).map(tab => (
             <button
@@ -1840,6 +1798,9 @@ export function SanctionsScreeningConfiguration({ breadcrumbs, onBreadcrumbNavig
           ))}
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 overflow-hidden p-4 gap-4">
 
       {/* Search + Buttons (Tab Content Action Bar) */}
       <div className="flex-none bg-white dark:bg-gray-900 px-0 py-0 flex items-center justify-between">

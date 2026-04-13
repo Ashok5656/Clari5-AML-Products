@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Dropdown } from "carbon-components-react";
 import {
   Search, Add, View, Download, DocumentExport, ChevronDown, TrashCan,
   ArrowLeft, Checkmark, Settings,
@@ -10,6 +11,7 @@ import { TableBody, TableCell, TableRow } from "./ui/table";
 import { CarbonPaginationFooter } from "./carbon-pagination-footer";
 import { useSortableData } from "../hooks/use-sortable-data";
 import { SortableHeader } from "./ui/sortable-header";
+import { Badge } from "./ui/badge";
 import { cn } from "./ui/utils";
 import { CreationLoader } from "./creation-loader";
 import { CreationSuccessDialog } from "./creation-success-dialog";
@@ -68,6 +70,19 @@ const RISK_BADGE: Record<RiskLevel, string> = {
   Low:    "bg-green-100 text-green-700",
 };
 
+const CATEGORY_BADGE: Record<Category, string> = {
+  Sanctions:         "bg-orange-100 text-orange-700 border-orange-200",
+  Terrorism:         "bg-red-100 text-red-700 border-red-200",
+  PEP:               "bg-purple-100 text-purple-700 border-purple-200",
+  "Financial Crime": "bg-blue-100 text-blue-700 border-blue-200",
+};
+
+const MATCH_BADGE: Record<MatchType, string> = {
+  "Exact phrase":  "bg-green-100 text-green-700 border-green-200",
+  "Partial match": "bg-gray-100 text-gray-600 border-gray-200",
+  "Regex pattern": "bg-blue-100 text-blue-700 border-blue-200",
+};
+
 
 
 // ── Component ──────────────────────────────────────────────────────────────
@@ -86,7 +101,6 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
   const [newCategory, setNewCategory]   = useState<Category>("Sanctions");
   const [newRisk, setNewRisk]           = useState<RiskLevel>("Medium");
   const [newMatchType, setNewMatchType] = useState<MatchType>("Exact phrase");
-  const [newReason, setNewReason]       = useState("");
   const [narrative, setNarrative]       = useState("");
 
   // submit flow
@@ -113,7 +127,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
   const goToMain = () => { setPageMode("main"); setSelectedKeyword(null); onSubPageChange?.(false); };
   const openCreate = () => {
     setNewPhrase(""); setNewCategory("Sanctions"); setNewRisk("Medium");
-    setNewMatchType("Exact phrase"); setNewReason(""); setNarrative("");
+    setNewMatchType("Exact phrase"); setNarrative("");
     setPageMode("create"); onSubPageChange?.(true);
   };
 
@@ -290,7 +304,6 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
   // ── CREATE KEYWORD PAGE ───────────────────────────────────────────────
   // ══════════════════════════════════════════════════════════════════════
   if (pageMode === "create") {
-    const charLeft = 500 - newReason.length;
     return (
       <div className="flex flex-col h-full bg-white dark:bg-gray-900">
         {isSubmitting && <CreationLoader />}
@@ -315,10 +328,10 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
           </div>
         </div>
 
-        {/* Form body */}
-        <div className="flex-1 flex flex-col overflow-hidden px-6 py-5 gap-5">
+        {/* Form body — one section per row, scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
 
-          {/* Keyword / Phrase — full row */}
+          {/* Row 1 — Keyword / Phrase */}
           <div className="shrink-0 space-y-1.5">
             <label className="text-[13px] font-semibold text-[#161616]">
               Keyword / Phrase <span className="text-[#fb2c36]">*</span>
@@ -331,94 +344,79 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
             />
           </div>
 
-          {/* Category · Risk Level · Match Type — 3 cols */}
+          {/* Row 2 — Category · Risk Level · Match Type (Carbon dropdowns) */}
           <div className="shrink-0 grid grid-cols-3 gap-5">
             <div className="space-y-1.5">
-              <label className="text-[13px] font-semibold text-[#161616]">
-                Category <span className="text-[#fb2c36]">*</span>
-              </label>
-              <select
-                value={newCategory}
-                onChange={e => setNewCategory(e.target.value as Category)}
-                className="w-full h-[46px] px-3 bg-white border border-gray-200 rounded-[8px] text-[14px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
-              >
-                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-              </select>
+              <label className="text-[13px] font-semibold text-[#161616]">Category <span className="text-[#fb2c36]">*</span></label>
+              <div className="kw-dropdown-wrap">
+                <Dropdown
+                  id="kw-category"
+                  titleText=""
+                  label=""
+                  items={CATEGORIES}
+                  selectedItem={newCategory}
+                  onChange={({ selectedItem }: any) => setNewCategory(selectedItem as Category)}
+                />
+              </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[13px] font-semibold text-[#161616]">
-                Risk Level <span className="text-[#fb2c36]">*</span>
-              </label>
-              <select
-                value={newRisk}
-                onChange={e => setNewRisk(e.target.value as RiskLevel)}
-                className="w-full h-[46px] px-3 bg-white border border-gray-200 rounded-[8px] text-[14px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
-              >
-                {RISK_LEVELS.map(r => <option key={r}>{r}</option>)}
-              </select>
+              <label className="text-[13px] font-semibold text-[#161616]">Risk Level <span className="text-[#fb2c36]">*</span></label>
+              <div className="kw-dropdown-wrap">
+                <Dropdown
+                  id="kw-risk"
+                  titleText=""
+                  label=""
+                  items={RISK_LEVELS}
+                  selectedItem={newRisk}
+                  onChange={({ selectedItem }: any) => setNewRisk(selectedItem as RiskLevel)}
+                />
+              </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[13px] font-semibold text-[#161616]">
-                Match Type <span className="text-[#fb2c36]">*</span>
-              </label>
-              <select
-                value={newMatchType}
-                onChange={e => setNewMatchType(e.target.value as MatchType)}
-                className="w-full h-[46px] px-3 bg-white border border-gray-200 rounded-[8px] text-[14px] text-[#161616] focus:outline-none focus:ring-1 focus:ring-[#2a53a0]"
-              >
-                {MATCH_TYPES.map(m => <option key={m}>{m}</option>)}
-              </select>
+              <label className="text-[13px] font-semibold text-[#161616]">Match Type <span className="text-[#fb2c36]">*</span></label>
+              <div className="kw-dropdown-wrap">
+                <Dropdown
+                  id="kw-matchtype"
+                  titleText=""
+                  label=""
+                  items={MATCH_TYPES}
+                  selectedItem={newMatchType}
+                  onChange={({ selectedItem }: any) => setNewMatchType(selectedItem as MatchType)}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="shrink-0 border-t border-gray-100" />
-
-          {/* Reason — card */}
-          <div className="bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden shrink-0">
-            <div className="px-5 py-3 border-b border-gray-100 bg-[#f8fafc]">
-              <h2 className="text-[14px] font-semibold text-[#161616]">Reason for Addition</h2>
-              <p className="text-[12px] text-[#6b7280] mt-0.5">Mandatory — retained in the audit log.</p>
-            </div>
-            <div className="p-5">
-              <textarea
-                rows={3}
-                maxLength={500}
-                value={newReason}
-                onChange={e => setNewReason(e.target.value)}
-                placeholder="Describe why this keyword is being added..."
-                className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
-              />
-              <p className={cn("text-[11px] mt-1 text-right", charLeft < 50 ? "text-red-500" : "text-[#9ca3af]")}>
-                {charLeft} characters remaining
-              </p>
-            </div>
-          </div>
-
-          {/* Live Narrative Tester — card */}
-          <div className="bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden shrink-0">
+          {/* Row 3 — Live Narrative Tester */}
+          <div className="shrink-0 bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-5 py-3 border-b border-gray-100 bg-[#f8fafc]">
               <h2 className="text-[14px] font-semibold text-[#161616]">Live Narrative Tester</h2>
               <p className="text-[12px] text-[#6b7280] mt-0.5">Paste a transaction remark to test keyword matching in real time.</p>
             </div>
-            <div className="p-5 grid grid-cols-2 gap-5">
-              <div>
-                <textarea
-                  rows={4}
-                  value={narrative}
-                  onChange={e => setNarrative(e.target.value)}
-                  placeholder="Paste a transaction remark or narrative here..."
-                  className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
-                />
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold text-[#6b7280] uppercase tracking-wide mb-2">Preview — Matched Keywords Highlighted</p>
-                <div className="min-h-[96px] p-3 bg-gray-50 border border-gray-200 rounded-[8px] text-[13px]">
-                  {narrative.trim() && highlighted ? (
-                    <span className="text-[#161616] leading-relaxed" dangerouslySetInnerHTML={{ __html: highlighted }} />
-                  ) : (
-                    <p className="text-[#9ca3af] leading-relaxed">No narrative entered. Paste text above to see live keyword matches highlighted.</p>
-                  )}
-                </div>
+            <div className="p-5">
+              <textarea
+                rows={4}
+                value={narrative}
+                onChange={e => setNarrative(e.target.value)}
+                placeholder="Paste a transaction remark or narrative here..."
+                className="w-full p-3 bg-white border border-[#d1d5dc] rounded-[8px] text-[14px] text-[#161616] placeholder:text-[#9ca3af] focus:outline-none focus:ring-1 focus:ring-[#2a53a0] resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Row 4 — Preview */}
+          <div className="shrink-0 bg-white rounded-[8px] border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-5 py-3 border-b border-gray-100 bg-[#f8fafc]">
+              <h2 className="text-[14px] font-semibold text-[#161616]">Preview — Matched Keywords Highlighted</h2>
+              <p className="text-[12px] text-[#6b7280] mt-0.5">Active keywords found in the narrative above are highlighted in real time.</p>
+            </div>
+            <div className="p-5">
+              <div className="min-h-[80px] p-3 bg-gray-50 border border-gray-200 rounded-[8px] text-[14px]">
+                {narrative.trim() && highlighted ? (
+                  <span className="text-[#161616] leading-relaxed" dangerouslySetInnerHTML={{ __html: highlighted }} />
+                ) : (
+                  <p className="text-[#9ca3af] leading-relaxed">No narrative entered. Paste text above to see live keyword matches highlighted.</p>
+                )}
               </div>
             </div>
           </div>
@@ -432,7 +430,7 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!newPhrase.trim() || !newReason.trim()}
+            disabled={!newPhrase.trim()}
             className="h-[46px] px-6 rounded-[8px] bg-[#2a53a0] hover:bg-[#1e3a70] text-white"
           >
             Submit
@@ -708,12 +706,14 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
 
                     {/* Keyword phrase */}
                     <TableCell className="pl-4 px-4 align-middle">
-                      <span className="text-sm font-semibold text-[#161616] dark:text-white">{kw.phrase}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{kw.phrase}</span>
                     </TableCell>
 
-                    {/* Category */}
+                    {/* Category badge */}
                     <TableCell className="px-4 align-middle">
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{kw.category}</span>
+                      <Badge variant="secondary" className={cn("text-xs px-2 py-0.5 font-medium whitespace-nowrap", CATEGORY_BADGE[kw.category])}>
+                        {kw.category}
+                      </Badge>
                     </TableCell>
 
                     {/* Risk badge */}
@@ -723,9 +723,11 @@ export function ScreeningKeywordsConfiguration({ onSubPageChange }: { onSubPageC
                       </span>
                     </TableCell>
 
-                    {/* Match type */}
+                    {/* Match type badge */}
                     <TableCell className="px-4 align-middle">
-                      <span className="text-sm text-[#2a53a0] dark:text-[#6b93e6]">{kw.matchType}</span>
+                      <Badge variant="secondary" className={cn("text-xs px-2 py-0.5 font-medium whitespace-nowrap", MATCH_BADGE[kw.matchType])}>
+                        {kw.matchType}
+                      </Badge>
                     </TableCell>
 
                     {/* Date Added */}

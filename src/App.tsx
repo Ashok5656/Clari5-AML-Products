@@ -278,6 +278,7 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [extraBreadcrumbs, setExtraBreadcrumbs] = useState<any[]>([]);
   const [sanctionListSubPage, setSanctionListSubPage] = useState(false);
+  const [keywordsSubPage, setKeywordsSubPage] = useState(false);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(true); // Default to true to show dashboard submenu
@@ -303,6 +304,7 @@ export default function App() {
 
     setExtraBreadcrumbs([]);
     if (item !== "sanctions-sanction-custom-list-management") setSanctionListSubPage(false);
+    if (item !== "config-screening-keywords-configuration") setKeywordsSubPage(false);
     if (item === activeItem) {
       setRefreshKey(prev => prev + 1);
     } else {
@@ -652,7 +654,7 @@ export default function App() {
               />
             </div>
 
-            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "config-sanctions-screening-configuration" && !(activeItem === "sanctions-sanction-custom-list-management" && sanctionListSubPage) && (
+            {activeItem !== "sanctions-sanction-mis-reports" && activeItem !== "config-out-of-the-box-tm-rules-configuration" && !activeItem.startsWith("sanctions-manual-screening") && activeItem !== "config-sanctions-screening-configuration" && !(activeItem === "sanctions-sanction-custom-list-management" && sanctionListSubPage) && !(activeItem === "config-screening-keywords-configuration" && keywordsSubPage) && (
               <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm px-4 py-2 flex items-center justify-between relative">
                 <div className="flex items-center gap-3">
                    {extraBreadcrumbs.length > 0 && activeItem.includes("customer-360-view") ? (
@@ -784,7 +786,7 @@ export default function App() {
                 ) : activeItem === "sanctions-sanction-custom-list-management" ? (
                   <SanctionListManagement onSubPageChange={setSanctionListSubPage} />
                 ) : activeItem === "config-screening-keywords-configuration" ? (
-                  <ScreeningKeywordsConfiguration />
+                  <ScreeningKeywordsConfiguration onSubPageChange={setKeywordsSubPage} />
                 ) : activeItem === "sanctions-sanction-mis-reports" ? (
                   <SanctionMisReports 
                     breadcrumbs={currentContent.breadcrumbs}

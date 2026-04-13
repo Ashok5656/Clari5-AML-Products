@@ -102,6 +102,45 @@
   font-size: 13px !important;
 }
 
+/* Keyword dropdown wrapper — 46px height with visible border */
+.kw-dropdown-wrap {
+  border: 1px solid #d1d5dc;
+  border-radius: 8px;
+  background: #ffffff;
+  height: 46px;
+  position: relative;
+  overflow: visible;
+}
+.kw-dropdown-wrap:has(.bx--list-box--expanded) {
+  border-color: #2a53a0;
+}
+.kw-dropdown-wrap .bx--dropdown,
+.kw-dropdown-wrap .bx--list-box {
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  height: 46px !important;
+}
+.kw-dropdown-wrap .bx--list-box__field {
+  height: 46px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+}
+.kw-dropdown-wrap .bx--list-box__menu {
+  border-radius: 8px !important;
+  margin-top: 4px !important;
+  overflow: hidden !important;
+  top: 46px !important;
+}
+.kw-dropdown-wrap .bx--label {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #161616 !important;
+  margin-bottom: 4px !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
