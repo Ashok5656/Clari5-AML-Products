@@ -234,7 +234,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
     <div className="flex flex-col h-full overflow-hidden bg-gray-50">
       {/* ═══ Filter Panel ═══════════════════════════════ */}
       <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
-        <div className="px-5 pt-4 pb-3.5 space-y-3">
+        <div className="px-4 pt-4 pb-3.5 space-y-3">
 
           {/* Row 1: All filter fields in one line — full width */}
           <div className="flex gap-3 items-end w-full">
