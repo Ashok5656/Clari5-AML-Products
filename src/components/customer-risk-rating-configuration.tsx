@@ -19,8 +19,8 @@ interface CustomerRiskRatingConfigurationProps {
   onBreadcrumbNavigate?: (path: string) => void;
 }
 
-type RiskLevel = "Extreme" | "High" | "Medium-High" | "Medium" | "Low";
-type OverrideOption = "No" | "Yes" | "Override to High" | "Override to Medium-High" | "Override to Medium";
+type RiskLevel = "Extreme" | "High" | "Medium-High" | "Medium" | "Low-Medium" | "Low";
+type OverrideOption = "No" | "Yes" | "Yes – Prohibit" | "Override to High" | "Override to Medium-High" | "Override to Medium";
 
 interface Parameter {
   id: string;
@@ -52,7 +52,8 @@ const RISK_SCORE_MAP: Record<RiskLevel, number> = {
   High: 75,
   "Medium-High": 60,
   Medium: 40,
-  Low: 20,
+  "Low-Medium": 25,
+  Low: 10,
 };
 
 const getScoreColor = (score: number): string => {
@@ -77,6 +78,7 @@ const initialCategories: Category[] = [
   { id: "1.6", number: "1.6", label: "PEP & Political Exposure Risk",      weight: 8  },
   { id: "1.7", number: "1.7", label: "Adverse Media & Reputational Risk",  weight: 5  },
   { id: "1.8", number: "1.8", label: "Channel & Delivery Risk",            weight: 2  },
+  { id: "1.9", number: "1.9", label: "Entity Type & Corporate Structure",  weight: 1  },
 ];
 
 const initialSubSections: Record<string, SubSection[]> = {
@@ -224,8 +226,36 @@ const initialSubSections: Record<string, SubSection[]> = {
         { id: "p801", label: "Customer Onboarded via Fully Digital / Remote Channel",        enabled: true, riskLevel: "Medium",      score: 40, override: "No" },
         { id: "p802", label: "Transactions Initiated from High-Risk IP / Device",            enabled: true, riskLevel: "High",        score: 75, override: "No" },
         { id: "p803", label: "Use of Anonymising Technology (VPN / TOR / Proxy)",            enabled: true, riskLevel: "High",        score: 75, override: "Override to High" },
-        { id: "p804", label: "Mobile-Only / Branchless Banking Customer",                    enabled: true, riskLevel: "Low",         score: 20, override: "No" },
+        { id: "p804", label: "Mobile-Only / Branchless Banking Customer",                    enabled: true, riskLevel: "Low",         score: 10, override: "No" },
         { id: "p805", label: "Third-Party Payment Initiation (Open Banking / API)",   isNew: true, enabled: true, riskLevel: "Medium-High", score: 60, override: "No" },
+      ],
+    },
+  ],
+  "1.9": [
+    {
+      id: "1.9.1", number: "1.9.1", title: "ENTITY TYPE CLASSIFICATION",
+      parameters: [
+        { id: "p901", label: "Shell Company (No Operations)",              enabled: true, riskLevel: "Extreme",     score: 100, override: "Yes – Prohibit" },
+        { id: "p902", label: "Trust",                                      enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p903", label: "Foundation",                                 enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p904", label: "Offshore Company",                           enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p905", label: "Shelf Company (Recently Activated)",         enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p906", label: "No Trade License / Operating Illegally",     enabled: true, riskLevel: "High",        score: 75,  override: "Override to High" },
+        { id: "p907", label: "Charity / Non-Profit",                       enabled: true, riskLevel: "Medium-High", score: 60,  override: "No" },
+        { id: "p908", label: "Private Limited Company (LLC)",              enabled: true, riskLevel: "Low",         score: 10,  override: "No" },
+        { id: "p909", label: "Government / Government Entity",             enabled: true, riskLevel: "Low",         score: 10,  override: "No" },
+      ],
+    },
+    {
+      id: "1.9.2", number: "1.9.2", title: "CORPORATE STRUCTURE COMPLEXITY",
+      parameters: [
+        { id: "p910", label: "Complex Group Structure (>3 layers)",        enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p911", label: "Circular Ownership",                         enabled: true, riskLevel: "High",        score: 75,  override: "No" },
+        { id: "p912", label: "Multi-Jurisdictional Structure",             enabled: true, riskLevel: "Medium-High", score: 60,  override: "No" },
+        { id: "p913", label: "Frequent Corporate Restructuring",           enabled: true, riskLevel: "Medium-High", score: 60,  override: "No" },
+        { id: "p914", label: "Startup Company (< 2 years)",               enabled: true, riskLevel: "Medium-High", score: 60,  override: "No" },
+        { id: "p915", label: "Established Company (2–5 years)",           enabled: true, riskLevel: "Low-Medium",  score: 25,  override: "No" },
+        { id: "p916", label: "Mature Company (> 5 years)",                enabled: true, riskLevel: "Low",         score: 10,  override: "No" },
       ],
     },
   ],
@@ -420,7 +450,7 @@ export function CustomerRiskRatingConfiguration(_props: CustomerRiskRatingConfig
                             id={`risk-${param.id}`}
                             titleText=""
                             label=""
-                            items={["Extreme", "High", "Medium-High", "Medium", "Low"]}
+                            items={["Extreme", "High", "Medium-High", "Medium", "Low-Medium", "Low"]}
                             selectedItem={param.riskLevel}
                             onChange={({ selectedItem }: any) =>
                               updateParameter(selectedCategoryId, param.id, "riskLevel", selectedItem as RiskLevel)
@@ -446,7 +476,7 @@ export function CustomerRiskRatingConfiguration(_props: CustomerRiskRatingConfig
                             id={`override-${param.id}`}
                             titleText=""
                             label=""
-                            items={["No", "Yes", "Override to High", "Override to Medium-High", "Override to Medium"]}
+                            items={["No", "Yes", "Yes – Prohibit", "Override to High", "Override to Medium-High", "Override to Medium"]}
                             selectedItem={param.override}
                             onChange={({ selectedItem }: any) =>
                               updateParameter(selectedCategoryId, param.id, "override", selectedItem as OverrideOption)
