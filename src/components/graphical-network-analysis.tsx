@@ -234,12 +234,15 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
     <div className="flex flex-col h-full overflow-hidden bg-gray-50">
       {/* ═══ Filter Panel ═══════════════════════════════ */}
       <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
-        <div className="px-4 pt-4 pb-3.5 space-y-3">
 
-          {/* Row 1: All filter fields in one line — full width */}
-          <div className="flex gap-3 items-end w-full">
-            {/* Customer Search — flex-[2] for slightly wider */}
-            <div className="flex flex-col gap-1 flex-[2] min-w-0">
+        {/* ── Filter fields ── */}
+        <div className="px-5 pt-3 pb-2.5 space-y-2.5">
+
+          {/* Row 1: Search + grouped date + grouped amount + txn type + levels */}
+          <div className="flex gap-2.5 items-end w-full">
+
+            {/* Customer Search */}
+            <div className="flex flex-col gap-1 flex-[2.5] min-w-0">
               <FilterLabel>Customer ID / Name / Account No.</FilterLabel>
               <div className="relative">
                 <FilterInput
@@ -252,35 +255,41 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               </div>
             </div>
 
-            {/* Date From */}
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <FilterLabel>Date From</FilterLabel>
-              <FilterInput type="date" value={filters.dateFrom}
-                onChange={e => setFilter('dateFrom', e.target.value)} className="w-full" />
-            </div>
-
-            {/* Date To */}
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <FilterLabel>Date To</FilterLabel>
-              <FilterInput type="date" value={filters.dateTo}
-                onChange={e => setFilter('dateTo', e.target.value)} className="w-full" />
-            </div>
-
-            {/* Amount Range — unified range component */}
+            {/* Date Range — two inputs under one label */}
             <div className="flex flex-col gap-1 flex-[2] min-w-0">
-              <FilterLabel>Transaction Amount Range</FilterLabel>
-              <div className="flex items-center h-[46px] border border-[#d1d5dc] rounded-[8px] bg-white overflow-hidden focus-within:ring-1 focus-within:ring-[#2a53a0] transition-all">
-                <input
-                  type="text" placeholder="Min"
-                  value={filters.amountMin}
-                  onChange={e => setFilter('amountMin', e.target.value)}
-                  className="flex-1 min-w-0 h-full px-3 text-[14px] text-[#161616] placeholder:text-[#9ca3af] bg-transparent focus:outline-none" />
-                <span className="text-[#d1d5dc] text-base select-none flex-shrink-0 px-1">—</span>
-                <input
-                  type="text" placeholder="Max"
-                  value={filters.amountMax}
-                  onChange={e => setFilter('amountMax', e.target.value)}
-                  className="flex-1 min-w-0 h-full px-3 text-[14px] text-[#161616] placeholder:text-[#9ca3af] bg-transparent focus:outline-none" />
+              <FilterLabel>Date Range</FilterLabel>
+              <div className="flex items-center gap-1.5">
+                <FilterInput type="date" value={filters.dateFrom}
+                  onChange={e => setFilter('dateFrom', e.target.value)}
+                  className="flex-1 min-w-0" />
+                <span className="text-[#c4c9d4] text-[15px] select-none flex-shrink-0 font-light">→</span>
+                <FilterInput type="date" value={filters.dateTo}
+                  onChange={e => setFilter('dateTo', e.target.value)}
+                  className="flex-1 min-w-0" />
+              </div>
+            </div>
+
+            {/* Amount Range — two number inputs under one label */}
+            <div className="flex flex-col gap-1 flex-[2] min-w-0">
+              <FilterLabel>Amount Range</FilterLabel>
+              <div className="flex items-center gap-1.5">
+                <div className="relative flex-1 min-w-0">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">$</span>
+                  <FilterInput
+                    type="number" placeholder="Min"
+                    value={filters.amountMin}
+                    onChange={e => setFilter('amountMin', e.target.value)}
+                    className="pl-5 w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                </div>
+                <span className="text-[#c4c9d4] text-[15px] select-none flex-shrink-0 font-light">—</span>
+                <div className="relative flex-1 min-w-0">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">$</span>
+                  <FilterInput
+                    type="number" placeholder="Max"
+                    value={filters.amountMax}
+                    onChange={e => setFilter('amountMax', e.target.value)}
+                    className="pl-5 w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                </div>
               </div>
             </div>
 
@@ -289,7 +298,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               <FilterLabel>Transaction Type</FilterLabel>
               <button
                 onClick={() => setTxnTypeOpen(o => !o)}
-                className="border border-[#d1d5dc] rounded-[8px] px-3 h-[46px] w-full flex items-center justify-between bg-white text-[14px] text-[#161616] cursor-pointer hover:border-[#2a53a0] transition-colors focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
+                className="border border-[#d1d5dc] rounded-[8px] px-3 h-[46px] w-full flex items-center justify-between bg-white text-[13px] text-[#161616] cursor-pointer hover:border-[#2a53a0] transition-colors focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
                 <span className="truncate">
                   {filters.txnTypes.length === TXN_TYPES.length ? 'All Types' : filters.txnTypes.length > 0 ? `${filters.txnTypes.length} selected` : 'Select…'}
                 </span>
@@ -313,32 +322,34 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
             <div className="flex flex-col gap-1 flex-1 min-w-0">
               <FilterLabel># of Levels</FilterLabel>
               <select value={filters.levels} onChange={e => setFilter('levels', Number(e.target.value))}
-                className="border border-[#d1d5dc] bg-white rounded-[8px] px-3 h-[46px] w-full text-[14px] text-[#161616] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2a53a0] transition-colors appearance-none pr-7"
+                className="border border-[#d1d5dc] bg-white rounded-[8px] px-3 h-[46px] w-full text-[13px] text-[#161616] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2a53a0] transition-colors appearance-none pr-7"
                 style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 6px center', backgroundSize: '16px' }}>
                 {[1, 2, 3, 4].map(l => <option key={l} value={l}>Level {l}</option>)}
               </select>
             </div>
           </div>
 
-          {/* Row 3: Checkboxes + Action buttons */}
-          <div className="flex flex-wrap items-center gap-y-2 gap-x-3">
+          {/* Row 2: Display options */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10.5px] font-bold text-[#9ca3af] uppercase tracking-widest flex-shrink-0 whitespace-nowrap">Display</span>
+            <div className="w-px h-3.5 bg-gray-200 flex-shrink-0" />
             <div className="flex flex-wrap gap-1.5 flex-1">
               {CHECKBOX_OPTIONS.map(opt => {
                 const checked = filters[opt.key] as boolean;
                 return (
                   <label key={opt.key} className={cn(
-                    'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-medium cursor-pointer select-none transition-all border',
+                    'flex items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-medium cursor-pointer select-none transition-all border',
                     checked
                       ? 'bg-[#2A53A0]/8 border-[#2A53A0]/30 text-[#2A53A0]'
-                      : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300'
+                      : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-600'
                   )}>
                     <div className={cn(
-                      'w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 border transition-colors',
+                      'w-3 h-3 rounded flex items-center justify-center flex-shrink-0 border transition-colors',
                       checked ? 'bg-[#2A53A0] border-[#2A53A0]' : 'border-gray-300 bg-white'
                     )}>
                       {checked && (
-                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 10">
-                          <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 10 10">
+                          <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
                     </div>
@@ -350,23 +361,25 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 );
               })}
             </div>
-
-            <div className="flex gap-2 flex-shrink-0">
-              <button onClick={handleViewNetwork} disabled={!filters.customerSearch.trim() || isLoading}
-                className="bg-[#2A53A0] hover:bg-[#1f3d7a] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-[8px] px-5 h-[46px] text-[14px] font-semibold flex items-center gap-2 transition-colors shadow-sm">
-                {isLoading
-                  ? <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                      className="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full" />
-                  : <Search className="w-3.5 h-3.5" />
-                }
-                View Network Links
-              </button>
-              <button onClick={() => { setFilters({ ...DEFAULT_FILTERS }); setGraphVisible(false); setSelectedNode(null); }}
-                className="bg-white border border-[#d1d5dc] hover:bg-gray-50 text-[#161616] rounded-[8px] px-5 h-[46px] text-[14px] font-semibold transition-colors">
-                Reset Filters
-              </button>
-            </div>
           </div>
+
+          {/* Row 3: Action buttons */}
+          <div className="flex items-center gap-2 pt-0.5 pb-0.5">
+            <button onClick={handleViewNetwork} disabled={!filters.customerSearch.trim() || isLoading}
+              className="bg-[#2A53A0] hover:bg-[#1f3d7a] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-[8px] px-5 h-[40px] text-[13px] font-semibold flex items-center gap-2 transition-colors shadow-sm">
+              {isLoading
+                ? <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                    className="inline-block w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full" />
+                : <Search className="w-3.5 h-3.5" />
+              }
+              View Network Links
+            </button>
+            <button onClick={() => { setFilters({ ...DEFAULT_FILTERS }); setGraphVisible(false); setSelectedNode(null); }}
+              className="bg-white border border-[#d1d5dc] hover:bg-gray-50 text-[#374151] rounded-[8px] px-5 h-[40px] text-[13px] font-semibold transition-colors">
+              Reset Filters
+            </button>
+          </div>
+
         </div>
       </div>
 
