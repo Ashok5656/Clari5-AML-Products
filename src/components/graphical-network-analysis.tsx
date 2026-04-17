@@ -90,8 +90,8 @@ const MOCK_ALERTS = [
   { rule: 'PEP Association Alert',        date: '25 Jan 2025', desc: 'Account transacting with known PEP — Priya Sharma (CUST-078).' },
 ];
 const MOCK_COMMON_LINKS = [
-  { icon: '📱', type: 'Common Phone Number',  entity: 'Unknown Payee', value: '+971 50 XXX XXXX (masked)' },
-  { icon: '✉️', type: 'Common Email Domain',  entity: 'Shell Ltd',     value: 'ops@acme-group.com' },
+  { icon: '📱', type: 'Common Phone Number',  entity: 'Gulf Trade LLC', value: '+971 50 XXX XXXX (masked)' },
+  { icon: '✉️', type: 'Common Email Domain',  entity: 'Shell Ltd',      value: 'ops@acme-group.com' },
 ];
 
 // ─── Mock Data ──────────────────────────────────────────
@@ -99,7 +99,7 @@ const MOCK_NODES: GNode[] = [
   { id: 'focal',       label: 'ACME Corp',      subLabel: 'CUST-001',      icon: '🏢', level: 0, riskLevel: 'HIGH', badges: ['str'],             x: 390, y: 220, customerId: 'CUST-001', entityType: 'Non-Individual / Corporate',     address: '42, Commercial Zone, Mumbai', email: 'ops@acmecorp.in',       contact: '+91 98765 43210', strFiled: 'Yes — 12 Feb 2025', totalTxnAmount: '₹1,24,50,000', incoming: '₹85,00,000 (32 txns)', outgoing: '₹39,50,000 (18 txns)' },
   { id: 'l1-left',    label: 'Raj Kumar',       subLabel: 'CUST-012',      icon: '👤', level: 1, riskLevel: 'MED', badges: ['adverse'],          x: 215, y: 220, customerId: 'CUST-012', entityType: 'Individual',                    address: '12, Park Avenue, Delhi',      email: 'raj.kumar@email.com',   contact: '+91 87654 32109',                                   totalTxnAmount: '₹12,50,000',    incoming: '₹5,00,000 (8 txns)',   outgoing: '₹7,50,000 (12 txns)' },
   { id: 'l1-right',   label: 'Global Bank',     subLabel: 'CUST-034',      icon: '🏦', level: 1, riskLevel: 'LOW', badges: [],                   x: 565, y: 220, customerId: 'CUST-034', entityType: 'Financial Institution',         address: '1, Bank Street, Hyderabad',   email: 'ops@globalbank.com',    contact: '+91 40 2345 6789',                                  totalTxnAmount: '₹8,20,000',     incoming: '₹8,20,000 (6 txns)',   outgoing: '—' },
-  { id: 'l1-bottom',  label: 'Unknown Payee',   subLabel: 'Non-Customer',  icon: '👤', level: 1, riskLevel: 'HIGH', isAlertNode: true, badges: ['highRiskCountry'], x: 390, y: 372, customerId: '—', entityType: 'Non-Customer / Individual', address: 'Dubai, UAE',                  email: '—',                     contact: '—',                      strFiled: 'Pending',           totalTxnAmount: '₹45,00,000',    incoming: '—',                    outgoing: '₹45,00,000 (3 txns)' },
+  { id: 'l1-bottom',  label: 'Gulf Trade LLC',  subLabel: 'Non-Customer',  icon: '🏢', level: 1, riskLevel: 'HIGH', isAlertNode: true, badges: ['highRiskCountry', 'sanction'], x: 390, y: 372, customerId: '—', entityType: 'Non-Individual / Corporate', address: 'Dubai, UAE', email: 'info@gulftrade.ae', contact: '+971 4 XXX XXXX', strFiled: 'Pending', totalTxnAmount: '₹45,00,000', incoming: '—', outgoing: '₹45,00,000 (3 txns)' },
   { id: 'l1-topleft', label: 'Priya Sharma',    subLabel: 'CUST-078',      icon: '👤', level: 1, riskLevel: 'LOW', badges: ['pep'],               x: 268, y: 128, customerId: 'CUST-078', entityType: 'Individual / PEP',             address: '7, Civil Lines, Chennai',     email: 'priya.s@email.com',     contact: '+91 94456 78901',                                   totalTxnAmount: '₹3,40,000',     incoming: '₹3,40,000 (4 txns)',   outgoing: '—' },
   { id: 'l1-topright',label: 'Shell Ltd',       subLabel: 'Non-Customer',  icon: '🏢', level: 1, riskLevel: 'MED', badges: ['sanction'],          x: 512, y: 128, customerId: '—',        entityType: 'Non-Individual / Shell Company', address: 'Cayman Islands',             email: '—',                     contact: '—',                                                 totalTxnAmount: '₹22,00,000',    incoming: '₹22,00,000 (5 txns)', outgoing: '—' },
   { id: 'l2-tl',      label: 'Ali Merchants',   subLabel: '',              icon: '👤', level: 2, riskLevel: 'LOW', badges: [],                   x: 118, y: 96,  customerId: '—', entityType: 'Individual',  address: '—', email: '—', contact: '—', totalTxnAmount: '—', incoming: '—', outgoing: '—' },
@@ -112,9 +112,9 @@ const MOCK_EDGES: GEdge[] = [
   { source: 'focal',       target: 'l1-left',    type: 'normal',       amount: '₹12.5L', direction: 'both', strokeWidth: 3   },
   { source: 'focal',       target: 'l1-right',   type: 'normal',       amount: '₹8.2L',  direction: 'out',  strokeWidth: 2.5 },
   { source: 'focal',       target: 'l1-bottom',  type: 'alerted',      amount: '₹45L',   direction: 'out',  strokeWidth: 5   },
+  { source: 'l1-left',     target: 'l1-bottom',  type: 'commonContact',                                    strokeWidth: 1.5 },
   { source: 'focal',       target: 'l1-topleft', type: 'normal',       amount: '₹3.4L',  direction: 'in',   strokeWidth: 2   },
   { source: 'focal',       target: 'l1-topright',type: 'normal',       amount: '₹22L',   direction: 'in',   strokeWidth: 3.5 },
-  { source: 'l1-left',     target: 'l1-bottom',  type: 'commonContact',                                    strokeWidth: 1.5 },
   { source: 'l1-topleft',  target: 'l2-tl',      type: 'normal',       amount: '₹2L',    direction: 'out',  strokeWidth: 1.5 },
   { source: 'l1-topright', target: 'l2-tr',      type: 'normal',       amount: '₹5L',    direction: 'in',   strokeWidth: 2   },
   { source: 'l1-right',    target: 'l2-br',      type: 'normal',       amount: '₹3L',    direction: 'out',  strokeWidth: 1.5 },
