@@ -141,6 +141,561 @@
   margin-bottom: 4px !important;
 }
 
+/* ── MultiSelect overrides inside kw-dropdown-wrap ─────── */
+/* Count badge */
+.kw-dropdown-wrap .bx--list-box__selection--multi {
+  background-color: #2A53A0 !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
+  padding: 0 6px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+  margin-right: 4px !important;
+}
+.kw-dropdown-wrap .bx--list-box__selection--multi svg {
+  fill: #ffffff !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+/* Checkbox items inside MultiSelect dropdown */
+.kw-dropdown-wrap .bx--checkbox-label {
+  font-size: 13px !important;
+  color: #161616 !important;
+  padding-left: 1.5rem !important;
+  user-select: none !important;
+}
+.kw-dropdown-wrap .bx--checkbox-label::before {
+  width: 14px !important;
+  height: 14px !important;
+  border: 1.5px solid #8d8d8d !important;
+  border-radius: 2px !important;
+  top: 1px !important;
+}
+.kw-dropdown-wrap .bx--checkbox:checked + .bx--checkbox-label::before {
+  background-color: #2A53A0 !important;
+  border-color: #2A53A0 !important;
+}
+.kw-dropdown-wrap .bx--checkbox:checked + .bx--checkbox-label::after {
+  border-color: #ffffff !important;
+  top: 5px !important;
+  left: 3px !important;
+}
+.kw-dropdown-wrap .bx--list-box__menu-item--active {
+  background-color: #eef2fa !important;
+}
+/* Placeholder text colour */
+.kw-dropdown-wrap .bx--list-box__label {
+  color: #9ca3af !important;
+}
+.kw-dropdown-wrap .bx--list-box--has-selection .bx--list-box__label {
+  color: #161616 !important;
+}
+
+/* ── filter-wrap: Carbon Dropdown / MultiSelect inside filter panel ── */
+.filter-wrap {
+  border: 1px solid #d1d5dc;
+  border-radius: 8px;
+  background: #ffffff;
+  height: 46px;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: stretch;
+}
+.filter-wrap:has(.bx--list-box--expanded) {
+  border-color: #2a53a0;
+  box-shadow: 0 0 0 1px #2a53a0;
+}
+
+/* ── Level 1 outer wrappers (Dropdown = bx--dropdown__wrapper, MultiSelect = bx--multi-select__wrapper) */
+.filter-wrap .bx--dropdown__wrapper,
+.filter-wrap .bx--list-box__wrapper,
+.filter-wrap .bx--multi-select__wrapper {
+  height: 46px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+/* ── Hide Carbon's internal label — we use FilterLabel outside ── */
+.filter-wrap .bx--label,
+.filter-wrap .bx--visually-hidden,
+.filter-wrap .bx--form-requirement,
+.filter-wrap .bx--form__helper-text {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ── Level 2: the list-box container ── */
+.filter-wrap .bx--dropdown,
+.filter-wrap .bx--list-box,
+.filter-wrap .bx--multi-select {
+  width: 100% !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  position: relative !important;
+}
+
+/* ── Level 3 (MultiSelect only): bx--list-box__field--wrapper ── */
+.filter-wrap .bx--list-box__field--wrapper {
+  height: 46px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+/* ── Level 4: the actual clickable trigger field ── */
+.filter-wrap .bx--list-box__field {
+  height: 46px !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  flex: 1 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 10px 0 12px !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.filter-wrap .bx--list-box__field:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Placeholder / selected-item text ── */
+.filter-wrap .bx--list-box__label {
+  font-size: 13px !important;
+  color: #9ca3af !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+.filter-wrap .bx--list-box--has-selection .bx--list-box__label {
+  color: #161616 !important;
+}
+
+/* ── Chevron icon ── */
+.filter-wrap .bx--list-box__menu-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  background: none !important;
+}
+.filter-wrap .bx--list-box__menu-icon svg {
+  fill: #525252 !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* ── Dropdown menu panel ── */
+.filter-wrap .bx--list-box__menu {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: -1px !important;
+  right: -1px !important;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14) !important;
+  z-index: 9999 !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  padding: 4px 0 !important;
+}
+.filter-wrap .bx--list-box__menu-item {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  height: auto !important;
+}
+.filter-wrap .bx--list-box__menu-item__option {
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #161616 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  border: none !important;
+  height: auto !important;
+}
+.filter-wrap .bx--list-box__menu-item:hover .bx--list-box__menu-item__option,
+.filter-wrap .bx--list-box__menu-item--highlighted .bx--list-box__menu-item__option {
+  background: #eef2fa !important;
+  color: #161616 !important;
+}
+.filter-wrap .bx--list-box__menu-item--active .bx--list-box__menu-item__option {
+  background: #eef2fa !important;
+  color: #2a53a0 !important;
+  font-weight: 600 !important;
+}
+
+/* ── MultiSelect — count badge ── */
+.filter-wrap .bx--list-box__selection--multi {
+  background-color: #2A53A0 !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+  min-width: 1.375rem !important;
+  height: 1.375rem !important;
+  padding: 0 6px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+  margin-right: 4px !important;
+  cursor: pointer !important;
+  border: none !important;
+  outline: none !important;
+}
+.filter-wrap .bx--list-box__selection--multi svg {
+  fill: #ffffff !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+/* ── MultiSelect — checkbox items in dropdown ── */
+.filter-wrap .bx--checkbox-wrapper {
+  width: 100% !important;
+}
+.filter-wrap .bx--checkbox-label {
+  font-size: 13px !important;
+  color: #161616 !important;
+  padding-left: 1.75rem !important;
+  line-height: 1.4 !important;
+  user-select: none !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.filter-wrap .bx--checkbox-label::before {
+  width: 14px !important;
+  height: 14px !important;
+  border: 1.5px solid #8d8d8d !important;
+  border-radius: 2px !important;
+  top: 2px !important;
+  left: 0 !important;
+}
+.filter-wrap .bx--checkbox:checked + .bx--checkbox-label::before {
+  background-color: #2A53A0 !important;
+  border-color: #2A53A0 !important;
+}
+.filter-wrap .bx--checkbox:checked + .bx--checkbox-label::after {
+  border-color: #ffffff !important;
+  top: 5px !important;
+  left: 2px !important;
+  width: 9px !important;
+  height: 5px !important;
+}
+.filter-wrap .bx--list-box__menu-item--active {
+  background-color: #eef2fa !important;
+}
+
+/* ── carbon-field-border: visual border wrapper around Carbon Dropdown/MultiSelect ── */
+.carbon-field-border {
+  border: 1px solid #d1d5dc;
+  border-radius: 8px;
+  background: #ffffff;
+  height: 46px;
+  position: relative;
+  overflow: visible;
+}
+.carbon-field-border:has(.bx--list-box--expanded) {
+  border-color: #2a53a0;
+  box-shadow: 0 0 0 1px #2a53a0;
+}
+
+/* ── filter-carbon: className applied directly on Carbon component ──────────
+   .filter-carbon === bx--dropdown__wrapper (Dropdown)
+                   === bx--multi-select__wrapper (MultiSelect)
+   Border lives HERE; children stretch to fill the 46px height.
+   ─────────────────────────────────────────────────────────────────────────── */
+.filter-carbon {
+  border: 1px solid #d1d5dc !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  height: 46px !important;
+  position: relative !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: stretch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.filter-carbon:has(.bx--list-box--expanded) {
+  border-color: #2a53a0 !important;
+  box-shadow: 0 0 0 1px #2a53a0 !important;
+}
+
+/* Hide Carbon's internal label — FilterLabel is rendered outside */
+.filter-carbon .bx--label,
+.filter-carbon .bx--visually-hidden,
+.filter-carbon .bx--form-requirement,
+.filter-carbon .bx--form__helper-text {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Level 2: the list-box container */
+.filter-carbon .bx--dropdown,
+.filter-carbon .bx--list-box,
+.filter-carbon .bx--multi-select {
+  width: 100% !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  flex: 1 !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Level 3 (MultiSelect only): extra field-wrapper div */
+.filter-carbon .bx--list-box__field--wrapper {
+  height: 46px !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Level 4: the clickable trigger */
+.filter-carbon .bx--list-box__field {
+  height: 46px !important;
+  width: auto !important;
+  min-height: 46px !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 10px 0 12px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+.filter-carbon .bx--list-box__field:focus,
+.filter-carbon .bx--list-box__field:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Placeholder / selected-item text */
+.filter-carbon .bx--list-box__label {
+  font-size: 13px !important;
+  color: #9ca3af !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+.filter-carbon .bx--list-box--has-selection .bx--list-box__label {
+  color: #161616 !important;
+}
+
+/* Chevron icon */
+.filter-carbon .bx--list-box__menu-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: none !important;
+  background: none !important;
+}
+.filter-carbon .bx--list-box__menu-icon svg {
+  fill: #525252 !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Dropdown menu panel */
+.filter-carbon .bx--list-box__menu {
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: -1px !important;
+  right: -1px !important;
+  background: #ffffff !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14) !important;
+  z-index: 9999 !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  padding: 4px 0 !important;
+}
+.filter-carbon .bx--list-box__menu-item {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  height: auto !important;
+}
+.filter-carbon .bx--list-box__menu-item__option {
+  display: flex !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  color: #161616 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  border: none !important;
+  height: auto !important;
+}
+.filter-carbon .bx--list-box__menu-item:hover .bx--list-box__menu-item__option,
+.filter-carbon .bx--list-box__menu-item--highlighted .bx--list-box__menu-item__option {
+  background: #eef2fa !important;
+  color: #161616 !important;
+}
+.filter-carbon .bx--list-box__menu-item--active .bx--list-box__menu-item__option {
+  background: #eef2fa !important;
+  color: #2a53a0 !important;
+  font-weight: 600 !important;
+}
+
+/* MultiSelect — count badge
+   Carbon v10 renders the badge as bx--tag.bx--tag--filter.bx--tag--high-contrast
+   (NOT bx--list-box__selection--multi — that is an old alias only on the fallback path) */
+.filter-carbon .bx--tag--filter,
+.filter-carbon .bx--list-box__selection--multi {
+  background-color: #2a53a0 !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+  height: 1.5rem !important;
+  min-height: 1.5rem !important;
+  max-height: 1.5rem !important;
+  padding: 0 6px 0 8px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  flex-shrink: 0 !important;
+  min-width: auto !important;
+  width: auto !important;
+  margin: 0 6px 0 6px !important;
+  align-self: center !important;
+  cursor: pointer !important;
+  border: none !important;
+  outline: none !important;
+}
+/* The count number inside the badge */
+.filter-carbon .bx--tag--filter .bx--tag__label {
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+/* The × close icon inside the badge */
+.filter-carbon .bx--tag--filter .bx--tag__close-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+.filter-carbon .bx--tag--filter .bx--tag__close-icon svg,
+.filter-carbon .bx--list-box__selection--multi svg {
+  fill: #ffffff !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Suppress Carbon's bx--tag--high-contrast dark background override */
+.filter-carbon .bx--tag--high-contrast {
+  background-color: #2a53a0 !important;
+  color: #ffffff !important;
+}
+
+/* MultiSelect — checkbox items in dropdown */
+.filter-carbon .bx--checkbox-wrapper {
+  width: 100% !important;
+}
+.filter-carbon .bx--checkbox-label {
+  font-size: 13px !important;
+  color: #161616 !important;
+  padding-left: 1.75rem !important;
+  line-height: 1.4 !important;
+  user-select: none !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.filter-carbon .bx--checkbox-label::before {
+  width: 14px !important;
+  height: 14px !important;
+  border: 1.5px solid #8d8d8d !important;
+  border-radius: 2px !important;
+  top: 2px !important;
+  left: 0 !important;
+}
+.filter-carbon .bx--checkbox:checked + .bx--checkbox-label::before {
+  background-color: #2a53a0 !important;
+  border-color: #2a53a0 !important;
+}
+.filter-carbon .bx--checkbox:checked + .bx--checkbox-label::after {
+  border-color: #ffffff !important;
+  top: 5px !important;
+  left: 2px !important;
+  width: 9px !important;
+  height: 5px !important;
+}
+.filter-carbon .bx--list-box__menu-item--active {
+  background-color: #eef2fa !important;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

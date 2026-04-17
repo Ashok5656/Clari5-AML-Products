@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from "motion/react";
-import { ZoomIn, ZoomOut, FitToScreen, Search, ChevronDown } from "@carbon/icons-react";
+import { ZoomIn, ZoomOut, FitToScreen, Search } from "@carbon/icons-react";
 import { cn } from "./ui/utils";
+import { Dropdown, MultiSelect } from "carbon-components-react";
 
 // ─── Types ─────────────────────────────────────────────
 type RiskLevel = 'HIGH' | 'MED' | 'LOW';
@@ -49,6 +50,8 @@ const CHECKBOX_OPTIONS: { key: keyof Filters; label: string }[] = [
   { key: 'showCommonLinks',   label: 'Show Common Links' },
   { key: 'showNonCustomers',  label: 'Customer & Non-Customer Links' },
 ];
+const DISPLAY_ITEMS = CHECKBOX_OPTIONS.map(o => ({ id: o.key, label: o.label }));
+const LEVEL_ITEMS = [1, 2, 3, 4].map(l => ({ id: l, label: `Level ${l}` }));
 const BADGE_ICONS: Record<BadgeType, string> = {
   highRiskCountry: '⛔', sanction: '🚫', adverse: '📰', pep: 'PEP',
   str: '🔔', dormant: '💤', mule: '🧟',
@@ -148,21 +151,59 @@ function FilterInput({ className = '', ...props }: React.InputHTMLAttributes<HTM
   );
 }
 
+// Split-pane constants (filter panel height range)
+const SPLIT_DEFAULT = 220;
+const SPLIT_MIN     = 140;
+const SPLIT_MAX     = 380;
+
 // ─── Component ─────────────────────────────────────────
 export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate: _n }: GraphicalNetworkAnalysisProps) {
   const [filters, setFilters]             = useState<Filters>({ ...DEFAULT_FILTERS });
-  const [txnTypeOpen, setTxnTypeOpen]     = useState(false);
+
   const [graphVisible, setGraphVisible]   = useState(false);
   const [isLoading, setIsLoading]         = useState(false);
   const [selectedNode, setSelectedNode]   = useState<GNode | null>(null);
   const [activeTab, setActiveTab]         = useState<NodeTab>('Entity Summary');
   const [scale, setScale]                 = useState(1);
   const [translate, setTranslate]         = useState({ x: 0, y: 0 });
+  const [splitPos, setSplitPos]           = useState(SPLIT_DEFAULT);
 
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const isDragging    = useRef(false);
-  const dragMoved     = useRef(false);
-  const dragOrigin    = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const containerRef   = useRef<HTMLDivElement>(null);
+  const isDragging     = useRef(false);
+  const dragMoved      = useRef(false);
+  const dragOrigin     = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const isResizing     = useRef(false);
+  const resizeStartY   = useRef(0);
+  const resizeStartPos = useRef(SPLIT_DEFAULT);
+
+  // Split-pane resize
+  const handleResizerMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizing.current     = true;
+    resizeStartY.current   = e.clientY;
+    resizeStartPos.current = splitPos;
+    document.body.style.cursor     = 'row-resize';
+    document.body.style.userSelect = 'none';
+  };
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = e.clientY - resizeStartY.current;
+      setSplitPos(Math.max(SPLIT_MIN, Math.min(SPLIT_MAX, resizeStartPos.current + delta)));
+    };
+    const onUp = () => {
+      if (!isResizing.current) return;
+      isResizing.current = false;
+      document.body.style.cursor     = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, []);
 
   // Wheel zoom
   useEffect(() => {
@@ -233,13 +274,14 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
   return (
     <div className="flex flex-col h-full overflow-hidden bg-gray-50">
       {/* ═══ Filter Panel ═══════════════════════════════ */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
+      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm overflow-hidden"
+        style={{ height: splitPos }}>
 
         {/* ── Filter fields ── */}
-        <div className="px-5 pt-3 pb-2.5 space-y-2.5">
+        <div className="px-4 pt-3 pb-2.5 space-y-4">
 
-          {/* Row 1: Search + grouped date + grouped amount + txn type + levels */}
-          <div className="flex gap-2.5 items-end w-full">
+          {/* Row 1: Search + Date Range + Amount Range */}
+          <div className="flex gap-4 items-end w-full">
 
             {/* Customer Search */}
             <div className="flex flex-col gap-1 flex-[2.5] min-w-0">
@@ -292,79 +334,76 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 </div>
               </div>
             </div>
-
-            {/* Transaction Type multi-select */}
-            <div className="flex flex-col gap-1 flex-[1.5] min-w-0 relative">
-              <FilterLabel>Transaction Type</FilterLabel>
-              <button
-                onClick={() => setTxnTypeOpen(o => !o)}
-                className="border border-[#d1d5dc] rounded-[8px] px-3 h-[46px] w-full flex items-center justify-between bg-white text-[13px] text-[#161616] cursor-pointer hover:border-[#2a53a0] transition-colors focus:outline-none focus:ring-1 focus:ring-[#2a53a0]">
-                <span className="truncate">
-                  {filters.txnTypes.length === TXN_TYPES.length ? 'All Types' : filters.txnTypes.length > 0 ? `${filters.txnTypes.length} selected` : 'Select…'}
-                </span>
-                <ChevronDown className={cn('w-3.5 h-3.5 text-gray-400 ml-1 flex-shrink-0 transition-transform', txnTypeOpen && 'rotate-180')} />
-              </button>
-              {txnTypeOpen && (
-                <div className="absolute top-full left-0 z-50 bg-white border border-gray-200 rounded-xl shadow-xl mt-1.5 p-2 w-44">
-                  {TXN_TYPES.map(t => (
-                    <label key={t} className="flex items-center gap-2.5 px-2.5 py-2 hover:bg-blue-50 rounded-lg cursor-pointer text-[13px] text-gray-700 transition-colors">
-                      <input type="checkbox" className="accent-[#2A53A0] w-3.5 h-3.5"
-                        checked={filters.txnTypes.includes(t)}
-                        onChange={e => setFilter('txnTypes', e.target.checked ? [...filters.txnTypes, t] : filters.txnTypes.filter(x => x !== t))} />
-                      {t}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* # of Levels */}
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
-              <FilterLabel># of Levels</FilterLabel>
-              <select value={filters.levels} onChange={e => setFilter('levels', Number(e.target.value))}
-                className="border border-[#d1d5dc] bg-white rounded-[8px] px-3 h-[46px] w-full text-[13px] text-[#161616] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#2a53a0] transition-colors appearance-none pr-7"
-                style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 6px center', backgroundSize: '16px' }}>
-                {[1, 2, 3, 4].map(l => <option key={l} value={l}>Level {l}</option>)}
-              </select>
-            </div>
           </div>
 
-          {/* Row 2: Display options */}
-          <div className="flex items-center gap-2.5">
-            <span className="text-[10.5px] font-bold text-[#9ca3af] uppercase tracking-widest flex-shrink-0 whitespace-nowrap">Display</span>
-            <div className="w-px h-3.5 bg-gray-200 flex-shrink-0" />
-            <div className="flex flex-wrap gap-1.5 flex-1">
-              {CHECKBOX_OPTIONS.map(opt => {
-                const checked = filters[opt.key] as boolean;
-                return (
-                  <label key={opt.key} className={cn(
-                    'flex items-center gap-1.5 rounded-full px-3 py-1 text-[11.5px] font-medium cursor-pointer select-none transition-all border',
-                    checked
-                      ? 'bg-[#2A53A0]/8 border-[#2A53A0]/30 text-[#2A53A0]'
-                      : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-600'
-                  )}>
-                    <div className={cn(
-                      'w-3 h-3 rounded flex items-center justify-center flex-shrink-0 border transition-colors',
-                      checked ? 'bg-[#2A53A0] border-[#2A53A0]' : 'border-gray-300 bg-white'
-                    )}>
-                      {checked && (
-                        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 10 10">
-                          <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </div>
-                    <input type="checkbox" className="sr-only"
-                      checked={checked}
-                      onChange={e => setFilter(opt.key, e.target.checked)} />
-                    {opt.label}
-                  </label>
-                );
-              })}
+          {/* Row 2: Transaction Type + # of Levels + Graph Display Settings (Carbon DS) */}
+          <div className="flex gap-4 items-end w-full">
+
+            {/* Transaction Type — Carbon MultiSelect */}
+            <div className="flex flex-col gap-1 flex-[1.5] min-w-0">
+              <FilterLabel>Transaction Type</FilterLabel>
+              <div className="carbon-field-border">
+                <MultiSelect
+                  id="txn-types"
+                  className="filter-carbon"
+                  titleText=""
+                  hideLabel
+                  label="All Types"
+                  items={TXN_TYPES as any}
+                  itemToString={(item: any) => item || ''}
+                  selectedItems={filters.txnTypes as any}
+                  onChange={({ selectedItems }: any) =>
+                    setFilter('txnTypes', selectedItems as TxnType[])
+                  }
+                />
+              </div>
+            </div>
+
+            {/* # of Levels — Carbon Dropdown */}
+            <div className="flex flex-col gap-1 flex-1 min-w-0">
+              <FilterLabel># of Levels</FilterLabel>
+              <div className="carbon-field-border">
+                <Dropdown
+                  id="levels"
+                  className="filter-carbon"
+                  titleText=""
+                  label=""
+                  items={LEVEL_ITEMS as any}
+                  itemToString={(item: any) => item ? item.label : ''}
+                  selectedItem={LEVEL_ITEMS.find(l => l.id === filters.levels) as any}
+                  onChange={({ selectedItem }: any) => {
+                    if (selectedItem) setFilter('levels', selectedItem.id);
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Graph Display Settings — Carbon MultiSelect */}
+            <div className="flex flex-col gap-1 flex-[3] min-w-0">
+              <FilterLabel>Graph Display Settings</FilterLabel>
+              <div className="carbon-field-border">
+                <MultiSelect
+                  id="display-settings"
+                  className="filter-carbon"
+                  titleText=""
+                  hideLabel
+                  label="Select display options..."
+                  items={DISPLAY_ITEMS as any}
+                  itemToString={(item: any) => item ? item.label : ''}
+                  selectedItems={DISPLAY_ITEMS.filter(item =>
+                    filters[item.id as keyof Filters] as boolean
+                  ) as any}
+                  onChange={({ selectedItems }: any) => {
+                    const ids = new Set((selectedItems as typeof DISPLAY_ITEMS).map(i => i.id));
+                    CHECKBOX_OPTIONS.forEach(o => setFilter(o.key, ids.has(o.key)));
+                  }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Row 3: Action buttons */}
-          <div className="flex items-center gap-2 pt-0.5 pb-0.5">
+          <div className="flex items-center justify-end gap-4 pt-0.5 pb-0.5">
             <button onClick={handleViewNetwork} disabled={!filters.customerSearch.trim() || isLoading}
               className="bg-[#2A53A0] hover:bg-[#1f3d7a] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-[8px] px-5 h-[40px] text-[13px] font-semibold flex items-center gap-2 transition-colors shadow-sm">
               {isLoading
@@ -380,6 +419,18 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
             </button>
           </div>
 
+        </div>
+      </div>
+
+      {/* ═══ Split-pane resizer ══════════════════════════ */}
+      <div
+        className="flex-shrink-0 h-[6px] bg-gray-100 border-y border-gray-200 cursor-row-resize hover:bg-blue-50 hover:border-blue-200 transition-colors flex items-center justify-center select-none group"
+        onMouseDown={handleResizerMouseDown}
+      >
+        <div className="flex gap-[3px] opacity-40 group-hover:opacity-90 transition-opacity">
+          {[0,1,2,3,4].map(i => (
+            <div key={i} className="w-[3px] h-[3px] rounded-full bg-gray-500 group-hover:bg-blue-500" />
+          ))}
         </div>
       </div>
 
@@ -609,7 +660,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
           {selectedNode && (
             <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-              className="absolute top-0 right-0 h-full w-[320px] bg-white border-l border-gray-200 shadow-2xl z-30 flex flex-col">
+              className="absolute top-0 right-0 h-full w-[420px] bg-white border-l border-gray-200 shadow-2xl z-30 flex flex-col">
 
               {/* Panel header */}
               <div className="px-4 py-4 border-b border-gray-100 flex-shrink-0">
