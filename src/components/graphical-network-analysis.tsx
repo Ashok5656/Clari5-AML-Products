@@ -43,12 +43,12 @@ const DEFAULT_FILTERS: Filters = {
   highlightAlerted: true, showCommonLinks: true, showNonCustomers: true,
 };
 const CHECKBOX_OPTIONS: { key: keyof Filters; label: string }[] = [
-  { key: 'showPEP',           label: 'Display PEP / Adverse Match' },
-  { key: 'showSanction',      label: 'Display Sanction Match' },
-  { key: 'showHighRiskJuris', label: 'High Risk Jurisdictions' },
-  { key: 'highlightAlerted',  label: 'Highlight Alerted Txns' },
-  { key: 'showCommonLinks',   label: 'Show Common Links' },
-  { key: 'showNonCustomers',  label: 'Customer & Non-Customer Links' },
+  { key: 'showPEP',           label: 'PEP / Adverse' },
+  { key: 'showSanction',      label: 'Sanction Match' },
+  { key: 'showHighRiskJuris', label: 'High Risk Country' },
+  { key: 'highlightAlerted',  label: 'Highlight Alerted' },
+  { key: 'showCommonLinks',   label: 'Common Links' },
+  { key: 'showNonCustomers',  label: 'Non-Customer Links' },
 ];
 const DISPLAY_ITEMS = CHECKBOX_OPTIONS.map(o => ({ id: o.key, label: o.label }));
 const LEVEL_ITEMS = [1, 2, 3, 4].map(l => ({ id: l, label: `Level ${l}` }));
@@ -163,11 +163,6 @@ function FilterInput({ className = '', ...props }: React.InputHTMLAttributes<HTM
   );
 }
 
-// Split-pane constants (filter panel height range)
-const SPLIT_DEFAULT = 260;
-const SPLIT_MIN     = 160;
-const SPLIT_MAX     = 440;
-
 // ─── Component ─────────────────────────────────────────
 export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate: _n }: GraphicalNetworkAnalysisProps) {
   const [filters, setFilters]             = useState<Filters>({ ...DEFAULT_FILTERS });
@@ -178,45 +173,13 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
   const [activeTab, setActiveTab]         = useState<NodeTab>('Entity Summary');
   const [scale, setScale]                 = useState(1);
   const [translate, setTranslate]         = useState({ x: 0, y: 0 });
-  const [splitPos, setSplitPos]           = useState(SPLIT_DEFAULT);
+  const [filterEditMode, setFilterEditMode] = useState(true);
 
-  const containerRef   = useRef<HTMLDivElement>(null);
-  const svgRef         = useRef<SVGSVGElement>(null);
-  const isDragging     = useRef(false);
-  const dragMoved      = useRef(false);
-  const dragOrigin     = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
-  const isResizing     = useRef(false);
-  const resizeStartY   = useRef(0);
-  const resizeStartPos = useRef(SPLIT_DEFAULT);
-
-  // Split-pane resize
-  const handleResizerMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    isResizing.current     = true;
-    resizeStartY.current   = e.clientY;
-    resizeStartPos.current = splitPos;
-    document.body.style.cursor     = 'row-resize';
-    document.body.style.userSelect = 'none';
-  };
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!isResizing.current) return;
-      const delta = e.clientY - resizeStartY.current;
-      setSplitPos(Math.max(SPLIT_MIN, Math.min(SPLIT_MAX, resizeStartPos.current + delta)));
-    };
-    const onUp = () => {
-      if (!isResizing.current) return;
-      isResizing.current = false;
-      document.body.style.cursor     = '';
-      document.body.style.userSelect = '';
-    };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef       = useRef<SVGSVGElement>(null);
+  const isDragging   = useRef(false);
+  const dragMoved    = useRef(false);
+  const dragOrigin   = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
 
   // Wheel zoom
   useEffect(() => {
@@ -276,7 +239,12 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
   const handleViewNetwork = () => {
     if (!filters.customerSearch.trim()) return;
     setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); setGraphVisible(true); setSelectedNode(null); }, 1500);
+    setTimeout(() => {
+      setIsLoading(false);
+      setGraphVisible(true);
+      setSelectedNode(null);
+      setFilterEditMode(false);
+    }, 1500);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -322,11 +290,52 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-gray-50">
-      {/* ═══ Filter Panel ═══════════════════════════════ */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm overflow-hidden"
-        style={{ height: splitPos }}>
+      {/* ═══ Filter Summary (read-only) ════════════════ */}
+      {graphVisible && !filterEditMode && (
+        <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
+          <div className="px-4 py-2.5 flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-1 flex-wrap min-w-0">
+              {[
+                { label: 'Customer', value: filters.customerSearch },
+                { label: 'Date',     value: `${filters.dateFrom} → ${filters.dateTo}` },
+                { label: 'Amount',   value: `₹${filters.amountMin} – ₹${filters.amountMax}` },
+                { label: 'Types',    value: filters.txnTypes.length === TXN_TYPES.length ? 'All Types' : filters.txnTypes.slice(0, 3).join(', ') + (filters.txnTypes.length > 3 ? ` +${filters.txnTypes.length - 3}` : '') },
+                { label: 'Level',    value: `Level ${filters.levels}` },
+              ].map(chip => (
+                <div key={chip.label} className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1">
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{chip.label}:</span>
+                  <span className="text-[11.5px] font-medium text-gray-700">{chip.value}</span>
+                </div>
+              ))}
+              {/* Active display settings */}
+              {(() => {
+                const active = CHECKBOX_OPTIONS.filter(o => filters[o.key as keyof Filters]);
+                if (!active.length) return null;
+                return (
+                  <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1">
+                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Display:</span>
+                    <span className="text-[11.5px] font-medium text-gray-700">
+                      {active.slice(0, 2).map(o => o.label).join(', ')}{active.length > 2 ? ` +${active.length - 2}` : ''}
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+            <button
+              onClick={() => setFilterEditMode(true)}
+              className="flex-shrink-0 flex items-center gap-1.5 border border-[#2A53A0] text-[#2A53A0] bg-white hover:bg-blue-50 rounded-[6px] px-3 h-[30px] text-[12px] font-semibold transition-colors">
+              <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5z" />
+              </svg>
+              Edit Filters
+            </button>
+          </div>
+        </div>
+      )}
 
-        {/* ── Filter fields ── */}
+      {/* ═══ Filter Edit Form ════════════════════════════ */}
+      {(!graphVisible || filterEditMode) && (
+      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
         <div className="px-4 pt-3 pb-2.5 space-y-4">
 
           {/* Row 1: Search + Date Range + Amount Range */}
@@ -385,11 +394,11 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
             </div>
           </div>
 
-          {/* Row 2: Transaction Type + # of Levels + Graph Display Settings (Carbon DS) */}
-          <div className="flex gap-4 items-start w-full">
+          {/* Row 2: Transaction Type + # of Levels + Graph Display Settings */}
+          <div className="flex gap-3 items-center w-full">
 
             {/* Transaction Type — Carbon MultiSelect */}
-            <div className="flex flex-col gap-1 flex-[1.5] min-w-0">
+            <div className="flex flex-col gap-1 flex-[1] min-w-0">
               <FilterLabel>Transaction Type</FilterLabel>
               <div className="carbon-field-border">
                 <MultiSelect
@@ -409,7 +418,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
             </div>
 
             {/* # of Levels — Carbon Dropdown */}
-            <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <div className="flex flex-col gap-1 flex-[1] min-w-0">
               <FilterLabel># of Levels</FilterLabel>
               <div className="carbon-field-border">
                 <Dropdown
@@ -427,19 +436,19 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               </div>
             </div>
 
-            {/* Graph Display Settings — inline checklist */}
-            <div className="flex flex-col gap-1 flex-[3] min-w-0">
+            {/* Graph Display Settings — single-row checklist */}
+            <div className="flex flex-col gap-1 flex-[4] min-w-0">
               <FilterLabel>Graph Display Settings</FilterLabel>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 border border-[#d1d5dc] rounded-[8px] bg-white px-3 py-2">
+              <div className="flex flex-row flex-nowrap gap-x-3 border border-[#d1d5dc] rounded-[8px] bg-white px-3 h-[46px] items-center w-full justify-between">
                 {CHECKBOX_OPTIONS.map(opt => (
-                  <label key={opt.key} className="flex items-center gap-1.5 cursor-pointer select-none min-w-0">
+                  <label key={opt.key} className="flex items-center gap-1 cursor-pointer select-none whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={filters[opt.key] as boolean}
                       onChange={e => setFilter(opt.key, e.target.checked)}
-                      className="w-3.5 h-3.5 rounded flex-shrink-0 accent-[#2A53A0]"
+                      className="w-3 h-3 rounded flex-shrink-0 accent-[#2A53A0]"
                     />
-                    <span className="text-[12px] text-[#374151] leading-tight truncate">{opt.label}</span>
+                    <span className="text-[11px] text-[#374151] leading-tight">{opt.label}</span>
                   </label>
                 ))}
               </div>
@@ -457,26 +466,21 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               }
               View Network Links
             </button>
-            <button onClick={() => { setFilters({ ...DEFAULT_FILTERS }); setGraphVisible(false); setSelectedNode(null); }}
+            <button onClick={() => { setFilters({ ...DEFAULT_FILTERS }); setGraphVisible(false); setSelectedNode(null); setFilterEditMode(true); }}
               className="bg-white border border-[#d1d5dc] hover:bg-gray-50 text-[#374151] rounded-[8px] px-5 h-[40px] text-[13px] font-semibold transition-colors">
               Reset Filters
             </button>
+            {graphVisible && filterEditMode && (
+              <button onClick={() => setFilterEditMode(false)}
+                className="bg-white border border-[#d1d5dc] hover:bg-gray-50 text-[#374151] rounded-[8px] px-5 h-[40px] text-[13px] font-semibold transition-colors">
+                Cancel
+              </button>
+            )}
           </div>
 
         </div>
       </div>
-
-      {/* ═══ Split-pane resizer ══════════════════════════ */}
-      <div
-        className="flex-shrink-0 h-[6px] bg-gray-100 border-y border-gray-200 cursor-row-resize hover:bg-blue-50 hover:border-blue-200 transition-colors flex items-center justify-center select-none group"
-        onMouseDown={handleResizerMouseDown}
-      >
-        <div className="flex gap-[3px] opacity-40 group-hover:opacity-90 transition-opacity">
-          {[0,1,2,3,4].map(i => (
-            <div key={i} className="w-[3px] h-[3px] rounded-full bg-gray-500 group-hover:bg-blue-500" />
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* ═══ Graph Canvas ════════════════════════════════ */}
       <div className="flex-1 relative overflow-hidden bg-white" ref={containerRef}
@@ -714,16 +718,19 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 {btn.icon}
               </button>
             ))}
-            {/* Export Graph */}
-            <div className="w-px h-3 bg-gray-200 mx-auto" />
-            <button onClick={exportGraph} title="Export graph as PNG"
-              className="w-8 h-8 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-lg text-gray-600 flex items-center justify-center transition-colors shadow-sm">
-              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M8 2v8M5 7l3 4 3-4" />
-                <path d="M3 13h10" />
-              </svg>
-            </button>
           </div>
+        )}
+
+        {/* ── Export Button (top-right) ──────────────── */}
+        {graphVisible && (
+          <button onClick={exportGraph} title="Export graph as PNG"
+            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-lg px-3 h-8 text-[12px] font-medium text-gray-600 transition-colors shadow-sm">
+            <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 2v8M5 7l3 4 3-4" />
+              <path d="M3 13h10" />
+            </svg>
+            Export
+          </button>
         )}
 
         {/* ═══ Node Detail Panel ═══════════════════════ */}
