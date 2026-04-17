@@ -109,17 +109,17 @@ const MOCK_NODES: GNode[] = [
   { id: 'l2-top',     label: 'Trade Corp',      subLabel: '',              icon: '🏢', level: 2, riskLevel: 'LOW', badges: [],                   x: 390, y: 58,  customerId: '—', entityType: 'Corporate',   address: '—', email: '—', contact: '—', totalTxnAmount: '—', incoming: '—', outgoing: '—' },
 ];
 const MOCK_EDGES: GEdge[] = [
-  { source: 'focal', target: 'l1-left',    type: 'normal',        amount: '₹12.5L', direction: 'both', strokeWidth: 3.5 },
-  { source: 'focal', target: 'l1-right',   type: 'normal',        amount: '₹8.2L',  direction: 'out',  strokeWidth: 4.5 },
-  { source: 'focal', target: 'l1-bottom',  type: 'alerted',       amount: '₹45L',   direction: 'out',  strokeWidth: 4 },
-  { source: 'focal', target: 'l1-topleft', type: 'normal',        amount: '₹3.4L',  direction: 'in',   strokeWidth: 3 },
-  { source: 'focal', target: 'l1-topright',type: 'normal',        amount: '₹22L',   direction: 'in',   strokeWidth: 2.5 },
-  { source: 'l1-left', target: 'l1-bottom',type: 'commonContact', strokeWidth: 1.5 },
-  { source: 'l1-topleft',  target: 'l2-tl',  type: 'normal', strokeWidth: 1.2 },
-  { source: 'l1-topright', target: 'l2-tr',  type: 'normal', strokeWidth: 1.2 },
-  { source: 'l1-right',    target: 'l2-br',  type: 'normal', strokeWidth: 1.2 },
-  { source: 'l1-left',     target: 'l2-bl',  type: 'normal', strokeWidth: 1.2 },
-  { source: 'l1-topleft',  target: 'l2-top', type: 'normal', strokeWidth: 1.2 },
+  { source: 'focal',       target: 'l1-left',    type: 'normal',       amount: '₹12.5L', direction: 'both', strokeWidth: 3   },
+  { source: 'focal',       target: 'l1-right',   type: 'normal',       amount: '₹8.2L',  direction: 'out',  strokeWidth: 2.5 },
+  { source: 'focal',       target: 'l1-bottom',  type: 'alerted',      amount: '₹45L',   direction: 'out',  strokeWidth: 5   },
+  { source: 'focal',       target: 'l1-topleft', type: 'normal',       amount: '₹3.4L',  direction: 'in',   strokeWidth: 2   },
+  { source: 'focal',       target: 'l1-topright',type: 'normal',       amount: '₹22L',   direction: 'in',   strokeWidth: 3.5 },
+  { source: 'l1-left',     target: 'l1-bottom',  type: 'commonContact',                                    strokeWidth: 1.5 },
+  { source: 'l1-topleft',  target: 'l2-tl',      type: 'normal',       amount: '₹2L',    direction: 'out',  strokeWidth: 1.5 },
+  { source: 'l1-topright', target: 'l2-tr',      type: 'normal',       amount: '₹5L',    direction: 'in',   strokeWidth: 2   },
+  { source: 'l1-right',    target: 'l2-br',      type: 'normal',       amount: '₹3L',    direction: 'out',  strokeWidth: 1.5 },
+  { source: 'l1-left',     target: 'l2-bl',      type: 'normal',       amount: '₹4L',    direction: 'in',   strokeWidth: 2   },
+  { source: 'l1-topleft',  target: 'l2-top',     type: 'normal',       amount: '₹1.5L',  direction: 'both', strokeWidth: 1.5 },
 ];
 
 // ─── Helpers ────────────────────────────────────────────
@@ -129,6 +129,18 @@ function riskTextDark(r: RiskLevel){ return r === 'HIGH' ? '#b91c1c' : r === 'ME
 function nodeR(l: 0 | 1 | 2)      { return l === 0 ? 34 : l === 1 ? 27 : 18; }
 function edgeColor(t: EdgeType)    { return t === 'normal' ? '#2563eb' : t === 'alerted' ? '#dc2626' : t === 'commonContact' ? '#d97706' : t === 'commonIP' ? '#7c3aed' : '#059669'; }
 function edgeDash(t: EdgeType)     { return (t === 'commonContact' || t === 'commonIP' || t === 'relatedParty') ? '6,4' : undefined; }
+
+function amountToStrokeWidth(amount?: string): number {
+  if (!amount) return 1.5;
+  const m = amount.match(/(\d+(?:\.\d+)?)\s*L/);
+  if (!m) return 1.5;
+  const l = parseFloat(m[1]);
+  if (l <= 3)  return 2;
+  if (l <= 8)  return 2.5;
+  if (l <= 15) return 3;
+  if (l <= 30) return 3.5;
+  return 5;
+}
 
 function calcEdgeEndpoints(src: GNode, tgt: GNode) {
   const dx = tgt.x - src.x, dy = tgt.y - src.y;
@@ -152,9 +164,9 @@ function FilterInput({ className = '', ...props }: React.InputHTMLAttributes<HTM
 }
 
 // Split-pane constants (filter panel height range)
-const SPLIT_DEFAULT = 220;
-const SPLIT_MIN     = 140;
-const SPLIT_MAX     = 380;
+const SPLIT_DEFAULT = 260;
+const SPLIT_MIN     = 160;
+const SPLIT_MAX     = 440;
 
 // ─── Component ─────────────────────────────────────────
 export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate: _n }: GraphicalNetworkAnalysisProps) {
@@ -169,6 +181,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
   const [splitPos, setSplitPos]           = useState(SPLIT_DEFAULT);
 
   const containerRef   = useRef<HTMLDivElement>(null);
+  const svgRef         = useRef<SVGSVGElement>(null);
   const isDragging     = useRef(false);
   const dragMoved      = useRef(false);
   const dragOrigin     = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
@@ -234,6 +247,32 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
     setTranslate({ x: (width - 780 * s) / 2, y: (height - 440 * s) / 2 });
   };
 
+  const exportGraph = () => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svg);
+    const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const rect = svg.getBoundingClientRect();
+      canvas.width  = rect.width  || 800;
+      canvas.height = rect.height || 500;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.download = 'network-graph.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = url;
+  };
+
   const handleViewNetwork = () => {
     if (!filters.customerSearch.trim()) return;
     setIsLoading(true);
@@ -265,9 +304,19 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
   const setFilter = <K extends keyof Filters>(k: K, v: Filters[K]) =>
     setFilters(f => ({ ...f, [k]: v }));
 
-  const visibleEdges = MOCK_EDGES.filter(e =>
-    filters.showCommonLinks || (e.type !== 'commonContact' && e.type !== 'commonIP' && e.type !== 'relatedParty')
+  const nonCustomerIds = new Set(
+    MOCK_NODES
+      .filter(n => n.subLabel === 'Non-Customer')
+      .map(n => n.id)
   );
+  const visibleNodes = MOCK_NODES.filter(n =>
+    filters.showNonCustomers || !nonCustomerIds.has(n.id)
+  );
+  const visibleEdges = MOCK_EDGES.filter(e => {
+    if (!filters.showCommonLinks && (e.type === 'commonContact' || e.type === 'commonIP' || e.type === 'relatedParty')) return false;
+    if (!filters.showNonCustomers && (nonCustomerIds.has(e.source) || nonCustomerIds.has(e.target))) return false;
+    return true;
+  });
   const resolvedEdgeType = (e: GEdge): EdgeType =>
     !filters.highlightAlerted && e.type === 'alerted' ? 'normal' : e.type;
 
@@ -337,7 +386,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
           </div>
 
           {/* Row 2: Transaction Type + # of Levels + Graph Display Settings (Carbon DS) */}
-          <div className="flex gap-4 items-end w-full">
+          <div className="flex gap-4 items-start w-full">
 
             {/* Transaction Type — Carbon MultiSelect */}
             <div className="flex flex-col gap-1 flex-[1.5] min-w-0">
@@ -378,26 +427,21 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               </div>
             </div>
 
-            {/* Graph Display Settings — Carbon MultiSelect */}
+            {/* Graph Display Settings — inline checklist */}
             <div className="flex flex-col gap-1 flex-[3] min-w-0">
               <FilterLabel>Graph Display Settings</FilterLabel>
-              <div className="carbon-field-border">
-                <MultiSelect
-                  id="display-settings"
-                  className="filter-carbon"
-                  titleText=""
-                  hideLabel
-                  label="Select display options..."
-                  items={DISPLAY_ITEMS as any}
-                  itemToString={(item: any) => item ? item.label : ''}
-                  selectedItems={DISPLAY_ITEMS.filter(item =>
-                    filters[item.id as keyof Filters] as boolean
-                  ) as any}
-                  onChange={({ selectedItems }: any) => {
-                    const ids = new Set((selectedItems as typeof DISPLAY_ITEMS).map(i => i.id));
-                    CHECKBOX_OPTIONS.forEach(o => setFilter(o.key, ids.has(o.key)));
-                  }}
-                />
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 border border-[#d1d5dc] rounded-[8px] bg-white px-3 py-2">
+                {CHECKBOX_OPTIONS.map(opt => (
+                  <label key={opt.key} className="flex items-center gap-1.5 cursor-pointer select-none min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={filters[opt.key] as boolean}
+                      onChange={e => setFilter(opt.key, e.target.checked)}
+                      className="w-3.5 h-3.5 rounded flex-shrink-0 accent-[#2A53A0]"
+                    />
+                    <span className="text-[12px] text-[#374151] leading-tight truncate">{opt.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </div>
@@ -471,14 +515,19 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
 
         {/* SVG Network Graph */}
         {graphVisible && (
-          <svg className="absolute inset-0 w-full h-full"
+          <svg ref={svgRef} className="absolute inset-0 w-full h-full"
             style={{ cursor: isDragging.current ? 'grabbing' : 'grab', userSelect: 'none' }}>
             <defs>
-              {/* Arrow markers */}
+              {/* Arrow markers — end (outgoing) and start (incoming) */}
               {[['blue','#2563eb'],['red','#dc2626'],['amber','#d97706'],['purple','#7c3aed'],['green','#059669']].map(([id, color]) => (
-                <marker key={id} id={`arrow-${id}`} markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
-                  <path d="M0,0 L0,7 L7,3.5 z" fill={color} opacity="0.9" />
-                </marker>
+                <React.Fragment key={id}>
+                  <marker id={`arrow-${id}`} markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+                    <path d="M0,0 L0,7 L7,3.5 z" fill={color} opacity="0.9" />
+                  </marker>
+                  <marker id={`arrow-start-${id}`} markerWidth="7" markerHeight="7" refX="1.5" refY="3.5" orient="auto-start-reverse">
+                    <path d="M0,0 L0,7 L7,3.5 z" fill={color} opacity="0.9" />
+                  </marker>
+                </React.Fragment>
               ))}
               {/* Drop shadow for nodes */}
               <filter id="node-shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -502,19 +551,21 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 const mx    = (src.x + tgt.x) / 2;
                 const my    = (src.y + tgt.y) / 2;
                 const markerKey: Record<EdgeType, string> = { normal: 'blue', alerted: 'red', commonContact: 'amber', commonIP: 'purple', relatedParty: 'green' };
-                const marker = edge.direction ? `url(#arrow-${markerKey[type]})` : undefined;
+                const sw = amountToStrokeWidth(edge.amount) || edge.strokeWidth;
+                const markerEnd   = (edge.direction === 'out'  || edge.direction === 'both') ? `url(#arrow-${markerKey[type]})` : undefined;
+                const markerStart = (edge.direction === 'in'   || edge.direction === 'both') ? `url(#arrow-start-${markerKey[type]})` : undefined;
 
                 return (
                   <g key={i}>
                     {/* Edge glow for alerted */}
                     {type === 'alerted' && (
                       <line x1={ep.x1} y1={ep.y1} x2={ep.x2} y2={ep.y2}
-                        stroke="#dc2626" strokeWidth={edge.strokeWidth + 5} opacity={0.08} />
+                        stroke="#dc2626" strokeWidth={sw + 5} opacity={0.08} />
                     )}
                     <line x1={ep.x1} y1={ep.y1} x2={ep.x2} y2={ep.y2}
-                      stroke={color} strokeWidth={edge.strokeWidth}
+                      stroke={color} strokeWidth={sw}
                       strokeDasharray={dash} opacity={0.85}
-                      markerEnd={marker} />
+                      markerEnd={markerEnd} markerStart={markerStart} />
                     {/* Amount label */}
                     {edge.amount && (
                       <g>
@@ -537,7 +588,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               })}
 
               {/* Nodes */}
-              {MOCK_NODES.map(node => {
+              {visibleNodes.map(node => {
                 const r           = nodeR(node.level);
                 const borderColor = riskBorder(node.riskLevel);
                 const bgColor     = riskBg(node.riskLevel);
@@ -628,9 +679,20 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               <div className="flex flex-wrap gap-x-4 gap-y-1.5">
                 {LEGEND_EDGES.map(l => (
                   <div key={l.label} className="flex items-center gap-1.5">
-                    <div className="w-6 h-0" style={{
-                      borderTop: l.dashed ? `2px dashed ${l.color}` : `2.5px solid ${l.color}`,
-                    }} />
+                    {l.dashed ? (
+                      <div className="w-6 h-0" style={{ borderTop: `2px dashed ${l.color}` }} />
+                    ) : (
+                      <svg width="24" height="10" viewBox="0 0 24 10">
+                        <defs>
+                          <marker id={`leg-arrow-${l.label.replace(/\s/g,'')}`} markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+                            <path d="M0,0 L0,5 L5,2.5 z" fill={l.color} />
+                          </marker>
+                        </defs>
+                        <line x1="0" y1="5" x2="18" y2="5"
+                          stroke={l.color} strokeWidth="2"
+                          markerEnd={`url(#leg-arrow-${l.label.replace(/\s/g,'')})`} />
+                      </svg>
+                    )}
                     <span className="text-[10px] text-gray-600 font-medium">{l.label}</span>
                   </div>
                 ))}
@@ -652,6 +714,15 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 {btn.icon}
               </button>
             ))}
+            {/* Export Graph */}
+            <div className="w-px h-3 bg-gray-200 mx-auto" />
+            <button onClick={exportGraph} title="Export graph as PNG"
+              className="w-8 h-8 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 rounded-lg text-gray-600 flex items-center justify-center transition-colors shadow-sm">
+              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M8 2v8M5 7l3 4 3-4" />
+                <path d="M3 13h10" />
+              </svg>
+            </button>
           </div>
         )}
 
