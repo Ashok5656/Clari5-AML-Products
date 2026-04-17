@@ -374,7 +374,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
               <FilterLabel>Amount Range</FilterLabel>
               <div className="flex items-center gap-1.5">
                 <div className="relative flex-1 min-w-0">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">$</span>
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">₹</span>
                   <FilterInput
                     type="number" placeholder="Min"
                     value={filters.amountMin}
@@ -383,7 +383,7 @@ export function GraphicalNetworkAnalysis({ breadcrumbs: _b, onBreadcrumbNavigate
                 </div>
                 <span className="text-[#c4c9d4] text-[15px] select-none flex-shrink-0 font-light">—</span>
                 <div className="relative flex-1 min-w-0">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">$</span>
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-[#9ca3af] font-medium select-none pointer-events-none">₹</span>
                   <FilterInput
                     type="number" placeholder="Max"
                     value={filters.amountMax}
